@@ -1,0 +1,45 @@
+name: Test and deploy user.yaml files
+
+on: workflow_call
+
+jobs:
+  run_tests:
+    name: Test user.yaml files
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2.4.0
+    - name: Set up Python
+      uses: actions/setup-python@v2.3.1
+      with:
+        python-version: 3.6
+    - name: Install dependencies
+      run: |
+        pip install gen3users
+        pip install pyyaml==5.4
+    - name: Lint files
+      run: |
+        cat - > lint.py <<EOM
+        import os
+        import yaml
+
+        def lint():
+            for commons in os.listdir("./users"):
+                with open(os.path.join("users", commons, "user.yaml"), "r") as f:
+                    data = yaml.safe_load(f)
+                # pyyaml auto sort
+                with open(os.path.join("users", commons, "user.yaml"), "w") as f:
+                    yaml.dump(data, f)
+
+        lint()
+        EOM
+        python lint.py
+        rm lint.py
+    - name: Run tests
+      run: |
+        gen3users validate users/*/user.yaml
+    # - name: Deploy to S3
+    #   if: github.ref == 'refs/heads/master'
+# ^ TODO: deploy; need AWS creds. Once done:
+# - delete travis files in user.yaml repos
+# - delete lint.py files in user.yaml repos
