@@ -1,10 +1,23 @@
 name: Test and deploy user.yaml files
 
-on: workflow_call
+on:
+  workflow_call:
+    inputs:
+      BUCKET:
+        required: true
+        type: string
+      REGION:
+        required: true
+        type: string
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
 
 jobs:
   run_tests:
-    name: Test user.yaml files
+    name: Test and deploy
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
@@ -36,10 +49,13 @@ jobs:
         python lint.py
         rm lint.py
     - name: Run tests
-      run: |
-        gen3users validate users/*/user.yaml
-    # - name: Deploy to S3
-    #   if: github.ref == 'refs/heads/master'
-# ^ TODO: deploy; need AWS creds. Once done:
-# - delete travis files in user.yaml repos
-# - delete lint.py files in user.yaml repos
+      run: gen3users validate users/*/user.yaml
+    - name: Install AWS CLI
+      if: github.ref == 'refs/heads/master'
+      uses: chrislennon/action-aws-cli@1.1
+    - name: Deploy to S3
+      if: github.ref == 'refs/heads/master'
+      run: aws s3 cp users s3://${{ inputs.BUCKET }}/ --recursive --region ${{ inputs.REGION }}
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
