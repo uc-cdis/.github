@@ -11,7 +11,15 @@ on:
         required: false
         type: string
         default: "us-east-1"
-      
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      QUAY_USERNAME:
+        required: true
+      QUAY_ROBOT_TOKEN:
+        required: true
 
 jobs:
   ci:
