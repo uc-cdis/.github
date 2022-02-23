@@ -1,0 +1,39 @@
+name: Build Image and Push to Quay
+
+on:
+  workflow_call:
+    inputs:
+      DOCKERFILE_LOCATION:
+        required: false
+        type: string
+        default: "./Dockerfile"
+    secrets:
+      REGISTRY:
+        required: true
+      REGISTRY_USER:
+        required: true
+      REGISTRY_PASSWORD:
+        required: true
+
+jobs:
+  ci:
+    name: Build Image and Push to Quay
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build Image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: image-gh-action
+          tags: v1
+          containerfiles: |
+            ${{ inputs.DOCKERFILE_LOCATION }}
+      - name: Push To repository
+           id: push-to-quay
+           uses: redhat-actions/push-to-registry@v2
+           with:
+             image: ${{ steps.build-image.outputs.image }}
+             tags: ${{ steps.build-image.outputs.tags }}
+             registry: ${{ secrets.REGISTRY}}
+             username: ${{ secrets.REGISTRY_USER}}
+             password: ${{ secrets.REGISTRY_PASSWORD }}
