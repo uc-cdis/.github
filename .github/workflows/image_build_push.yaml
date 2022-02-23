@@ -55,7 +55,7 @@ jobs:
       - name: Set Variables
         shell: bash
         run: |
-          echo "IMAGE_TAG=$(echo $GITHUB_REF_NAME | sed 's/\//_/')" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$(echo $GITHUB_REF_NAME | sed 's/\//_/' | sed -e 's/:refs//')" >> $GITHUB_ENV
           echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}' | sed -e 's/:refs//')" >> $GITHUB_ENV
 
       - name: Build and push
@@ -68,5 +68,5 @@ jobs:
           tags: |
             gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
             quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
-          cache-from: type=registry,ref=quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
-          cache-to: type=inline
+          # cache-from: type=registry,ref=quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
+          # cache-to: type=inline
