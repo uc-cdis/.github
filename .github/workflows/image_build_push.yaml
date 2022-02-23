@@ -13,13 +13,13 @@ on:
         default: "us-east-1"
     secrets:
       AWS_ACCESS_KEY_ID:
-        required: true
+        required: false
       AWS_SECRET_ACCESS_KEY:
-        required: true
+        required: false
       QUAY_USERNAME:
-        required: true
+        required: false
       QUAY_ROBOT_TOKEN:
-        required: true
+        required: false
       
 
 jobs:
