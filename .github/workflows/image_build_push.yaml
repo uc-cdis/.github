@@ -11,6 +11,10 @@ on:
         required: false
         type: string
         default: "us-east-1"
+      AWS_ECR_REGISTRY:
+        required: false
+        type: string
+        default: "707767160287.dkr.ecr.us-east-1.amazonaws.com"
     secrets:
       ECR_AWS_ACCESS_KEY_ID:
         required: true
@@ -35,10 +39,10 @@ jobs:
           password: ${{ secrets.QUAY_ROBOT_TOKEN }}
 
       # https://github.com/docker/login-action#aws-public-elastic-container-registry-ecr
-      - name: Login to Public ECR
+      - name: Login to ECR
         uses: docker/login-action@v1
         with:
-          registry: public.ecr.aws
+          registry: ${{ inputs.AWS_ECR_REGISTRY }}
           username: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
           password: ${{ secrets.ECR_AWS_SECRET_ACCESS_KEY }}
         env:
