@@ -37,17 +37,9 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v2
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-
-      - name: Build Image
-        id: build-image
-        uses: redhat-actions/buildah-build@v2
-        with:
-          image: image-gh-action
-          tags: v1
-          containerfiles: |
-            ${{ inputs.DOCKERFILE_LOCATION }}
 
       - name: Set Variables
         shell: bash
