@@ -11,6 +11,10 @@ on:
         required: false
         type: string
         default: "us-east-1"
+      ORG_AND_REPO_NAME:
+        required: false
+        type: string
+        default: ${{ GITHUB_REPOSITORY }}
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -73,5 +77,7 @@ jobs:
           push: true
           # https://docs.github.com/en/actions/learn-github-actions/expressions#format
           tags: |
-            user/app:${{ IMAGE_TAG }}
-            quay.io/uc-cdis/:${{ IMAGE_TAG }}
+            ${{ inputs.ORG_AND_REPO_NAME }}:${{ IMAGE_TAG }}
+            quay.io/${{ inputs.ORG_AND_REPO_NAME }}:${{ IMAGE_TAG }}
+          cache-from: type=registry,ref=quay.io/cdis/covid19-notebook-etl:${{ steps.extract_branch.outputs.branch }}
+          cache-to: type=inline
