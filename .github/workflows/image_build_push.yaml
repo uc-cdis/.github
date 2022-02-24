@@ -15,6 +15,14 @@ on:
         required: false
         type: string
         default: "707767160287.dkr.ecr.us-east-1.amazonaws.com"
+      DOCKERFILE_BUILD_CONTEXT:
+        required: false
+        type: string
+        default: "."
+      OVERRIDE_REPO_NAME:
+        required: false
+        type: string
+        default: ""
     secrets:
       ECR_AWS_ACCESS_KEY_ID:
         required: true
@@ -60,12 +68,16 @@ jobs:
         shell: bash
         run: |
           echo "IMAGE_TAG=$(echo $GITHUB_REF_NAME | sed 's/\//_/' | sed -e 's/:refs//')" >> $GITHUB_ENV
-          echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}' | sed -e 's/:refs//')" >> $GITHUB_ENV
+          if [[ -z "$OVERRIDE_REPO_NAME" ]]; then
+            echo "REPO_NAME=$OVERRIDE_REPO_NAME" >> $GITHUB_ENV
+          else
+            echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}' | sed -e 's/:refs//')" >> $GITHUB_ENV
+          fi
 
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: .
+          context: ${{ inputs.DOCKERFILE_BUILD_CONTEXT }}
           file: ${{ inputs.DOCKERFILE_LOCATION }}
           push: true
           tags: |
