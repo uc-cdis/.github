@@ -67,10 +67,13 @@ jobs:
       - name: Set Variables
         shell: bash
         run: |
+          echo "IMAGE_TAG=$(echo $GITHUB_REF_NAME | sed 's/\//_/' | sed -e 's/:refs//')"
           echo "IMAGE_TAG=$(echo $GITHUB_REF_NAME | sed 's/\//_/' | sed -e 's/:refs//')" >> $GITHUB_ENV
           if [[ -z $OVERRIDE_REPO_NAME ]]; then
+            echo "REPO_NAME=$OVERRIDE_REPO_NAME"
             echo "REPO_NAME=$OVERRIDE_REPO_NAME" >> $GITHUB_ENV
           else
+            echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}' | sed -e 's/:refs//')"
             echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}' | sed -e 's/:refs//')" >> $GITHUB_ENV
           fi
 
