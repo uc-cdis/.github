@@ -67,18 +67,18 @@ jobs:
       - name: Set Variables
         shell: bash
         run: |
-          echo "OVERRIDE_REPO_NAME = $OVERRIDE_REPO_NAME"
+          echo "OVERRIDE_REPO_NAME = ${{ inputs.OVERRIDE_REPO_NAME }}"
           echo "IMAGE_TAG=$(echo ${GITHUB_REF#refs/*/} | tr / _)"
           echo "IMAGE_TAG=$(echo ${GITHUB_REF#refs/*/} | tr / _)" >> $GITHUB_ENV
-          if [[ -z $OVERRIDE_REPO_NAME ]]
+          if [[ -z ${{ inputs.OVERRIDE_REPO_NAME }} ]]
           then
             echo "No OVERRIDE_REPO_NAME input provided, defaulting to repo name..."
             echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}' | sed -e 's/:refs//')"
             echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}' | sed -e 's/:refs//')" >> $GITHUB_ENV
           else
             echo "OVERRIDE_REPO_NAME provided, using it for REPO_NAME..."
-            echo "REPO_NAME=$OVERRIDE_REPO_NAME"
-            echo "REPO_NAME=$OVERRIDE_REPO_NAME" >> $GITHUB_ENV
+            echo "REPO_NAME=${{ inputs.OVERRIDE_REPO_NAME }}"
+            echo "REPO_NAME=${{ inputs.OVERRIDE_REPO_NAME }}" >> $GITHUB_ENV
           fi
 
       - name: Build and push
