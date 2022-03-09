@@ -67,6 +67,7 @@ jobs:
       - name: Set Variables
         shell: bash
         run: |
+          echo "$OVERRIDE_REPO_NAME"
           echo "IMAGE_TAG=$(echo ${GITHUB_REF#refs/*/} | tr / _)"
           echo "IMAGE_TAG=$(echo ${GITHUB_REF#refs/*/} | tr / _)" >> $GITHUB_ENV
           if [[ -z $OVERRIDE_REPO_NAME ]]; then
