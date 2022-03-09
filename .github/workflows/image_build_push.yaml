@@ -74,7 +74,7 @@ jobs:
           echo "OVERRIDE_REPO_NAME = ${{ inputs.OVERRIDE_REPO_NAME }}"
           echo "OVERRIDE_TAG_NAME = ${{ inputs.OVERRIDE_TAG_NAME }}"
 
-          if [[ -z ${{ inputs.OVERRIDE_TAG_NAME }} ]]
+          if [[ -z "${{ inputs.OVERRIDE_TAG_NAME }}" ]]
           then
             echo "No OVERRIDE_TAG_NAME input provided, defaulting to current branch/tag name..."
             echo "IMAGE_TAG=$(echo ${GITHUB_REF#refs/*/} | tr / _)"
@@ -85,7 +85,7 @@ jobs:
             echo "IMAGE_TAG=${{ inputs.OVERRIDE_TAG_NAME }}" >> $GITHUB_ENV
           fi
           
-          if [[ -z ${{ inputs.OVERRIDE_REPO_NAME }} ]]
+          if [[ -z "${{ inputs.OVERRIDE_REPO_NAME }}" ]]
           then
             echo "No OVERRIDE_REPO_NAME input provided, defaulting to repo name..."
             echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}')"
