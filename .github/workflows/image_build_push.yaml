@@ -23,6 +23,10 @@ on:
         required: false
         type: string
         default: ""
+      OVERRIDE_TAG_NAME:
+        required: false
+        type: string
+        default: ""
     secrets:
       ECR_AWS_ACCESS_KEY_ID:
         required: true
@@ -67,14 +71,29 @@ jobs:
       - name: Set Variables
         shell: bash
         run: |
-          echo "IMAGE_TAG=$(echo ${GITHUB_REF#refs/*/} | tr / _)"
-          echo "IMAGE_TAG=$(echo ${GITHUB_REF#refs/*/} | tr / _)" >> $GITHUB_ENV
-          if [[ -z $OVERRIDE_REPO_NAME ]]; then
-            echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}' | sed -e 's/:refs//')"
-            echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}' | sed -e 's/:refs//')" >> $GITHUB_ENV
+          echo "OVERRIDE_REPO_NAME = ${{ inputs.OVERRIDE_REPO_NAME }}"
+          echo "OVERRIDE_TAG_NAME = ${{ inputs.OVERRIDE_TAG_NAME }}"
+
+          if [[ -z "${{ inputs.OVERRIDE_TAG_NAME }}" ]]
+          then
+            echo "No OVERRIDE_TAG_NAME input provided, defaulting to current branch/tag name..."
+            echo "IMAGE_TAG=$(echo ${GITHUB_REF#refs/*/} | tr / _)"
+            echo "IMAGE_TAG=$(echo ${GITHUB_REF#refs/*/} | tr / _)" >> $GITHUB_ENV
           else
-            echo "REPO_NAME=$OVERRIDE_REPO_NAME"
-            echo "REPO_NAME=$OVERRIDE_REPO_NAME" >> $GITHUB_ENV
+            echo "OVERRIDE_TAG_NAME provided, using it for IMAGE_TAG..."
+            echo "IMAGE_TAG=${{ inputs.OVERRIDE_TAG_NAME }}"
+            echo "IMAGE_TAG=${{ inputs.OVERRIDE_TAG_NAME }}" >> $GITHUB_ENV
+          fi
+          
+          if [[ -z "${{ inputs.OVERRIDE_REPO_NAME }}" ]]
+          then
+            echo "No OVERRIDE_REPO_NAME input provided, defaulting to repo name..."
+            echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}')"
+            echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}')" >> $GITHUB_ENV
+          else
+            echo "OVERRIDE_REPO_NAME provided, using it for REPO_NAME..."
+            echo "REPO_NAME=${{ inputs.OVERRIDE_REPO_NAME }}"
+            echo "REPO_NAME=${{ inputs.OVERRIDE_REPO_NAME }}" >> $GITHUB_ENV
           fi
 
       - name: Build and push
