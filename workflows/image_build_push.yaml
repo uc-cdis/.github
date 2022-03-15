@@ -34,7 +34,7 @@ on:
         required: true
       QUAY_USERNAME:
         required: true
-      QUAY_ROBOT_TOKEN: 
+      QUAY_ROBOT_TOKEN:
         required: true
 
 jobs:
@@ -84,7 +84,7 @@ jobs:
             echo "IMAGE_TAG=${{ inputs.OVERRIDE_TAG_NAME }}"
             echo "IMAGE_TAG=${{ inputs.OVERRIDE_TAG_NAME }}" >> $GITHUB_ENV
           fi
-          
+
           if [[ -z "${{ inputs.OVERRIDE_REPO_NAME }}" ]]
           then
             echo "No OVERRIDE_REPO_NAME input provided, defaulting to repo name..."
