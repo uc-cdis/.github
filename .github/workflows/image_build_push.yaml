@@ -27,6 +27,10 @@ on:
         required: false
         type: string
         default: ""
+      USE_QUAY_ONLY:
+        required: false
+        type: boolean
+        default: false
     secrets:
       ECR_AWS_ACCESS_KEY_ID:
         required: true
@@ -97,6 +101,7 @@ jobs:
           fi
 
       - name: Build and push
+        if: ${{ !inputs.USE_QUAY_ONLY }}
         uses: docker/build-push-action@v2
         with:
           context: ${{ inputs.DOCKERFILE_BUILD_CONTEXT }}
@@ -107,3 +112,13 @@ jobs:
             ${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
           cache-from: type=registry,ref=${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
           cache-to: type=inline
+          
+      - name: Build and push (Quay only)
+        if: ${{ inputs.USE_QUAY_ONLY }}
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{ inputs.DOCKERFILE_BUILD_CONTEXT }}
+          file: ${{ inputs.DOCKERFILE_LOCATION }}
+          push: true
+          tags: |
+            quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
