@@ -43,7 +43,7 @@ on:
 
 jobs:
   ci:
-    name: Build Image and Push to Quay
+    name: Build Image and Push
     runs-on: ubuntu-latest
     steps:
       # https://github.com/docker/login-action#quayio
