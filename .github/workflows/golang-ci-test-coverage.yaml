@@ -1,0 +1,40 @@
+name: Build Image and Push to Registries
+
+on:
+  workflow_call:
+    inputs:
+      GO_VERSION:
+        required: false
+        type: string
+        default: "1.18"
+      TESTS_LOCATION:
+        required: false
+        type: string
+        default: "./..."
+    secrets:
+      REPO_GITHUB_TOKEN:
+        required: true
+
+jobs:
+  test:
+    name: Test with coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "${{ inputs.GO_VERSION }}"
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          go mod download
+      - name: Run Unit tests
+        run: |
+          go test ${{ inputs.TESTS_LOCATION }} -v -coverpkg=${{ inputs.TESTS_LOCATION }} -race -covermode atomic -coverprofile=./profile.cov
+      - name: Install goveralls
+        run: go install github.com/mattn/goveralls@latest
+      - name: Send coverage
+        env:
+          COVERALLS_TOKEN: ${{ secrets.REPO_GITHUB_TOKEN }}
+        run: goveralls -coverprofile=./profile.cov -service=github
