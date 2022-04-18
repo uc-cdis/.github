@@ -1,4 +1,4 @@
-name: Build Image and Push to Registries
+name: Golang tests with coverage
 
 on:
   workflow_call:
