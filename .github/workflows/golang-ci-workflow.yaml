@@ -39,19 +39,20 @@ jobs:
           # working-directory: somedir
 
           # Optional: golangci-lint command line arguments.
-          args: --timeout=30s
+          # args: --issues-exit-code=0
 
           # Optional: show only new issues if it's a pull request. The default value is `false`.
-          only-new-issues: true
+          # only-new-issues: true
 
-          # Optional: if set to true then the action will use pre-installed Go.
-          skip-go-installation: true
+          # Optional: if set to true then the all caching functionality will be complete disabled,
+          #           takes precedence over all other caching options.
+          skip-cache: true
 
           # Optional: if set to true then the action don't cache or restore ~/go/pkg.
-          skip-pkg-cache: true
+          # skip-pkg-cache: true
 
           # Optional: if set to true then the action don't cache or restore ~/.cache/go-build.
-          skip-build-cache: true
+          # skip-build-cache: true
       - name: Run Unit tests
         run: |
           go test ${{ inputs.TESTS_LOCATION }} -v -coverpkg=${{ inputs.TESTS_LOCATION }} -race -covermode atomic -coverprofile=./profile.cov
