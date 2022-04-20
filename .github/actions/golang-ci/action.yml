@@ -1,0 +1,7 @@
+name: Golang CI Action
+description: Golang CI Action
+
+runs:
+  using: "composite"
+  steps:
+    - uses: uc-cdis/.github/.github/workflows/golang-ci-workflow.yaml@master
