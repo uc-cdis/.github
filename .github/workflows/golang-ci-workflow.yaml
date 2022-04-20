@@ -11,9 +11,6 @@ on:
         required: false
         type: string
         default: "./..."
-    secrets:
-      REPO_GITHUB_TOKEN:
-        required: true
 
 jobs:
   test:
@@ -60,5 +57,5 @@ jobs:
         run: go install github.com/mattn/goveralls@latest
       - name: Send coverage
         env:
-          COVERALLS_TOKEN: ${{ secrets.REPO_GITHUB_TOKEN }}
+          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: goveralls -coverprofile=./profile.cov -service=github
