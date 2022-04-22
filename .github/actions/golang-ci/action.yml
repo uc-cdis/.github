@@ -1,0 +1,56 @@
+name: Golang CI Action
+description: Golang CI Action
+
+inputs:
+  GO_VERSION:
+    required: false
+    type: string
+    default: "1.18"
+  TESTS_LOCATION:
+    required: false
+    type: string
+    default: "./..."
+  COVERAGE_PROFILE_OUTPUT_LOCATION:
+    required: false
+    type: string
+    default: "./profile.cov"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: "${{ inputs.GO_VERSION }}"
+    - name: Check out code
+      uses: actions/checkout@v3
+    - name: Install dependencies
+      run: |
+        go mod download
+      shell: bash
+    - name: Lint source code
+      uses: golangci/golangci-lint-action@v3
+      with:
+        # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
+        version: v1.45
+        # Optional: working directory, useful for monorepos
+        # working-directory: somedir
+        # Optional: golangci-lint command line arguments.
+        args: --timeout=5m
+        # Optional: show only new issues if it's a pull request. The default value is `false`.
+        # only-new-issues: true
+        # Optional: if set to true then the all caching functionality will be complete disabled,
+        #           takes precedence over all other caching options.
+        skip-cache: true
+        # Optional: if set to true then the action don't cache or restore ~/go/pkg.
+        # skip-pkg-cache: true
+        # Optional: if set to true then the action don't cache or restore ~/.cache/go-build.
+        # skip-build-cache: true
+    - name: Run Unit tests
+      id: unit_tests_step
+      run: |
+        go test ${{ inputs.TESTS_LOCATION }} -v -coverpkg=${{ inputs.TESTS_LOCATION }} -race -covermode atomic -coverprofile=${{ inputs.COVERAGE_PROFILE_OUTPUT_LOCATION }}
+      shell: bash
+    - name: Install goveralls
+      run: go install github.com/mattn/goveralls@latest
+      shell: bash
