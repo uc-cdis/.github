@@ -10,6 +10,10 @@ inputs:
     required: false
     type: string
     default: "./..."
+  COVERAGE_PROFILE_OUTPUT_LOCATION:
+    required: false
+    type: string
+    default: "./profile.cov"
 
 runs:
   using: "composite"
@@ -43,8 +47,9 @@ runs:
         # Optional: if set to true then the action don't cache or restore ~/.cache/go-build.
         # skip-build-cache: true
     - name: Run Unit tests
+      id: unit_tests_step
       run: |
-        go test ${{ inputs.TESTS_LOCATION }} -v -coverpkg=${{ inputs.TESTS_LOCATION }} -race -covermode atomic -coverprofile=./profile.cov
+        go test ${{ inputs.TESTS_LOCATION }} -v -coverpkg=${{ inputs.TESTS_LOCATION }} -race -covermode atomic -coverprofile=${{ inputs.COVERAGE_PROFILE_OUTPUT_LOCATION }}
       shell: bash
     - name: Install goveralls
       run: go install github.com/mattn/goveralls@latest
