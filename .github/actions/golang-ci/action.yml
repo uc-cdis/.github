@@ -48,6 +48,7 @@ runs:
         # skip-build-cache: true
     - name: Display lint results
       run: golangci-lint run
+      if: always()
       shell: bash
     - name: Run Unit tests
       id: unit_tests_step
