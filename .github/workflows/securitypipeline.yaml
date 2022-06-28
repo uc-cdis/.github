@@ -1,0 +1,29 @@
+name: Security Pipeline
+
+on:
+  pull_request:
+    - opened
+    - reopened
+    - ready_for_review
+    - synchronize
+  push:
+    branches:
+      - '**'
+    tags:
+      - '!**'
+
+Jobs:
+  - name: Super-Linter
+    uses: uc-cdis/.github/.github/workflows/lint.yaml@master
+
+  - name: Easy detect-secrets
+    uses: RobertFischer/detect-secrets-action@v2.0.0
+
+  - name: Run Snyk to check for vulnerabilities
+    uses: snyk/actions/node@master
+    env:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    with:
+      command: monitor
+  - name: CodeQl
+    uses: uc-cdis/.github/.github/workflows/codeql-scan.yaml@master
