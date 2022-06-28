@@ -8,9 +8,9 @@ on:
       - '!**'
 
 jobs:
-  call-workflow-2-in-local-repo:
+  call-workflow-1-in-local-repo:
    uses: uc-cdis/.github/.github/workflows/lint.yaml@SDO-13-ci-using-gh-actions
-  call-workflow3-in-local-repo:
+  call-workflow2-in-local-repo:
    uses: uc-cdis/.github/.github/workflows/codeql-scan.yaml@master
   secrets-detection:
     runs-on: 'ubuntu-latest'
