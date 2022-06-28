@@ -2,17 +2,13 @@ name: Security Pipeline
 
 on:
   pull_request:
-    - opened
-    - reopened
-    - ready_for_review
-    - synchronize
   push:
     branches:
       - '**'
     tags:
       - '!**'
 
-Jobs:
+jobs:
   - name: Super-Linter
     uses: uc-cdis/.github/.github/workflows/lint.yaml@master
 
