@@ -15,7 +15,8 @@ jobs:
    uses: uc-cdis/.github/.github/workflows/codeql-scan.yaml@master
 
 jobs:
-  Secrets detect:
+  secrets-detection:
     runs-on: 'ubuntu-latest'
-    - name: secrets detect
-      uses: RobertFischer/detect-secrets-action@v2.0.0
+    steps:
+      - name: secrets detect
+        uses: RobertFischer/detect-secrets-action@v2.0.0
