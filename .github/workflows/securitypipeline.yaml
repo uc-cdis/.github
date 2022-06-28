@@ -9,7 +9,7 @@ on:
 
 jobs:
   call-workflow-2-in-local-repo:
-   uses: uc-cdis/.github/workflows/lint.yaml@master
+   uses: uc-cdis/.github/.github/workflows/lint.yaml@master
   call-workflow3-in-local-repo:
    uses: uc-cdis/.github/.github/workflows/codeql-scan.yaml@master
   secrets-detection:
