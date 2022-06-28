@@ -12,3 +12,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
        - uses: RobertFischer/detect-secrets-action@v2.0.0
+       - uses: uc-cdis/.github/.github/workflows/lint.yaml@master
+       - uses: uc-cdis/.github/.github/workflows/codeql-scan.yaml@master
