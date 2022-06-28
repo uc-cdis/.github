@@ -10,4 +10,4 @@ on:
 jobs:
   reusable_workflow_job:
     steps:
-        uses: RobertFischer/detect-secrets-action@v2.0.0
+       - uses: RobertFischer/detect-secrets-action@v2.0.0
