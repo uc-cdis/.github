@@ -15,11 +15,5 @@ jobs:
   - name: Easy detect-secrets
     uses: RobertFischer/detect-secrets-action@v2.0.0
 
-  - name: Run Snyk to check for vulnerabilities
-    uses: snyk/actions/node@master
-    env:
-      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-    with:
-      command: monitor
   - name: CodeQl
     uses: uc-cdis/.github/.github/workflows/codeql-scan.yaml@master
