@@ -16,7 +16,6 @@ jobs:
 
 jobs:
   Secrets detect:
-  check-for-secrets:
     runs-on: 'ubuntu-latest'
     - name: secrets detect
       uses: RobertFischer/detect-secrets-action@v2.0.0
