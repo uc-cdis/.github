@@ -1,7 +1,1 @@
-- name: Send custom JSON data to Slack workflow
-  id: slack
-  uses: slackapi/slack-github-action@v1.19.0
-  with:
-    payload-file-path: ""
-  env:
-    SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+.
