@@ -1,0 +1,14 @@
+name: SnykCLI for Poetry
+on: [workflow_call]
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/python@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SRVC_SNYKGITACTION }}
+        with:
+          command: --command=python3 --org=plan-x
+          args: --severity-threshold=high
