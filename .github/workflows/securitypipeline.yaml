@@ -1,10 +1,5 @@
 name: Security Pipeline
 on: [workflow_call]
-  push:
-    branches:
-      - '**'
-    tags:
-      - '!**'
 
 jobs:
   # Superlint a simple combination of various linters, written in bash, to help validate source code.
