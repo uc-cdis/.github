@@ -37,3 +37,6 @@ jobs:
         if: steps.check_files.outputs.files_exists == 'true'
         # Only runs if all of the files exists
         run: uc-cdis/.github/.github/actions/snykcli.yaml@sdo-13-ci-using-gh-actions
+  #Publish results in Slack
+  #call-workflow3-in-local-repo:
+  # uses: uc-cdis/.github/.github/workflows/notify.yaml@sdo-13-ci-using-gh-actions
