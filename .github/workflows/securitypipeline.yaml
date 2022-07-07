@@ -4,7 +4,7 @@ on: [workflow_call]
 jobs:
   # Superlint a simple combination of various linters, written in bash, to help validate source code.
   call-workflow-1-in-local-repo:
-   uses: uc-cdis/.github/.github/workflows/commonactions/lint.yaml@SDO-13-ci-using-gh-actions
+   uses: uc-cdis/.github/.github/workflows/lint.yaml@SDO-13-ci-using-gh-actions
   # CodeQL is a simple Github native Static code analysis tool
   call-workflow2-in-local-repo:
    uses: uc-cdis/.github/.github/workflows/codeql-scan.yaml@master
