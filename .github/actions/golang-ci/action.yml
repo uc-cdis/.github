@@ -28,6 +28,11 @@ runs:
       run: |
         go mod download
       shell: bash
+    - name: Run Unit tests
+      id: unit_tests_step
+      run: |
+        go test ${{ inputs.TESTS_LOCATION }} -v -coverpkg=${{ inputs.TESTS_LOCATION }} -race -covermode atomic -coverprofile=${{ inputs.COVERAGE_PROFILE_OUTPUT_LOCATION }}
+      shell: bash
     - name: Lint source code
       uses: golangci/golangci-lint-action@v3
       with:
@@ -46,10 +51,9 @@ runs:
         # skip-pkg-cache: true
         # Optional: if set to true then the action don't cache or restore ~/.cache/go-build.
         # skip-build-cache: true
-    - name: Run Unit tests
-      id: unit_tests_step
-      run: |
-        go test ${{ inputs.TESTS_LOCATION }} -v -coverpkg=${{ inputs.TESTS_LOCATION }} -race -covermode atomic -coverprofile=${{ inputs.COVERAGE_PROFILE_OUTPUT_LOCATION }}
+    - name: Display lint results
+      run: golangci-lint run
+      if: always()
       shell: bash
     - name: Install goveralls
       run: go install github.com/mattn/goveralls@latest
