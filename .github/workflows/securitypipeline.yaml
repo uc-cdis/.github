@@ -53,14 +53,6 @@ jobs:
 
       - name: File exists
         if: steps.check_files.outputs.files_exists == 'true'
-        # Only runs if all of the files exists
-        run: echo all files exist
-
-  SnykCLI:
-    runs-on: ubuntu-latest
-    needs: 'file_existence'
-    if: steps.check_files.outputs.files_exists == 'true'
-    steps:
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/python@master
         env:
