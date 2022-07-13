@@ -1,5 +1,13 @@
 name: Security Pipeline
-on: [workflow_call]
+on:
+  workflow_call:
+    secrets:
+      GITHUB_TOKEN:
+          required: true
+      SLACK_WEBHOOK_URL:
+          required: true
+      SNYK_TOKEN:
+          required: true
 
 jobs:
 # Superlint a simple combination of various linters, written in bash, to help validate source code.
@@ -30,7 +38,7 @@ jobs:
           notify_when: 'failure'
           channel: infosec-alerts
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.ACTION_MONITORING_SLACK }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_NOTIFY }}
 
   # Snyk native integration doesn't support poetry.lock files - this runs a check if a poetry.lock is found then runs a CLI scan to add coverage.
   file_existence:
