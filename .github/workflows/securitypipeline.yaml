@@ -61,7 +61,6 @@ jobs:
     needs: 'file_existence'
     if: steps.check_files.outputs.files_exists == 'true'
     steps:
-      - uses: actions/checkout@master
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/python@master
         env:
