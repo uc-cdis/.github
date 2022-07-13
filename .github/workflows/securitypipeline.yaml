@@ -56,5 +56,5 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SRVC_SNYKGITACTION }}
         with:
-          command:  monitor --org=plan-x
+          command:  --org=plan-x
           args: --severity-threshold=high
