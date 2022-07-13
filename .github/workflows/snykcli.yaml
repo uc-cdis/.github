@@ -1,6 +1,5 @@
 name: SnykCLI for Poetry
 on: [workflow_call]
-timeout-minutes: 15
 jobs:
   security:
     runs-on: ubuntu-latest
