@@ -54,11 +54,16 @@ jobs:
         if: steps.check_files.outputs.files_exists == 'true'
         run: echo All files exists!
 
-      - name: Poetry Scan
-        if: steps.check_files.outputs.files_exists == 'true'
-        uses: snyk/actions/python@master
+  Snyk_Scan:
+    name: Poetry Monitor
+    runs-on: ubuntu-latest
+    if: steps.check_files.outputs.files_exists == 'true'
+    steps:
+      - uses: actions/checkout@master
+      - name: Snyk Poetry Vuln Check
+      - uses: snyk/actions/python-3.8@master
         env:
           SRVC_SNYKGITACTION: ${{ secrets.SRVC_SNYKGITACTION }}
-        with:
-          command: monitor
-          args: --org=plan-x --severity-threshold=high
+          with:
+            command: monitor
+            args: --file=poetry.lock --package-manager=poetry --org=plan-x  --severity-threshold=high
