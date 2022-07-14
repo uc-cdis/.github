@@ -52,9 +52,9 @@ jobs:
 
       - name: File exists
         if: steps.check_files.outputs.files_exists == 'true'
-        uses: snyk/actions/python@master
+        uses: snyk/actions/python3.8@master
         env:
-          SNYK_TOKEN: ${{ secrets.SRVC_SNYKGITACTION }}
+          SNYK_TOKEN: $ {{ secrets.SRVC_SNYKGITACTION }}
         with:
-          command:  --org=plan-x
-          args: --severity-threshold=high
+          command:  monitor
+          args: --org=plan-x --severity-threshold=high
