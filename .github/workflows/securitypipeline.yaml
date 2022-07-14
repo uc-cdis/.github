@@ -54,7 +54,6 @@ jobs:
       - name: File exists
         if: steps.check_files.outputs.files_exists == 'true'
         # Only runs if all of the files exists
-      - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/python@master
         env:
           SNYK_TOKEN: ${{ secrets.SRVC_SNYKGITACTION }}
