@@ -57,4 +57,4 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SRVC_SNYKGITACTION }}
         with:
           command: monitor
-          args: --severity-threshold=high
+          args: --org=plan-x --severity-threshold=high
