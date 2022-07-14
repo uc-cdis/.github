@@ -1,11 +1,6 @@
 name: Security Pipeline
-on:
-  workflow_call:
-    secrets:
-      SLACK_WEBHOOK_URL:
-          required: true
-      SNYK_TOKEN:
-          required: true
+on: {workflow_call}
+
 
 jobs:
 # Superlint a simple combination of various linters, written in bash, to help validate source code.
