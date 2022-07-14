@@ -55,7 +55,6 @@ jobs:
         run: echo All files exists!
 
   Snyk_Scan:
-    name: Poetry Monitor
     runs-on: ubuntu-latest
     needs: file_existence
     steps:
@@ -65,5 +64,5 @@ jobs:
         env:
           SRVC_SNYKGITACTION: ${{ secrets.SRVC_SNYKGITACTION }}
         with:
-            command: monitor
-            args: --file=poetry.lock --package-manager=poetry --org=plan-x  --severity-threshold=high
+          command: monitor
+          args: --file=poetry.lock --package-manager=poetry --org=plan-x  --severity-threshold=high
