@@ -52,6 +52,10 @@ jobs:
 
       - name: File exists
         if: steps.check_files.outputs.files_exists == 'true'
+        run: echo All files exists!
+
+      - name: Poetry Scan
+        if: steps.check_files.outputs.files_exists == 'true'
         uses: snyk/actions/python@master
         env:
           SRVC_SNYKGITACTION: ${{ secrets.SRVC_SNYKGITACTION }}
