@@ -46,7 +46,7 @@ jobs:
         with:
           files: "poetry.lock"
 
-      - name: File exists
+      - name: Poetry File exists
         if: steps.check_files.outputs.files_exists == 'true'
         # Only runs if all of the files exists
         uses: snyk/actions/python@master
