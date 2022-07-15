@@ -34,7 +34,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_NOTIFY }}
 
   # Snyk native integration doesn't support poetry.lock files - this runs a check if a poetry.lock is found then runs a CLI scan to add coverage.
-  file_existence:
+  Poetry_file_existence:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
