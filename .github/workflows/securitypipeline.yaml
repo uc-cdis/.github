@@ -54,7 +54,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SRVC_SNYKGITACTION }}
         with:
           command: monitor
-          args: --command=python3 --org=plan-x --severity-threshold=high
+          args: --command=python3 --org=plan-x --target-reference="$(git branch --show-current)"
       - name: Snyk Block
         uses: snyk/actions/python@master
         env:
