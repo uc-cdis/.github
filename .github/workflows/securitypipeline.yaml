@@ -54,4 +54,15 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SRVC_SNYKGITACTION }}
         with:
           command: monitor
-          args: --command=python3 --org=plan-x --severity-threshold=high
+          args: --command=python3 --org=plan-x
+
+        - name: Snyk Test
+          if: steps.check_files.outputs.files_exists == 'true'
+          needs: File exists
+            # Only runs if all of the files exists
+            uses: snyk/actions/python@master
+            env:
+              SNYK_TOKEN: ${{ secrets.SRVC_SNYKGITACTION }}
+            with:
+              command: test
+              args: --command=python3 --org=plan-x --severity-threshold=high
