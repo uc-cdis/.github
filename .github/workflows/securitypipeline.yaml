@@ -55,3 +55,12 @@ jobs:
         with:
           command: monitor
           args: --command=python3 --org=plan-x --severity-threshold=high
+
+      - name: Synk Test and Block
+        if: step.check_files.outputs.files_exists == 'true'
+        uses: snyk/actions/python@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SRVC_SNYKGITACTION }}
+        with:
+          command: test
+          args: --org=plan-x --severity-threshold=high
