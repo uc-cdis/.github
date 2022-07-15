@@ -29,7 +29,7 @@ jobs:
         with:
           status: ${{ job.status }}
           notify_when: 'failure'
-          channel: infosec-alerts
+          slack_channel: infosec-alerts
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_NOTIFY }}
 
