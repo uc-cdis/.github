@@ -1,10 +1,9 @@
-- name: slack - GitHub Actions Slack integration
-  on: [workflow call]
-  uses: act10ns/slack@v1.6.0
-  with:
-    channel: '#infosec-alerts'
-    status: ${{ job.status }}
-    if_mention: 'failure,cancelled'
-  env:
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      
+name: slack - GitHub Actions Slack integration
+on: [workflow call]
+uses: act10ns/slack@v1.6.0
+with:
+  channel: '#infosec-alerts'
+  status: ${{ job.status }}
+  if_mention: 'failure,cancelled'
+env:
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
