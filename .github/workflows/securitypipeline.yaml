@@ -52,8 +52,8 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SRVC_SNYKGITACTION }}
         with:
-          command: monitor
-          args: --command=python3 --org=plan-x --target-reference=$(git branch --show-current)
+          command: monitor --target-reference="$(git branch --show-current)"
+          args: --command=python3 --org=plan-x
       - name: Snyk Block
         uses: snyk/actions/python@master
         if: github.ref == 'refs/heads/master'
@@ -61,4 +61,4 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SRVC_SNYKGITACTION }}
         with:
           command: test
-          args: --org=plan-x --severity-threshold=high
+          args: --org=plan-x --severity-threshold=high --fail-on=upgradable|pachable
