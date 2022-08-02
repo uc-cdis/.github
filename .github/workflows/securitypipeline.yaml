@@ -29,9 +29,9 @@ jobs:
         with:
           channel: '#infosec-alerts'
           status: ${{ job.status }}
-          if_mention: 'failure, cancelled'
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.ACTION_MONITORING_SLACK }}
+          if: failure()
+          webhook-url: ${{ secrets.ACTION_MONITORING_SLACK }}
+
   # Snyk native integration doesn't support poetry.lock files - this runs a check if a poetry.lock is found then runs a CLI scan to add coverage.
   Poetry_file_existence:
     runs-on: ubuntu-latest
