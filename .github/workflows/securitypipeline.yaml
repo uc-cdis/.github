@@ -53,7 +53,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SRVC_SNYKGITACTION }}
         with:
           command: monitor
-          args: --target-reference="$(git branch --show-current)" --command=python3 --org=plan-x
+          args: --command=python3 --org=plan-x
       - name: Snyk Block
         uses: snyk/actions/python@master
         if: github.ref == 'refs/heads/master'
