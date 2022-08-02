@@ -23,13 +23,14 @@ jobs:
     steps:
       - name: secrets detect
         uses: RobertFischer/detect-secrets-action@v2.0.0
+
       - name: Report Status
-        if: always()
+        if: failure()
         uses: act10ns/slack@v1.6.0
         with:
           channel: '#infosec-alerts'
           status: ${{ job.status }}
-          if: failure()
+        env:
           webhook-url: ${{ secrets.ACTION_MONITORING_SLACK }}
 
   # Snyk native integration doesn't support poetry.lock files - this runs a check if a poetry.lock is found then runs a CLI scan to add coverage.
