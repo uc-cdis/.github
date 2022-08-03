@@ -3,30 +3,38 @@ on: [workflow_call]
 
 jobs:
   # Superlint a simple combination of various linters, written in bash, to help validate source code.
-  call-workflow-1-in-local-repo:
-   uses: uc-cdis/.github/.github/workflows/lint.yaml@master
-  # CodeQL is a simple Github native Static code analysis tool
-  call-workflow2-in-local-repo:
-   uses: uc-cdis/.github/.github/workflows/codeql-scan.yaml@master
+  Superlint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Lint Repo
+        uses: github/super-linter/slim@v4
+        env:
+          VALIDATE_ALL_CODEBASE: false
+          DEFAULT_BRANCH: master
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   # Secrets detection is calling the Yelp Secrets Detector we use in pre-commit to ensure proper coverage
   secrets-detection:
     runs-on: 'ubuntu-latest'
     steps:
       - name: secrets detect
         uses: RobertFischer/detect-secrets-action@v2.0.0
-      - name: Report Status
-        if: always()
-        uses: ravsamhq/notify-slack-action@v1
-        with:
-          status: ${{ job.status }}
-          notify_when: 'failure'
-          channel: infosec-alerts
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.ACTION_MONITORING_SLACK }}
 
+      - name: Report Status
+        if: failure()
+        uses: act10ns/slack@v1.6.0
+        with:
+          channel: '#infosec-alerts'
+          status: ${{ job.status }}
+        env:
+          webhook-url: ${{ secrets.ACTION_MONITORING_SLACK }}
 
   # Snyk native integration doesn't support poetry.lock files - this runs a check if a poetry.lock is found then runs a CLI scan to add coverage.
-  file_existence:
+  Poetry_file_existence:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -41,4 +49,17 @@ jobs:
       - name: File exists
         if: steps.check_files.outputs.files_exists == 'true'
         # Only runs if all of the files exists
-        run: uc-cdis/.github/.github/actions/snykcli.yaml@master
+        uses: snyk/actions/python@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SRVC_SNYKGITACTION }}
+        with:
+          command: monitor
+          args: --command=python3 --org=plan-x
+      - name: Snyk Block
+        uses: snyk/actions/python@master
+        if: github.ref == 'refs/heads/master'
+        env:
+          SNYK_TOKEN: ${{ secrets.SRVC_SNYKGITACTION }}
+        with:
+          command: test
+          args: --org=plan-x --severity-threshold=high --fail-on=upgradable|pachable
