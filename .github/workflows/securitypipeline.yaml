@@ -54,7 +54,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SRVC_SNYKGITACTION }}
         with:
           command: test
-          args: --org=plan-x --severity-threshold=high --fail-on=upgradable|patchable
+          args: --org=plan-x --severity-threshold=high --fail-on=upgradable
       - name: Snyk UI upload
         uses: snyk/actions/python@master
         if: github.ref == 'refs/heads/master'
