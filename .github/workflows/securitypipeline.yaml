@@ -53,13 +53,13 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SRVC_SNYKGITACTION }}
         with:
-          command: monitor
-          args: --command=python3 --org=plan-x
-      - name: Snyk Block
+          command: test
+          args: --org=plan-x --severity-threshold=high --fail-on=upgradable
+      - name: Snyk UI upload
         uses: snyk/actions/python@master
         if: github.ref == 'refs/heads/master'
         env:
           SNYK_TOKEN: ${{ secrets.SRVC_SNYKGITACTION }}
         with:
-          command: test
-          args: --org=plan-x --severity-threshold=high --fail-on=upgradable|pachable
+          command: monitor
+          args: --org=plan-x
