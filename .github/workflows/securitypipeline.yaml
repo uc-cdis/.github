@@ -11,7 +11,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Lint Repo
-        uses: github/super-linter/slim@v4
+        uses: docker://github/super-linter:slim-latest
         env:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: master
