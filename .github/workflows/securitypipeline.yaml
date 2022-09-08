@@ -47,9 +47,7 @@ jobs:
           files: "poetry.lock"
 
       - name: Poetry Found
-        if:
-          github.ref != 'refs/heads/master
-          && steps.check_files.outputs.files_exists == 'true')
+        if: ${{ steps.check_files.outputs.files_exists == 'true' || github.ref != 'refs/heads/master'
         # Only runs if all of the files exists
         uses: snyk/actions/python@master
         env:
