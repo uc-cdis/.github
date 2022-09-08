@@ -48,7 +48,7 @@ jobs:
 
       - name: Poetry Found
         if:
-          github.ref != 'refs/heads/!master'
+          github.ref != 'refs/heads/master
           && steps.check_files.outputs.files_exists == 'true')
         # Only runs if all of the files exists
         uses: snyk/actions/python@master
