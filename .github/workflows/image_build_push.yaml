@@ -38,7 +38,7 @@ on:
         required: true
       QUAY_USERNAME:
         required: true
-      QUAY_ROBOT_TOKEN: 
+      QUAY_ROBOT_TOKEN:
         required: true
 
 jobs:
@@ -65,10 +65,11 @@ jobs:
           AWS_REGION: ${{ inputs.AWS_REGION }}
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           persist-credentials: false
-          
+          fetch-depth: 0
+
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v3
@@ -96,7 +97,7 @@ jobs:
             echo "IMAGE_TAG=${{ inputs.OVERRIDE_TAG_NAME }}"
             echo "IMAGE_TAG=${{ inputs.OVERRIDE_TAG_NAME }}" >> $GITHUB_ENV
           fi
-          
+
           if [[ -z "${{ inputs.OVERRIDE_REPO_NAME }}" ]]
           then
             echo "No OVERRIDE_REPO_NAME input provided, defaulting to repo name..."
@@ -121,7 +122,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
           cache-to: type=inline
-          
+
       - name: Build and push (Quay only)
         if: ${{ inputs.USE_QUAY_ONLY }}
         uses: docker/build-push-action@v2
