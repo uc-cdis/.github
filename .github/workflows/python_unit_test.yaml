@@ -1,5 +1,5 @@
 name: Run unit tests
-on: push
+on: [workflow_call]
 
 env: 
   PGPASSWORD: postgres
@@ -33,4 +33,16 @@ jobs:
         run: |
             curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
             source $HOME/.poetry/env
-            poetry install -vv
+            poetry install -vv   
+      - name: Service specific setup
+        run: |
+          
+      - name: Run test
+        run: | 
+          source $HOME/.poetry/env
+          poetry run pytest -vv --cov=fence --cov-report xml tests
+      - name: Clean up from test
+        run: |
+          pip3 install codacy-coverage
+          python-codacy-coverage -r coverage.xml
+          COVERALLS_REPO_TOKEN=$COVERALLS_TOKEN coveralls
