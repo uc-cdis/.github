@@ -1,4 +1,4 @@
-name: Run unit tests
+name: Run Python unit tests using Poetry, with a Postgres backend
 on: workflow_call
   inputs:
   SETUP_SCRIPT_LOCATION:
