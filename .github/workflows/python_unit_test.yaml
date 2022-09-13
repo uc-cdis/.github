@@ -1,11 +1,12 @@
 name: Run Python unit tests using Poetry, with a Postgres backend
 
-on: workflow_call
-  inputs:
-    SETUP_SCRIPT_LOCATION:
-      description: 'A URL identifying a Bash script that can run commands needed for service-specific test setup'
-      required: true
-      type: string
+on: 
+  workflow_call:
+    inputs:
+      SETUP_SCRIPT_LOCATION:
+        description: 'A URL identifying a Bash script that can run commands needed for service-specific test setup'
+        required: true
+        type: string
     
 env: 
   PGPASSWORD: postgres
