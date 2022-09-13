@@ -48,4 +48,3 @@ jobs:
         run: |
           pip3 install codacy-coverage
           python-codacy-coverage -r coverage.xml
-          COVERALLS_REPO_TOKEN=$COVERALLS_TOKEN coveralls
