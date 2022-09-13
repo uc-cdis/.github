@@ -1,3 +1,6 @@
+psql -c 'SELECT version();' -U postgres
+psql -U postgres -c "create database fence_test_tmp"
+
 sudo rm -f /etc/boto.cfg
 mkdir -p tests/resources/keys 
 
