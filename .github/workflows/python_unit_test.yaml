@@ -19,7 +19,7 @@ jobs:
     #Defining the Postgres DB service we will need to run the unit tests
     services:
       postgres:
-        image: postgres:13-bullseye
+        image: postgres:9-bullseye
         ports:
           - "5432:5432"
         env:
