@@ -46,7 +46,6 @@ jobs:
             curl -sSL "${{inputs.setup-script-location}}" | bash
       - name: Run test
         run: | 
-          source $HOME/.poetry/env
           poetry run pytest -vv --cov=fence --cov-report xml tests
       - name: Clean up from test
         run: |
