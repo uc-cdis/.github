@@ -10,7 +10,6 @@ on:
     
 env: 
   PGPASSWORD: postgres
-  GET_POETRY_IGNORE_DEPRECATION: 1
 
 jobs:
   run_tests:
@@ -39,9 +38,9 @@ jobs:
           python-version: "3.6"
       - name: Install poetry
         run: |
-            curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
-            source $HOME/.poetry/env
-            poetry install -vv   
+            pip install poetry
+            poetry install -vv 
+            pip list
       - name: Service specific setup
         run: |
             curl -sSL "${{inputs.setup-script-location}}" | bash
