@@ -48,7 +48,3 @@ jobs:
       - name: Run test
         run: | 
           poetry run pytest -vv --cov=fence --cov=migrations/versions --cov-report xml tests
-      - name: Clean up from test
-        run: |
-          pip3 install codacy-coverage
-          python-codacy-coverage -r coverage.xml
