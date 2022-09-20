@@ -38,6 +38,7 @@ jobs:
           python-version: "3.6.7"
       - name: Install poetry
         run: |
+            pip --version
             pip install poetry
             poetry install -vv 
             pip list
