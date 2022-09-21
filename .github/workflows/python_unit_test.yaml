@@ -7,6 +7,10 @@ on:
         description: 'A URL identifying a Bash script that can run commands needed for service-specific test setup'
         required: true
         type: string
+      dependency-file-location:
+        description: 'A URL identifying a pip dependency file that specifies all the libraries needed'
+        required: true
+        type: string
     
 env: 
   PGPASSWORD: postgres
@@ -36,6 +40,9 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.6.7"
+      - name: Install python pre-reqs
+        run: |
+            curl -sSL "${{inputs.dependency-file-location}}" > requirements.txt && pip install -r requirements.txt 
       - name: Install poetry
         run: |
             pip --version
