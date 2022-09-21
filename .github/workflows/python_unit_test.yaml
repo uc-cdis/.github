@@ -44,9 +44,9 @@ jobs:
       - name: Service specific setup
         run: |
             curl -sSL "${{inputs.setup-script-location}}" | bash
-      - name: Run test
-        run: | 
-          poetry run pytest -vv --cov=fence --cov=migrations/versions --cov-report xml tests 
       - name: Run pip list
         run: |
           pip list
+      - name: Run test
+        run: | 
+          poetry run pytest -vv --cov=fence --cov=migrations/versions --cov-report xml tests 
