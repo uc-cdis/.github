@@ -89,8 +89,6 @@ pipenv==2018.11.26
 pkginfo==1.8.3
 platformdirs==2.4.0
 pluggy==1.0.0
-poetry-core
-poetry
 prometheus-client==0.9.0
 prometheus-flask-exporter==0.18.7
 protobuf==3.19.4
