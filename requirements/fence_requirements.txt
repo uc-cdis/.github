@@ -19,7 +19,6 @@ cachetools==4.2.4
 cdiserrors==1.0.0
 cdislogging==1.0.0
 cdispyutils==2.0.1
-cdisutilstest==0.2.4
 certifi==2022.6.15
 cffi==1.15.1
 click==7.1.2
