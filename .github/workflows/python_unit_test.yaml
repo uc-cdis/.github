@@ -1,0 +1,49 @@
+name: Run Python unit tests using Poetry, with a Postgres backend
+
+on: 
+  workflow_call:
+    inputs:
+      setup-script-location:
+        description: 'A URL identifying a Bash script that can run commands needed for service-specific test setup'
+        required: true
+        type: string
+    
+env: 
+  PGPASSWORD: postgres
+
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest
+    
+    #Defining the Postgres DB service we will need to run the unit tests
+    services:
+      postgres:
+        image: postgres:9.6-bullseye
+        ports:
+          - "5432:5432"
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Set up python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.6.7"
+      - name: Install poetry
+        run: |
+            pip --version
+            pip install poetry
+            poetry install -vv
+      - name: Service specific setup
+        run: |
+            curl -sSL "${{inputs.setup-script-location}}" | bash
+      - name: Run test
+        run: | 
+          poetry run pytest -vv --cov=fence --cov=migrations/versions --cov-report xml tests 
