@@ -15,7 +15,7 @@ on:
         description: 'The version of Python to run the unit tests against. Expected to be a string representing an array of versions, this construct is needed due to limitations with Github Actions'
         required: false
         type: string
-        default: '["3.6.7"]'
+        default: ["3.6.7"]
     
 env: 
   PGPASSWORD: postgres
