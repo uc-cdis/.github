@@ -11,11 +11,11 @@ on:
         description: 'A URL identifying a pip dependency file that specifies all the libraries needed'
         required: true
         type: string
-      python-version:
-        description: 'The version of Python to run the unit tests against'
+      python-versions:
+        description: 'The version of Python to run the unit tests against. Expected to be a string representing an array of versions, this construct is needed due to limitations with Github Actions'
         required: false
         type: string
-        default: '3.6.7'
+        default: '[3.6.7]'
     
 env: 
   PGPASSWORD: postgres
@@ -23,6 +23,10 @@ env:
 jobs:
   run_tests:
     runs-on: ubuntu-latest
+    
+    strategy: 
+      matrix:
+        versions: ${{ fromJson(inputs.python-versions) }}
     
     #Defining the Postgres DB service we will need to run the unit tests
     services:
