@@ -11,6 +11,11 @@ on:
         description: 'A URL identifying a pip dependency file that specifies all the libraries needed'
         required: true
         type: string
+      python-version:
+        description: 'The version of Python to run the unit tests against'
+        required: false
+        type: string
+        default: '3.6.7'
     
 env: 
   PGPASSWORD: postgres
@@ -39,7 +44,7 @@ jobs:
       - name: Set up python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.6.7"
+          python-version: "${{inputs.python-version}}"
       - name: Install python pre-reqs
         run: |
             curl -sSL "${{inputs.dependency-file-location}}" > requirements.txt && pip install -r requirements.txt 
