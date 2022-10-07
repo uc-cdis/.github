@@ -15,18 +15,28 @@ on:
         description: 'The version of Python to run the unit tests against. Expected to be a string representing an array of versions, this construct is needed due to limitations with Github Actions'
         required: false
         type: string
-        default: ["3.6.7"]
+        default: "['3.6.7']"
     
 env: 
   PGPASSWORD: postgres
 
 jobs:
+  process_versions:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+    - id: set-matrix
+      run: echo "::set-output name=matrix::{ ${{inputs.python-versions }} }"
+
+
   run_tests:
+    needs: process_versions
     runs-on: ubuntu-latest
     
     strategy: 
       matrix:
-        versions: ${{ fromJson(inputs.python-versions) }}
+        versions: ${{fromJson(needs.process_versions.outputs.matrix)}}
     
     #Defining the Postgres DB service we will need to run the unit tests
     services:
