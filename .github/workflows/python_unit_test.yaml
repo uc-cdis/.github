@@ -27,7 +27,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
     - id: set-matrix
-      run: echo "::set-output name=matrix::{ ${{inputs.python-versions }} }"
+      run: echo "::set-output name=matrix::${{inputs.python-versions }}"
 
 
   run_tests:
