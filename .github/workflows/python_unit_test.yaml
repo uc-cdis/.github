@@ -29,12 +29,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
-      test-locations: ${{steps.set-test-locations.output.test-locations}}
     steps:
     - id: set-matrix
       run: echo "::set-output name=matrix::${{ inputs.python-versions }}"
-    - id: set-test-locations
-      run: echo "set-output name=test-location::${{ inputs.test-file-locations }}"
 
   run_tests:
     needs: process_versions
@@ -75,4 +72,12 @@ jobs:
             curl -sSL "${{inputs.setup-script-location}}" | bash
       - name: Run test
         run: | 
-          poetry run pytest -vv --cov=fence --cov=migrations/versions --cov-report xml tests 
+          testLocations=$(echo ${{inputs.test-file-locations}} | sed 's/\[//g' | sed 's/,//g' | sed 's/\]//g')
+
+          arrTestLocations=($testLocations)
+
+          echo poetry run pytest -vv --cov=${{inputs.package-name}} --cov-report xml ${arrTestLocations[0]}
+
+          for (( i=1; i<${#arrTestLocations[@]}; i++ )); do
+            echo poetry run pytest -vv --cov=${{inputs.package-name}} --cov-report xml --cov-append ${arrTestLocations[$i]}
+          done
