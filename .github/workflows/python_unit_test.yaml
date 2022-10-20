@@ -12,7 +12,15 @@ on:
         required: false
         type: string
         default: "['3.9']"
-    
+      package-name:
+        description: 'The name of the package, used for code coverage'
+        required: true
+        type: string
+      test-file-locations: 
+        description: 'A list of paths to directories that hold tests. This is necessary for services like Sheepdog, that run separate suites of tests due to data requirements. Expected to be a string representing an array of versions, this construct is needed due to limitations with Github Actions'
+        required: false
+        type: string
+        default: "['tests']"
 env: 
   PGPASSWORD: postgres
 
@@ -21,10 +29,12 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      test-locations: ${{steps.set-test-locations.output.test-locations}}
     steps:
     - id: set-matrix
-      run: echo "::set-output name=matrix::${{inputs.python-versions }}"
-
+      run: echo "::set-output name=matrix::${{ inputs.python-versions }}"
+    - id: set-test-locations
+      run: echo "set-output name=test-location::${{ inputs.test-file-locations }}"
 
   run_tests:
     needs: process_versions
