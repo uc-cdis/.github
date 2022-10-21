@@ -85,7 +85,7 @@ jobs:
 
           arrTestLocations=($testLocations)
 
-          echo poetry run pytest -vv --cov=${{inputs.package-name}} --cov-report xml ${arrTestLocations[0]}
+          poetry run pytest -vv $coverages --cov-report xml ${arrTestLocations[0]}
 
           for (( i=1; i<${#arrTestLocations[@]}; i++ )); do
             poetry run pytest -vv $coverages --cov-report xml --cov-append ${arrTestLocations[$i]}
