@@ -12,8 +12,8 @@ on:
         required: false
         type: string
         default: "['3.9']"
-      package-name:
-        description: 'The name of the package, used for code coverage'
+      package-names:
+        description: 'A list of paths to modules to test code coverage against. Expected to be a string representing an array of versions, this construct is needed due to limitations with Github Actions'
         required: true
         type: string
       test-file-locations: 
@@ -72,6 +72,15 @@ jobs:
             curl -sSL "${{inputs.setup-script-location}}" | bash
       - name: Run test
         run: | 
+          modules=$(echo ${{inputs.package-names}} | sed 's/\[//g' | sed 's/,//g' | sed 's/\]//g')
+
+          arrModules=($modules)
+          coverages=""
+
+          for module in ${modules[@]}; do
+                  coverages="$coverages --cov=$module"
+          done
+        
           testLocations=$(echo ${{inputs.test-file-locations}} | sed 's/\[//g' | sed 's/,//g' | sed 's/\]//g')
 
           arrTestLocations=($testLocations)
