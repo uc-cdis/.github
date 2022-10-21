@@ -20,6 +20,21 @@ jobs:
     name: Test and deploy
     runs-on: ubuntu-latest
     steps:
+    - name: Check PR
+      run: |
+        echo Event name: ${{ github.event_name }}
+        if [[ ${{ github.event_name }} = "pull_request" || ${{ github.event_name }} = "pull_request_target" ]]; then
+          is_fork=`curl --header "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.event.repository.full_name }}/pulls/${{github.event.number}} | jq -r .head.repo.fork`
+          echo Is this a fork? $is_fork
+          if [ $is_fork = "true" ]; then
+            labels=`curl -s --header "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.event.repository.full_name }}/issues/${{github.event.number}}/labels | jq -r '.[].name'`
+            echo Labels: $labels
+            if [[ ! " ${labels[*]} " =~ "safe to test" ]]; then
+              echo "ERROR: PRs from forks must be labeled with 'safe to test' to run the CI"
+              exit 1
+            fi
+          fi
+        fi
     - name: Set up Python
       uses: actions/setup-python@v2.3.1
       with:
