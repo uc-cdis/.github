@@ -77,8 +77,8 @@ jobs:
           arrModules=($modules)
           coverages=""
 
-          for module in ${modules[@]}; do
-                  coverages="$coverages --cov=$module"
+          for module in ${arrModules[@]}; do
+            coverages="$coverages --cov=$module"
           done
         
           testLocations=$(echo ${{inputs.test-file-locations}} | sed 's/\[//g' | sed 's/,//g' | sed 's/\]//g')
@@ -88,5 +88,5 @@ jobs:
           echo poetry run pytest -vv --cov=${{inputs.package-name}} --cov-report xml ${arrTestLocations[0]}
 
           for (( i=1; i<${#arrTestLocations[@]}; i++ )); do
-            echo poetry run pytest -vv --cov=${{inputs.package-name}} --cov-report xml --cov-append ${arrTestLocations[$i]}
+            poetry run pytest -vv --cov=${{inputs.package-name}} --cov-report xml --cov-append ${arrTestLocations[$i]}
           done
