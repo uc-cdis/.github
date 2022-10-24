@@ -83,7 +83,9 @@ jobs:
       uses: chrislennon/action-aws-cli@1.1
     - name: Deploy to S3
       if: github.ref == 'refs/heads/master'
-      run: aws s3 cp users s3://${{ inputs.BUCKET }}/ --recursive --region ${{ inputs.REGION }}
+      run: |
+        cd ${{ github.event.repository.name }}
+        aws s3 cp users s3://${{ inputs.BUCKET }}/ --recursive --region ${{ inputs.REGION }}
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
