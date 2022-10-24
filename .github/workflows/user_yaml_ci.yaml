@@ -49,7 +49,7 @@ jobs:
         git clone https://Bot:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.event.repository.full_name }}
         cd ${{ github.event.repository.name }}
         if [ ${{ github.event_name }} = "push" ]; then
-          branch=${GITHUB_REF##*/}
+          branch=${GITHUB_REF#refs/*/}
           echo Push event: checking out branch $branch
           git checkout $branch
         else # this is a pull request
