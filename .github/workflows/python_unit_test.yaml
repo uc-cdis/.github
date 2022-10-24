@@ -5,8 +5,9 @@ on:
     inputs:
       setup-script-location:
         description: 'A URL identifying a Bash script that can run commands needed for service-specific test setup'
-        required: true
+        required: false
         type: string
+        default: 'https://raw.githubusercontent.com/uc-cdis/.github/feat/reusable-unit-tests/default/tests/default_ci_setup.sh'
       python-versions:
         description: 'The version of Python to run the unit tests against. Expected to be a string representing an array of versions, this construct is needed due to limitations with Github Actions'
         required: false
