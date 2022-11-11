@@ -1,11 +1,7 @@
 # github action set up NPM with input version, and run npm install, then run npm test, then run codecov and upload coverage report to codecov.io
 name: NPM Unit Test
-
 on:
-  push:
-  pull_request:
-    types: [opened, reopened]
-
+  workflow_call:
     inputs:
       version:
         description: 'NPM version'
