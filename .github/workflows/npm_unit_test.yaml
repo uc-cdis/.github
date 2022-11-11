@@ -1,0 +1,47 @@
+# github action set up NPM with input version, and run npm install, then run npm test, then run codecov and upload coverage report to codecov.io
+name: NPM Unit Test
+
+on:
+  push:
+  pull_request:
+    types: [opened, reopened]
+
+    inputs:
+      version:
+        description: 'NPM version'
+        required: true
+        default: '14'
+
+
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  unit_test:
+    name: NPM Unit Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ inputs.NODE_VERSION }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ inputs.NODE_VERSION }}
+
+      - name: NPM Install
+        run: npm install
+
+      - name: NPM Test
+        run: npm test
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          file: ./coverage/*.json
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: true
+          with:
+            token: ${{ secrets.CODECOV_TOKEN }}
