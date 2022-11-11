@@ -3,10 +3,15 @@ name: NPM Unit Test
 on:
   workflow_call:
     inputs:
-      node_version:
-        description: 'NPM version'
+      node-version:
+          required: false
+          type: string
+          default: "14"
+      NPM_VERSION:
+        description: 'The NPM version to use for this job'
         required: false
-        default: '14'
+        type: string
+        default: "8.5"
 
 
 concurrency:
@@ -24,18 +29,10 @@ jobs:
       - name: Use Node.js ${{ inputs.NODE_VERSION }}
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ inputs.NODE_VERSION }}
+          node-version: ${{ inputs.NPM_VERSION }}
 
-      - name: NPM Install
-        run: npm install
+      - name: NPM CI
+        run: npm ci
 
       - name: NPM Test
         run: npm test
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
-        with:
-          file: ./coverage/*.json
-          flags: unittests
-          name: codecov-umbrella
-          fail_ci_if_error: true
