@@ -5,7 +5,7 @@ on:
     inputs:
       NODE_VERSION:
         description: 'NPM version'
-        required: true
+        required: false
         default: '14'
 
 
