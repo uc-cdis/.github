@@ -8,7 +8,7 @@ on:
         required: false
         type: string
       python-version:
-        description: 'The Python version to use'
+        description: 'The Python version to use and defaults to latest'
         required: false
         default: 'latest'
         type: string
