@@ -3,7 +3,7 @@ name: NPM Unit Test
 on:
   workflow_call:
     inputs:
-      NODE_VERSION:
+      node_version:
         description: 'NPM version'
         required: false
         default: '14'
