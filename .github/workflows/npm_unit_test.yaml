@@ -27,7 +27,6 @@ jobs:
           node-version: ${{ inputs.NPM_VERSION }}
 
       - name: NPM CI
-        run: npm ci
-
-      - name: NPM Test
-        run: npm test
+        run: |
+          npm run ci
+          npm run test
