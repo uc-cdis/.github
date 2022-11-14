@@ -4,9 +4,10 @@ on:
   workflow_call:
     inputs:
       node-version:
-          required: false
-          type: matrix
-          default: [ 16.x ]
+        description: 'Node version'
+        required: false
+        type: matrix
+        default: [12.x, 14.x]
 
 jobs:
   build:
