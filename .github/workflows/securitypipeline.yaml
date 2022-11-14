@@ -35,7 +35,7 @@ jobs:
           webhook-url: ${{ secrets.ACTION_MONITORING_SLACK }}
 
   # Snyk native integration doesn't support poetry.lock files - this runs a check if a poetry.lock is found then runs a CLI scan to add coverage.
-  Poetry_file_existence:
+  Poetry_Vulnerabilities:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -45,7 +45,7 @@ jobs:
 
       - name: Check file existence
         id: check_files
-        uses: andstor/file-existence-action@v1
+        uses: andstor/file-existence-action@v2
         with:
           files: "poetry.lock"
 
@@ -58,6 +58,15 @@ jobs:
         with:
           command: test
           args: --org=plan-x --severity-threshold=high --fail-on=upgradable
+      - name: comment on PR
+        # comment on PR if snyk found vulnerabilities
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.number }}
+          body: |
+            Snyk found vulnerabilities in this PR
+          reactions: rocket
+        if: ${{ failure() && github.event_name == 'pull_request' }}
       - name: Snyk UI upload
         uses: snyk/actions/python@master
         if: github.ref == 'refs/heads/master'
