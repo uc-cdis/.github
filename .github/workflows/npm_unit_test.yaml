@@ -26,6 +26,5 @@ jobs:
         if: ${{ github.repository == 'uc-cdis/data-portal' }}
       - run: npm run relay
       - run: npm run params
-      - name: scripts
       - run: ./tests/*.sh
         shell: bash
