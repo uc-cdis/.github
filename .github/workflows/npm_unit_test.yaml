@@ -6,24 +6,20 @@ on:
       node-version:
           required: false
           type: matrix
-          default: "16"
-      NPM_VERSION:
-        description: 'The NPM version to use for this job'
-        required: false
-        type: string
-        default: "8.5"
+          default: [16.x]
 
-    build:
-      runs-on: ubuntu-latest
-      strategy:
-        matrix:
-          node: [ ${{ inputs.node-version }} ]
-      name: Node ${{ matrix.node }} sample
-      steps:
-        - uses: actions/checkout@v3
-        - name: Setup node
-          uses: actions/setup-node@v3
-          with:
-            node-version: ${{ matrix.node }}
-        - run: npm ci
-        - run: npm test
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [ ${{ inputs.node-version }} ]
+    name: Node ${{ matrix.node }} sample
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm ci
+      - run: npm test
