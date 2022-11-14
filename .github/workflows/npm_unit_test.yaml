@@ -22,3 +22,10 @@ jobs:
       - run: npm ci
       - run: npm run build --if-present
       - run: npm test
+      - name: NPM advanced script
+        if: ${{ github.repository == 'uc-cdis/data-portal' }}
+      - run: npm run relay
+      - run: npm run params
+      - name: scripts
+      - run: ./tests/*.sh
+        shell: bash
