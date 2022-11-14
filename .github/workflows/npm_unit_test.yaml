@@ -6,7 +6,7 @@ on:
       node-version:
         description: 'Node.js version Matrix'
         required: true
-        type: string
+        type: matrix
 
 jobs:
   build:
