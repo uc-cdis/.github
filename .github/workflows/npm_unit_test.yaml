@@ -6,7 +6,7 @@ on:
       node-version:
           required: false
           type: matrix
-          default: [16.x]
+          default: [ 16.x ]
 
 jobs:
   build:
@@ -20,6 +20,6 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node }}
+           node-version: ${{ matrix.node }}
       - run: npm ci
       - run: npm test
