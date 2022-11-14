@@ -32,7 +32,6 @@ jobs:
         uses: andstor/file-existence-action@v2
         with:
           files: "testSchema.sh"
-          run_if_exists: true
           if: ${{ steps.check_files.outputs.files_exists == 'true' }}
           run: |
             - ./testSchema.sh
