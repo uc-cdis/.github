@@ -4,20 +4,23 @@ on:
   workflow_call:
     inputs:
       node-version:
-        description: 'Node version to use'
+        description: 'Node version'
         required: false
-        type: string
-        default: '16'
+        type: matrix
+        default: [14.x, 16.x]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Node ${{ inputs.node-version }} unit test
+    strategy:
+      matrix:
+        node-version: ${{ inputs.node-version }}
+    name: Node ${{ matrix.node }} unit test
     steps:
       - uses: actions/checkout@v3
       - name: Setup node
-        uses: actions/setup-node@v3.4.1
+        uses: actions/setup-node@v3
         with:
-           node-version: $${{ inputs.node-version }}
+           node-version: ${{ matrix.node }}
       - run: npm ci
       - run: npm test
