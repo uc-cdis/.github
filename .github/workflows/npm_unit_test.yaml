@@ -6,7 +6,7 @@ on:
       node-version:
           required: false
           type: matrix
-          default: "[16]"
+          default: "16"
       NPM_VERSION:
         description: 'The NPM version to use for this job'
         required: false
