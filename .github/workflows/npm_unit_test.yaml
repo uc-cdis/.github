@@ -7,7 +7,7 @@ on:
         description: 'Node version'
         required: false
         type: matrix
-        default: [12.x, 14.x]
+        default: [16.x, 18.x]
 
 jobs:
   build:
