@@ -13,8 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [ ${{ inputs.node-version }} ]
-    name: Node ${{ matrix.node }} sample
+        node-version: ${{ inputs.node-version }}
+    name: Node ${{ matrix.node }} unit test
     steps:
       - uses: actions/checkout@v3
       - name: Setup node
