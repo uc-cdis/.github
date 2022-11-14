@@ -5,28 +5,25 @@ on:
     inputs:
       node-version:
           required: false
-          type: string
-          default: "16"
+          type: matrix
+          default: "[16]"
       NPM_VERSION:
         description: 'The NPM version to use for this job'
         required: false
         type: string
         default: "8.5"
 
-jobs:
-  unit_test:
-    name: NPM Unit Test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Use Node.js ${{ inputs.NODE_VERSION }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ inputs.NPM_VERSION }}
-
-      - name: NPM CI
-        run: |
-          npm install -g npm && npm ci
-          npm run test
+    build:
+      runs-on: ubuntu-latest
+      strategy:
+        matrix:
+          node: [ ${{ inputs.node-version }} ]
+      name: Node ${{ matrix.node }} sample
+      steps:
+        - uses: actions/checkout@v3
+        - name: Setup node
+          uses: actions/setup-node@v3
+          with:
+            node-version: ${{ matrix.node }}
+        - run: npm ci
+        - run: npm test
