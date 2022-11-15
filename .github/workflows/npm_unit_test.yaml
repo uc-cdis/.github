@@ -42,7 +42,7 @@ jobs:
           node-version: ${{ inputs.node-version }}
           cache: 'npm'
           cache-dependency-path: '**/package-lock.json'
-      - run: npm install -g npm@8.5
+      - run: npm install -g npm@${{ inputs.npm-version }}
       - run: npm ci
       - run: npm run build --if-present
         working-directory: ./src
