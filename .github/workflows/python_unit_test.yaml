@@ -24,7 +24,12 @@ env:
 jobs:
   run_tests:
     runs-on: ubuntu-latest
-
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     #Defining the Postgres DB service we will need to run the unit tests if postgres-needed is true
     services:
@@ -40,13 +45,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
-    steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-            username: ${{ secrets.DOCKERHUB_USERNAME }}
-            password: ${{ secrets.DOCKERHUB_TOKEN }}
+    Unit Test:
       - name: Check out code
         uses: actions/checkout@v3
       - name: Set up python
