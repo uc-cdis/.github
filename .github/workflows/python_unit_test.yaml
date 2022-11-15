@@ -30,22 +30,19 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-    #Defining the Postgres DB service we will need to run the unit tests if postgres-needed is true
-    services:
-      if: ${{ inputs.postgres-needed == 'true' }}
-      postgres:
-        image: postgres:9.6-bullseye
-        ports:
-          - "5432:5432"
-        env:
-          POSTGRES_PASSWORD: ${{ secrets.default_postgres_password }}
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    test:
+        services:
+          if: ${{ inputs.postgres-needed == 'true' }}
+          postgres:
+            image: postgres:12.6
+            env:
+              POSTGRES_PASSWORD: ${{ secrets.default_postgres_password }}
+            ports:
+              - 5432:5432
+            options: >-
+              --health-cmd pg_isready
+              --health-interval 10s
+              --health-timeout 5s
+              --health-retries 5
       - name: Check out code
         uses: actions/checkout@v3
       - name: Set up python
