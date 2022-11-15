@@ -31,7 +31,7 @@ jobs:
         working-directory: ./src
       - run: npm test
 
-  build data portal:
+  build-data-portal:
 
     runs-on: ubuntu-latest
     if: ${{ github.repository == 'uc-cdis/data-portal' }}
