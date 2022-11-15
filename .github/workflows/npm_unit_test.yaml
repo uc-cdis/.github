@@ -9,8 +9,9 @@ on:
         type: string
       npm-version:
         description: 'NPM version'
-        required: true
+        required: false
         type: string
+        default: '8.5'
 
 jobs:
   build:
