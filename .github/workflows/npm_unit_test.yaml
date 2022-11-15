@@ -7,6 +7,10 @@ on:
         description: 'Node.js version'
         required: true
         type: string
+      npm-version:
+        description: 'NPM version'
+        required: true
+        type: string
 
 jobs:
   build:
@@ -26,7 +30,7 @@ jobs:
         working-directory: ./src
       - run: npm test
 
-  build2:
+  build data portal:
 
     runs-on: ubuntu-latest
     if: ${{ github.repository == 'uc-cdis/data-portal' }}
