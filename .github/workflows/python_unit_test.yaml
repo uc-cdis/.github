@@ -19,7 +19,7 @@ on:
         type: string
 
 env:
-  PGPASSWORD: ${{ secrets.default_postgres_password }}
+  PGPASSWORD: postgres
 
 jobs:
   run_tests:
