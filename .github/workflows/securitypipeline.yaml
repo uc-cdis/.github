@@ -66,15 +66,6 @@ jobs:
         with:
           command: test
           args: --org=plan-x --severity-threshold=high --fail-on=upgradable
-      - name: comment on PR
-        # comment on PR if snyk found vulnerabilities
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          issue-number: ${{ github.event.number }}
-          body: |
-            Snyk found vulnerabilities in this PR
-          reactions: rocket
-        if: ${{ failure() && github.event_name == 'pull_request' }}
       - name: Snyk UI upload
         uses: snyk/actions/python@master
         if: github.ref == 'refs/heads/master'
