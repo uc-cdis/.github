@@ -45,11 +45,5 @@ jobs:
       - run: npm run relay
       - run: npm run params
       - run: npm test
-      - name: check file existence
-        id: check_files
-        uses: andstor/file-existence-action@v2
-        with:
-          files: "testSchema.sh"
-          if: ${{ steps.check_files.outputs.files_exists == 'true' }}
-          run: |
-            - ./testSchema.sh
+      - run: |
+            - bash $ ./testSchema.sh
