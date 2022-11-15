@@ -27,7 +27,7 @@ jobs:
 
       - name: Report Status
         if: failure()
-        uses: act10ns/slack@v1.6.0
+        uses: act10ns/slack@v2.0.0
         with:
           channel: '#infosec-alerts'
           status: ${{ job.status }}
