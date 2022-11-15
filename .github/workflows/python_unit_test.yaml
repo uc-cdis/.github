@@ -28,7 +28,9 @@ jobs:
 
     #Defining the Postgres DB service we will need to run the unit tests if postgres-needed is true
     services:
+      #if this service is needed, we will run the postgres container
       postgres:
+        if: ${{ inputs.postgres-needed == 'true' }}
         image: postgres:9.6-bullseye
         ports:
           - "5432:5432"
