@@ -5,6 +5,7 @@ on:
       python-poetry:
         description: 'Poetry used to install dependencies'
         required: false
+        type: string
         default: 'true'
 
 jobs:
