@@ -67,6 +67,7 @@ jobs:
           command: test
           args: --org=plan-x --severity-threshold=high --fail-on=upgradable
       - name: comment on PR
+        depends-on: Poetry Found
         # comment on PR if snyk found vulnerabilities
         uses: peter-evans/create-or-update-comment@v1
         with:
