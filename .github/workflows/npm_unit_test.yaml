@@ -43,7 +43,7 @@ jobs:
       - run: npm run build --if-present
         working-directory: ./src
       - run: npm run relay
-      - run: npm params
+      - run: npm run params
       - run: npm test
       - name: check file existence
         id: check_files
