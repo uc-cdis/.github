@@ -14,7 +14,7 @@ on:
         default: '8.5'
 
 jobs:
-  build:
+  build-generic-unit-test:
 
     runs-on: ubuntu-latest
     if: ${{ github.repository != 'uc-cdis/data-portal' }}
@@ -31,7 +31,7 @@ jobs:
         working-directory: ./src
       - run: npm test
 
-  build-data-portal:
+  build-data-portal-unit-test:
 
     runs-on: ubuntu-latest
     if: ${{ github.repository == 'uc-cdis/data-portal' }}
