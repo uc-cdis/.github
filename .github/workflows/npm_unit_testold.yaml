@@ -12,19 +12,9 @@ on:
         required: false
         type: string
         default: '8.5'
-      pre-test:
-        description: 'Pre-test command'
-        required: false
-        type: string
-        default: ''
-      post-test:
-        description: 'Post-test command'
-        required: false
-        type: string
-        default: ''
 
 jobs:
-  test-generic-unit-test:
+  build:
 
     runs-on: ubuntu-latest
     if: ${{ github.repository != 'uc-cdis/data-portal' }}
@@ -38,14 +28,27 @@ jobs:
           cache-dependency-path: '**/package-lock.json'
       - run: npm ci
       - run: npm run build --if-present
-      - run: ${{ inputs.pre-test }}
         working-directory: ./src
       - run: npm test
-      - run: ${{ inputs.post-test }}
+
+  build-data-portal:
+
+    runs-on: ubuntu-latest
+    if: ${{ github.repository == 'uc-cdis/data-portal' }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ inputs.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+      - run: npm install -g npm@${{ inputs.npm-version }}
+      - run: npm ci
+      - run: npm run build --if-present
         working-directory: ./src
+      - run: npm run relay
+      - run: npm run params
+      - run: npm test
       - run: |
-          if [ -d "./src/scripts" ]; then
-              for f in ./testSchema.sh; do
-              bash "$f" -H
-              done
-          fi
+          bash ${GITHUB_WORKSPACE}/testSchema.sh
