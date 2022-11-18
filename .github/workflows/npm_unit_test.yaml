@@ -27,7 +27,6 @@ jobs:
   test-generic-unit-test:
 
     runs-on: ubuntu-latest
-    if: ${{ github.repository != 'uc-cdis/data-portal' }}
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ inputs.node-version }}
