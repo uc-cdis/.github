@@ -6,11 +6,12 @@ on:
       setup-script-location:
         description: 'A URL identifying a Bash script that can run commands needed for service-specific test setup'
         required: false
+        default: 'default_ci_setup.sh'
         type: string
       python-version:
         description: 'The Python version to use and defaults to latest'
         required: false
-        default: 'latest'
+        default: '3.9'
         type: string
       postgres-needed:
         description: 'Whether or not a Postgres backend is needed'
@@ -45,13 +46,16 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: Set up python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ inputs.python-version }}
       - name: Install poetry
         run: |
-          pip --version
+          pip install --upgrade pip
+          pip version
           pip install poetry
           poetry install -vv
       - name: Service specific setup
@@ -59,10 +63,4 @@ jobs:
           curl -sSL "${{inputs.setup-script-location}}" | bash
       - name: Run test
         run: |
-          poetry run pytest -vv --cov=${{ env.REPO_NAME }} --cov=migrations/versions --cov-report xml tests
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage.xml
-          fail_ci_if_error: true
+          poetry run pytest -vv

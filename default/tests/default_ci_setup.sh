@@ -1,1 +1,1 @@
-echo "No special setup needed! Continiung..."
+echo "No special setup needed! Continuing..."
