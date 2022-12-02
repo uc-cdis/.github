@@ -81,6 +81,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
       - name: Set Variables
         shell: bash
         run: |
@@ -122,6 +125,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
           cache-to: type=inline
+          platforms: linux/x86, linux/amd64, linux/arm64
 
       - name: Build and push (Quay only)
         if: ${{ inputs.USE_QUAY_ONLY }}
@@ -135,3 +139,4 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
           cache-to: type=inline
+          platforms: linux/x86, linux/amd64, linux/arm64
