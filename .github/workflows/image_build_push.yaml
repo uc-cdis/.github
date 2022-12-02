@@ -31,6 +31,10 @@ on:
         required: false
         type: boolean
         default: false
+      BUILD_PLATFORMS:
+        required: false
+        type: string
+        default: "linux/amd64, linux/arm64"
     secrets:
       ECR_AWS_ACCESS_KEY_ID:
         required: true
@@ -125,7 +129,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
           cache-to: type=inline
-          platforms: linux/amd64, linux/arm64
+          platforms: ${{ inputs.BUILD_PLATFORMS }}
 
       - name: Build and push (Quay only)
         if: ${{ inputs.USE_QUAY_ONLY }}
@@ -139,4 +143,4 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
           cache-to: type=inline
-          platforms: linux/amd64, linux/arm64
+          platforms: ${{ inputs.BUILD_PLATFORMS }}
