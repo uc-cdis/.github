@@ -74,14 +74,6 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v3
-        with:
-          images: |
-            quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
-            ${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -115,6 +107,14 @@ jobs:
             echo "REPO_NAME=${{ inputs.OVERRIDE_REPO_NAME }}"
             echo "REPO_NAME=${{ inputs.OVERRIDE_REPO_NAME }}" >> $GITHUB_ENV
           fi
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
+            ${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
 
       - name: Build and push
         if: ${{ !inputs.USE_QUAY_ONLY }}
