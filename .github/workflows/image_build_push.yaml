@@ -119,6 +119,9 @@ jobs:
       - name: Build and push
         if: ${{ !inputs.USE_QUAY_ONLY }}
         uses: docker/build-push-action@v3
+        # You may get ECR-push errors when first adding the workflow to a github repo.
+        # If so, run the following in dev/qa to create the ECR repository:
+        # qaplanetv1@cdistest_dev_admin:~$ aws ecr create-repository --repository-name "gen3/<repo name>" --image-scanning-configuration scanOnPush=true
         with:
           context: ${{ inputs.DOCKERFILE_BUILD_CONTEXT }}
           file: ${{ inputs.DOCKERFILE_LOCATION }}
