@@ -78,13 +78,13 @@ jobs:
         uses: docker/setup-buildx-action@v2
         with:
           driver: kubernetes
-          driver-opts: nodeselector=kubernetes.io/arch=amd64,node.kubernetes.io/instance-type=t3.2xlarge,namespace=self-hosted-runners,requests.cpu=7,requests.memory=29G
+          driver-opts: nodeselector="kubernetes.io/arch=amd64,node.kubernetes.io/instance-type=t3.2xlarge",namespace=self-hosted-runners,requests.cpu=7,requests.memory=29G
           platforms: linux/amd64
           append: |
             - platforms: linux/arm64
               name: k8s-arm-${{ inputs.OVERRIDE_TAG_NAME }}"
               driver-opts:
-              - nodeselector=kubernetes.io/arch=arm64,node.kubernetes.io/instance-type=c7g.2xlarge
+              - nodeselector="kubernetes.io/arch=arm64,node.kubernetes.io/instance-type=c7g.2xlarge"
               - namespace=self-hosted-runners
               - requests.cpu=7
               - requests.memory=14G
