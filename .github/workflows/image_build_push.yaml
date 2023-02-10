@@ -82,6 +82,7 @@ jobs:
           platforms: linux/amd64
           append: |
             - platforms: linux/arm64
+              name: k8s-arm
               driver-opts:
               - nodeselector=kubernetes.io/arch=arm64
 
