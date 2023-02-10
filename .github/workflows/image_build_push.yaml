@@ -78,6 +78,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
         with:
           driver: kubernetes
+          name: k8s-amd
           driver-opts: nodeselector=kubernetes.io/arch=amd64
           platforms: linux/amd64
           append: |
