@@ -76,6 +76,16 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+        with:
+          driver: kubernetes
+          driver-opts: |
+            nodeselector=kubernetes.io/arch=amd64
+          platforms: linux/amd64
+          append: |
+            name: k8s
+            driver-opts: |
+              nodeselector=kubernetes.io/arch=arm64
+            platforms: linux/arm64
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
