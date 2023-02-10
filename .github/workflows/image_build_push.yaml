@@ -82,7 +82,8 @@ jobs:
             nodeselector=kubernetes.io/arch=amd64
           platforms: linux/amd64
           append: |
-            - driver-opts: nodeselector=kubernetes.io/arch=arm64
+            - driver-opts: |
+              nodeselector=kubernetes.io/arch=arm64
             - platforms: linux/arm64
 
       - name: Set up QEMU
