@@ -78,12 +78,11 @@ jobs:
         uses: docker/setup-buildx-action@v2
         with:
           driver: kubernetes
-          name: k8s-amd
           driver-opts: nodeselector=kubernetes.io/arch=amd64,namespace=self-hosted-runners
           platforms: linux/amd64
           append: |
             - platforms: linux/arm64
-              name: k8s-arm
+              name: k8s-arm-${{ inputs.OVERRIDE_TAG_NAME }}"
               driver-opts:
               - nodeselector=kubernetes.io/arch=arm64
               - namespace=self-hosted-runners
