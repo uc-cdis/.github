@@ -48,7 +48,7 @@ on:
 jobs:
   ci:
     name: Build Image and Push
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       # https://github.com/docker/login-action#quayio
       - name: Login to Quay.io
