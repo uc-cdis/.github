@@ -79,7 +79,7 @@ jobs:
         with:
           driver: kubernetes
           name: k8s-amd
-          driver-opts: nodeselector=kubernetes.io/arch=amd64, namespace=self-hosted-runners
+          driver-opts: nodeselector=kubernetes.io/arch=amd64,namespace=self-hosted-runners
           platforms: linux/amd64
           append: |
             - platforms: linux/arm64
