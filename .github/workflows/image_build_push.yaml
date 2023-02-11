@@ -84,10 +84,7 @@ jobs:
             - platforms: linux/arm64
               name: k8s-arm
               driver-opts:
-              - \"nodeselector=kubernetes.io/arch=arm64,node.kubernetes.io/instance-type=c7g.2xlarge\"
-              - namespace=self-hosted-runners
-              - requests.cpu=7
-              - requests.memory=14G
+              - namespace=self-hosted-runners,"nodeselector=kubernetes.io/arch=arm64,node.kubernetes.io/instance-type=c7g.2xlarge",requests.cpu=7,requests.memory=14G
 
       - name: Set Variables
         shell: bash
