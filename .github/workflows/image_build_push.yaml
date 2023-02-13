@@ -27,6 +27,10 @@ on:
         required: false
         type: string
         default: ""
+      OVERRIDE_BUILDER_NAME:
+        required: false
+        type: string
+        default: ""
       USE_QUAY_ONLY:
         required: false
         type: boolean
@@ -82,7 +86,7 @@ jobs:
           platforms: linux/amd64
           append: |
             - platforms: linux/arm64
-              name: k8s-arm
+              name: k8s-arm${{ inputs.OVERRIDE_BUILDER_NAME }}
               driver-opts:
               - namespace=self-hosted-runners,"nodeselector=kubernetes.io/arch=arm64,node.kubernetes.io/instance-type=c7g.2xlarge",requests.cpu=6,requests.memory=10G
 
