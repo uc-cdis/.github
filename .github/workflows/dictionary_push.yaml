@@ -34,6 +34,7 @@ jobs:
       with:
         virtualenvs-create: true
         virtualenvs-in-project: false
+        version: 1.3.2
     - name: Install AWS CLI
       uses: chrislennon/action-aws-cli@1.1
     - name: Initialize Packages
