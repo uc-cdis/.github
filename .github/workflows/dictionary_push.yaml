@@ -28,14 +28,15 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.6.7'
+        python-version: '3.6.9'
     - name: Install AWS CLI
-      if: github.ref == 'refs/heads/master'
       uses: chrislennon/action-aws-cli@1.1
     - name: Test and Deploy Dictionary
       run: |
+        pip install nosetests
         yes | python setup.py install
-        git clone https://github.com/uc-cdis/dictionaryutils; cd dictionaryutils
+        git clone https://github.com/uc-cdis/dictionaryutils
+        cd dictionaryutils
         ./run_tests.sh
         aws s3 cp artifacts s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME --recursive --region ${{ inputs.REGION }}
       env:
