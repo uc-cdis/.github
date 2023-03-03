@@ -21,7 +21,7 @@ on:
         required: true
 jobs:
   test:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
     - name: checkout
       uses: actions/checkout@v3.3.0
@@ -34,7 +34,6 @@ jobs:
       with:
         virtualenvs-create: true
         virtualenvs-in-project: false
-        installer-parallel: true
     - name: Install AWS CLI
       uses: chrislennon/action-aws-cli@1.1
     - name: Initialize Packages
