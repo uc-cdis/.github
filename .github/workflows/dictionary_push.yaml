@@ -31,12 +31,12 @@ jobs:
         python-version: '3.6.9'
     - name: Install AWS CLI
       uses: chrislennon/action-aws-cli@1.1
-    - name: Test and Deploy Dictionary
+    - name: Initialize Packages
       run: |
-        pip install nose
         yes | python setup.py install
-        git clone https://github.com/uc-cdis/dictionaryutils
-        cd dictionaryutils
+        git clone https://github.com/uc-cdis/dictionaryutils; cd dictionaryutils
+    - name: Deploy Dictionary
+      run: |
         ./run_tests.sh
         aws s3 cp artifacts s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME --recursive --region ${{ inputs.REGION }}
       env:
