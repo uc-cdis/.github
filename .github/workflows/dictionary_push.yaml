@@ -34,7 +34,6 @@ jobs:
       uses: chrislennon/action-aws-cli@1.1
     - name: Test and Deploy Dictionary
       run: |
-        pip install -r requirements.txt
         yes | python setup.py install
         git clone https://github.com/uc-cdis/dictionaryutils; cd dictionaryutils
         ./run_tests.sh
