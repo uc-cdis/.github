@@ -34,8 +34,7 @@ jobs:
       with:
         virtualenvs-create: true
         virtualenvs-in-project: false
-        virtualenvs-path: ~/my-custom-path
-    installer-parallel: true
+        installer-parallel: true
     - name: Install AWS CLI
       uses: chrislennon/action-aws-cli@1.1
     - name: Initialize Packages
