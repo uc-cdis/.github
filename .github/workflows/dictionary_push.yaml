@@ -33,7 +33,7 @@ jobs:
       uses: chrislennon/action-aws-cli@1.1
     - name: Test and Deploy Dictionary
       run: |
-        pip install nosetests
+        pip install nose
         yes | python setup.py install
         git clone https://github.com/uc-cdis/dictionaryutils
         cd dictionaryutils
