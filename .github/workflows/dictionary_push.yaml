@@ -1,0 +1,44 @@
+name: Test and deploy dictionaries
+
+on:
+  workflow_call:
+    inputs:
+      BUCKET:
+        required: false
+        type: string
+        default: "dictionary-artifacts"
+      REGION:
+        required: false
+        type: string
+        default: "us-east-1"
+      DIRECTORY:
+        required: true
+        type: string
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3.3.0
+    - name: Set up Python
+      uses: actions/setup-python@v4.5.0
+      with:
+        python-version: '3.6'
+    - name: Install AWS CLI
+      if: github.ref == 'refs/heads/master'
+      uses: chrislennon/action-aws-cli@1.1
+    - name: Test and Deploy Dictionary
+      run: |
+        pip install -r requirements.txt
+        yes | python setup.py install
+        git clone https://github.com/uc-cdis/dictionaryutils; cd dictionaryutils
+        ./run_tests.sh
+        aws s3 cp artifacts s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME --recursive --region ${{ inputs.REGION }}
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
