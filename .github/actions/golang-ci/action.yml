@@ -31,7 +31,7 @@ runs:
     - name: Run Unit tests
       id: unit_tests_step
       run: |
-        go test ${{ inputs.TESTS_LOCATION }} -v -coverpkg=${{ inputs.TESTS_LOCATION }} -race -covermode atomic -coverprofile=${{ inputs.COVERAGE_PROFILE_OUTPUT_LOCATION }}
+        go test ${{ inputs.TESTS_LOCATION }} -v -p 1 -coverpkg=${{ inputs.TESTS_LOCATION }} -race -covermode atomic -coverprofile=${{ inputs.COVERAGE_PROFILE_OUTPUT_LOCATION }}
       shell: bash
     - name: Lint source code
       uses: golangci/golangci-lint-action@v3
