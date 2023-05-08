@@ -59,7 +59,7 @@ jobs:
           poetry install -vv
       - name: Service specific setup
         run: |
-          sh -c ./tests/{{setup-script}}
+          bash -c ./tests/{{setup-script}}
       - name: Run test
         run: |
           poetry run pytest -vv
