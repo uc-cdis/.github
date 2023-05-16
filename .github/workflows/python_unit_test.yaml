@@ -6,8 +6,12 @@ on:
       setup-script:
         description: 'A Bash script in the Python repo that handles any setup needed for testing'
         required: false
-        default: 'default_ci_setup.sh'
+        default: 'ci_setup.sh'
         type: string
+      test-script:
+        description: 'A Bash script in the .test directory of the Python repo that handles running tests'
+        required: false
+        default: 'ci_commands_script.sh'
       python-version:
         description: 'The Python version to use and defaults to latest'
         required: false
@@ -25,7 +29,6 @@ env:
 jobs:
   run_tests:
     runs-on: ubuntu-latest
-
 
     #Defining the Postgres DB service we will need to run the unit tests if postgres-needed is true
     services:
@@ -67,4 +70,4 @@ jobs:
           fi
       - name: Run test
         run: |
-          poetry run pytest -vv
+          bash -c .test/{{ env.}}
