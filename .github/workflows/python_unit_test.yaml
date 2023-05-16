@@ -4,12 +4,12 @@ on:
   workflow_call:
     inputs:
       setup-script:
-        description: 'A Bash script in the Python repo that handles any setup needed for testing'
+        description: 'A Bash script in the tests directory of the Python repo that handles any setup needed for testing'
         required: false
         default: 'ci_setup.sh'
         type: string
       test-script:
-        description: 'A Bash script in the .test directory of the Python repo that handles running tests'
+        description: 'A Bash script in the tests directory of the Python repo that handles running tests'
         required: false
         default: 'ci_commands_script.sh'
       python-version:
@@ -62,12 +62,12 @@ jobs:
           poetry install -vv
       - name: Run the service-specific setup script, if it exists
         run: |
-          if [ -f .tests/${{ env.setup-script }} ]; then
-            bash -c .tests/{{ env.setup-script }}
+          if [ -f tests/${{ env.setup-script }} ]; then
+            bash -c tests/{{ env.setup-script }}
             echo "Successfully found and ran setup script {{ env.setup-script}} "
           else
-            echo "Could not find {{ env.setup-script }} in the .tests directory"
+            echo "Could not find {{ env.setup-script }} in the tests directory"
           fi
       - name: Run test
         run: |
-          bash -c .test/{{ env.}}
+          bash -c tests/{{ env.}}
