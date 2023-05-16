@@ -57,9 +57,14 @@ jobs:
           pip version
           pip install poetry
           poetry install -vv
-      - name: Service specific setup
+      - name: Run the service-specific setup script, if it exists
         run: |
-          bash -c ./tests/{{setup-script}}
+          if [ -f .tests/${{ env.setup-script }} ]; then
+            bash -c .tests/{{ env.setup-script }}
+            echo "Successfully found and ran setup script {{ env.setup-script}} "
+          else
+            echo "Could not find {{ env.setup-script }} in the .tests directory"
+          fi
       - name: Run test
         run: |
           poetry run pytest -vv
