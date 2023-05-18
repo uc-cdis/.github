@@ -70,4 +70,4 @@ jobs:
           fi
       - name: Run test
         run: |
-          bash -c tests/{{ env.}}
+          bash -c tests/{{ env.test-script }}
