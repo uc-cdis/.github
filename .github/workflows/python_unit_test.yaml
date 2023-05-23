@@ -68,5 +68,4 @@ jobs:
             echo "Could not find {{ inputs.setup-script }} in the tests directory"
           fi
       - name: Run test
-        run: |
-          bash -c tests/{{ inputs.test-script }}
+        run: tests/{{ inputs.test-script }}
