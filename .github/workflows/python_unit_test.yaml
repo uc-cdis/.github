@@ -60,12 +60,7 @@ jobs:
           pip install poetry
           poetry install -vv
       - name: Run the service-specific setup script, if it exists
-        run: |
-          if [ -f tests/${{ inputs.setup-script }} ]; then
-            bash -c tests/{{ inputs.setup-script }}
-            echo "Successfully found and ran setup script {{ inputs.setup-script}} "
-          else
-            echo "Could not find {{ inputs.setup-script }} in the tests directory"
-          fi
+        run: bash -c tests/{{ inputs.setup-script }}
+
       - name: Run test
         run: tests/{{ inputs.test-script }}
