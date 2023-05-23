@@ -12,6 +12,7 @@ on:
         description: 'A Bash script in the tests directory of the Python repo that handles running tests'
         required: false
         default: 'ci_commands_script.sh'
+        type: string
       python-version:
         description: 'The Python version to use and defaults to latest'
         required: false
