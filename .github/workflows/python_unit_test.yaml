@@ -60,7 +60,7 @@ jobs:
           pip install poetry
           poetry install -vv
       - name: Run the service-specific setup script, if it exists
-        run: tests/{{ inputs.setup-script }}
+        run: tests/${{ inputs.setup-script }}
 
       - name: Run test
-        run: tests/{{ inputs.test-script }}
+        run: tests/${{ inputs.test-script }}
