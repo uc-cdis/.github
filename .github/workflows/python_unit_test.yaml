@@ -26,6 +26,8 @@ on:
 
 env:
   PGPASSWORD: postgres
+  POSTGRES_HOST: localhost
+  POSTGRES_PORT: 5432
 
 jobs:
   run_tests:
