@@ -72,3 +72,4 @@ jobs:
           else
             echo "Test script ${{ inputs.test-script }} not found. Falling back to default command"
             poetry run pytest -vv
+          fi
