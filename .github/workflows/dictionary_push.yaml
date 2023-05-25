@@ -38,8 +38,9 @@ jobs:
         source env/bin/activate
         echo "VIRTUAL ENV:" $VIRTUAL_ENV
         #poetry env use "3.6.9"
-        #yes | poetry run python setup.py install
-        yes | python setup.py install
+        pip install poetry
+        yes | poetry run python setup.py install
+        #yes | python setup.py install
         git clone https://github.com/uc-cdis/dictionaryutils; cd dictionaryutils
         ./run_tests.sh
         aws s3 cp artifacts s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME --recursive --region ${{ inputs.REGION }}
