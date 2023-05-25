@@ -52,7 +52,7 @@ jobs:
         aws sts get-caller-identity
         ls -all
         ls artifacts
-        aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME --recursive --region us-east-1
+        aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME --region us-east-1
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
