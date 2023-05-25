@@ -6,12 +6,12 @@ on:
       setup-script:
         description: 'A Bash script in the tests directory of the Python repo that handles any setup needed for testing'
         required: false
-        default: 'ci_setup.sh'
+        default: 'tests/ci_setup.sh'
         type: string
       test-script:
         description: 'A Bash script in the tests directory of the Python repo that handles running tests'
         required: false
-        default: 'ci_commands_script.sh'
+        default: 'tests/ci_commands_script.sh'
         type: string
       python-version:
         description: 'The Python version to use and defaults to latest'
@@ -58,11 +58,17 @@ jobs:
           poetry install -vv
       - name: Run the service-specific setup script, if it exists
         run: |
-          if test -f "tests/${{ inputs.setup-script }}"; then
-            bash tests/${{ inputs.setup-script }}
+          if test -f "${{ inputs.setup-script }}"; then
             echo "Running setup script ${{ inputs.setup-script }}"
+            bash ${{ inputs.setup-script }}
           else
-            echo "Setup script ${{ inputs.setup-script }} not found in tests directory"
+            echo "Setup script ${{ inputs.setup-script }} not found."
           fi
       - name: Run test
-        run: bash tests/${{ inputs.test-script }}
+        run: | 
+          if test -f "${{ inputs.test-script }}"; then
+            echo "Running test script ${{ inputs.test-script }}"
+            bash ${{ inputs.test-script }}
+          else
+            echo "Test script ${{ inputs.test-script }} not found. Falling back to default command"
+            poetry run pytest -vv
