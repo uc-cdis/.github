@@ -25,18 +25,13 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v3.3.0
-    - name: Install poetry
-      run: pipx install poetry
     - name: Setup Python
       uses: actions/setup-python@v4
-      with:
-        python-version: "3.6.9"
-        cache: "poetry"
     - name: Install AWS CLI
       uses: chrislennon/action-aws-cli@1.1
     - name: Initialize Packages
       run: |
-        poetry env use "3.6.9"
+        #poetry env use "3.6.9"
         #yes | poetry run python setup.py install
         yes | python setup.py install
         git clone https://github.com/uc-cdis/dictionaryutils; cd dictionaryutils
