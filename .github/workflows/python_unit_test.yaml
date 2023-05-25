@@ -18,11 +18,6 @@ on:
         required: false
         default: '3.9'
         type: string
-      postgres-needed:
-        description: 'Whether or not a Postgres backend is needed'
-        required: false
-        default: 'false'
-        type: string
 
 env:
   PGPASSWORD: postgres
@@ -33,7 +28,7 @@ jobs:
   run_tests:
     runs-on: ubuntu-latest
 
-    #Defining the Postgres DB service we will need to run the unit tests if postgres-needed is true
+    #Defining a Postgres DB service, for tests that use it
     services:
       postgres:
         image: postgres:9.6-bullseye
@@ -62,6 +57,11 @@ jobs:
           pip install poetry
           poetry install -vv
       - name: Run the service-specific setup script, if it exists
-        run: bash tests/${{ inputs.setup-script }}
+        run: |
+          if test -f "tests/${{ inputs.setup-script }}"
+            bash tests/${{ inputs.setup-script }}
+            echo "Running setup script ${{ inputs.setup-script }}"
+          else
+            echo "Setup script ${{ inputs.setup-script }} not found in tests directory"
       - name: Run test
         run: bash tests/${{ inputs.test-script }}
