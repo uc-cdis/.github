@@ -40,6 +40,7 @@ jobs:
         #poetry env use "3.6.9"
         #pip install poetry
         #yes | poetry run python setup.py install
+        pip install --upgrade pip
         yes | python setup.py install
         git clone https://github.com/uc-cdis/dictionaryutils; cd dictionaryutils
         ./run_tests.sh
