@@ -28,19 +28,19 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
-        python-version: 3.8
+        python-version: 3.6
     - name: Install AWS CLI
       uses: chrislennon/action-aws-cli@1.1
     - name: Initialize Packages
       run: |
         pip install --upgrade pip
-        python3.8 -m venv env
+        python3.6 -m venv env
         source env/bin/activate
         echo "VIRTUAL ENV:" $VIRTUAL_ENV
         #poetry env use "3.6.9"
         pip install poetry
-        yes | poetry run python setup.py install
-        #yes | python setup.py install
+        #yes | poetry run python setup.py install
+        yes | python setup.py install
         git clone https://github.com/uc-cdis/dictionaryutils; cd dictionaryutils
         ./run_tests.sh
         aws s3 cp artifacts s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME --recursive --region ${{ inputs.REGION }}
