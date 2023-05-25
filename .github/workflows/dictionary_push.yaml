@@ -33,7 +33,7 @@ jobs:
       uses: chrislennon/action-aws-cli@1.1
     - name: Initialize Packages
       run: |
-        pip install --upgrade pip
+        #pip install --upgrade pip
         python3.6 -m venv env
         source env/bin/activate
         echo "VIRTUAL ENV:" $VIRTUAL_ENV
