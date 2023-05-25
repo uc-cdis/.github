@@ -58,10 +58,11 @@ jobs:
           poetry install -vv
       - name: Run the service-specific setup script, if it exists
         run: |
-          if test -f "tests/${{ inputs.setup-script }}"
+          if test -f "tests/${{ inputs.setup-script }}"; do
             bash tests/${{ inputs.setup-script }}
             echo "Running setup script ${{ inputs.setup-script }}"
           else
             echo "Setup script ${{ inputs.setup-script }} not found in tests directory"
+          fi
       - name: Run test
         run: bash tests/${{ inputs.test-script }}
