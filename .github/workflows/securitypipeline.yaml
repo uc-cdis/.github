@@ -9,24 +9,6 @@ on:
         default: 'true'
 
 jobs:
-  # Superlint a simple combination of various linters, written in bash, to help validate source code.
-  Superlint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-        with:
-          persist-credentials: false
-          fetch-depth: 0
-      - name: Lint Repo
-        uses: github/super-linter/slim@v4
-        env:
-          VALIDATE_ALL_CODEBASE: false
-          VALIDATE_TYPESCRIPT_STANDARD: false
-          JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.json
-          DEFAULT_BRANCH: master
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   # Secrets detection is calling the Yelp Secrets Detector we use in pre-commit to ensure proper coverage
   secrets-detection:
     runs-on: 'ubuntu-latest'
