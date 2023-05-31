@@ -1,21 +1,34 @@
 name: Run Python unit tests using Poetry, with a Postgres backend
 
-on: 
+on:
   workflow_call:
     inputs:
-      setup-script-location:
-        description: 'A URL identifying a Bash script that can run commands needed for service-specific test setup'
-        required: true
+      setup-script:
+        description: 'A Bash script in the tests directory of the Python repo that handles any setup needed for testing'
+        required: false
+        default: 'tests/ci_setup.sh'
         type: string
-    
-env: 
+      test-script:
+        description: 'A Bash script in the tests directory of the Python repo that handles running tests'
+        required: false
+        default: 'tests/ci_commands_script.sh'
+        type: string
+      python-version:
+        description: 'The Python version to use and defaults to latest'
+        required: false
+        default: '3.9'
+        type: string
+
+env:
   PGPASSWORD: postgres
+  PGHOST: localhost
+  PGPORT: 5432
 
 jobs:
   run_tests:
     runs-on: ubuntu-latest
-    
-    #Defining the Postgres DB service we will need to run the unit tests
+
+    #Defining a Postgres DB service, for tests that use it
     services:
       postgres:
         image: postgres:9.6-bullseye
@@ -28,22 +41,35 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-    
+
     steps:
       - name: Check out code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
       - name: Set up python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.6.7"
+          python-version: ${{ inputs.python-version }}
       - name: Install poetry
         run: |
-            pip --version
-            pip install poetry
-            poetry install -vv
-      - name: Service specific setup
+          pip install --upgrade pip
+          pip install poetry
+          poetry install -vv
+      - name: Run the service-specific setup script, if it exists
         run: |
-            curl -sSL "${{inputs.setup-script-location}}" | bash
+          if test -f "${{ inputs.setup-script }}"; then
+            echo "Running setup script ${{ inputs.setup-script }}"
+            bash ${{ inputs.setup-script }}
+          else
+            echo "Setup script ${{ inputs.setup-script }} not found."
+          fi
       - name: Run test
         run: | 
-          poetry run pytest -vv --cov=fence --cov=migrations/versions --cov-report xml tests 
+          if test -f "${{ inputs.test-script }}"; then
+            echo "Running test script ${{ inputs.test-script }}"
+            bash ${{ inputs.test-script }}
+          else
+            echo "Test script ${{ inputs.test-script }} not found. Falling back to default command"
+            poetry run pytest -vv
+          fi
