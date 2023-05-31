@@ -64,7 +64,7 @@ jobs:
           else
             echo "Setup script ${{ inputs.setup-script }} not found."
           fi
-      - name: Run test
+      - name: Run tests
         run: | 
           if test -f "${{ inputs.test-script }}"; then
             echo "Running test script ${{ inputs.test-script }}"
