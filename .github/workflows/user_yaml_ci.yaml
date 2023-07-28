@@ -81,10 +81,9 @@ jobs:
         user_yamls=()
         for file in $changed_files; do
           if [[ "$file" == *user.yaml ]]; then
-            user_yamls+=$file
+            gen3users validate $file
           fi
         done
-        gen3users validate $user_yamls
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install AWS CLI
