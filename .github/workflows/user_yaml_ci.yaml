@@ -78,6 +78,8 @@ jobs:
 
         # run the tests
         gen3users validate users/*/user.yaml
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install AWS CLI
       if: github.ref == 'refs/heads/master'
       uses: chrislennon/action-aws-cli@1.1
