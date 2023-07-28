@@ -80,7 +80,7 @@ jobs:
         changed_files=$(git diff --name-only HEAD..${{ github.event.pull_request.base.sha }})
         user_yamls=()
         for file in $changed_files; do
-          if [[ "$file" == *user.yaml ]]
+          if [[ "$file" == *user.yaml ]]; then
             user_yamls+=$file
           fi
         done
