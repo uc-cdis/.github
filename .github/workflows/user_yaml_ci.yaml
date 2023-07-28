@@ -78,9 +78,11 @@ jobs:
 
         # run the tests
         changed_files=$(git diff --name-only HEAD..${{ github.event.pull_request.base.sha }})
-        user_yamls=()
+        # user_yamls=()
         for file in $changed_files; do
           if [[ "$file" == *user.yaml ]]; then
+            # TODO do `user_yamls+=$file` here and `gen3users validate $user_yamls` after
+            # the `for` statement to validate all at once. Need to split `user_yamls` correctly
             gen3users validate $file
           fi
         done
