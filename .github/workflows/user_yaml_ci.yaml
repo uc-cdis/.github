@@ -77,7 +77,14 @@ jobs:
         rm lint.py
 
         # run the tests
-        gen3users validate users/*/user.yaml
+        changed_files=$(git diff --name-only HEAD..${{ github.event.pull_request.base.sha }})
+        user_yamls=()
+        for file in $changed_files; do
+          if [[ "$file" == *user.yaml ]]
+            user_yamls+=$file
+        fi
+        done
+        gen3users validate $user_yamls
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install AWS CLI
