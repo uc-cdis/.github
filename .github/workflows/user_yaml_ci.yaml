@@ -67,7 +67,6 @@ jobs:
             for commons in os.listdir("./users"):
                 with open(os.path.join("users", commons, "user.yaml"), "r") as f:
                     data = yaml.safe_load(f)
-                # pyyaml auto sort
                 with open(os.path.join("users", commons, "user.yaml"), "w") as f:
                     yaml.dump(data, f)
 
