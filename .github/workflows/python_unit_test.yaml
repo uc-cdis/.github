@@ -19,29 +19,26 @@ on:
         default: '3.9'
         type: string
 
-env:
-  PGPASSWORD: postgres
-  PGHOST: localhost
-  PGPORT: 5432
-
 jobs:
   run_tests:
     runs-on: ubuntu-latest
 
     #Defining a Postgres DB service, for tests that use it
+    # Service containers to run with `container-job`
     services:
+      # Label used to access the service container
       postgres:
-        image: postgres:9.6-bullseye
-        ports:
-          - "5432:5432"
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
         env:
           POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -65,6 +62,12 @@ jobs:
           else
             echo "Setup script ${{ inputs.setup-script }} not found."
           fi
+        env:
+            # The hostname used to communicate with the PostgreSQL service container
+            POSTGRES_HOST: localhost
+            POSTGRES_PASSWORD: postgres
+            # The default PostgreSQL port
+            POSTGRES_PORT: 5432
       - name: Run tests
         run: | 
           if test -f "${{ inputs.test-script }}"; then
@@ -74,3 +77,9 @@ jobs:
             echo "Test script ${{ inputs.test-script }} not found. Falling back to default command"
             poetry run pytest -vv
           fi
+        env:
+            # The hostname used to communicate with the PostgreSQL service container
+            POSTGRES_HOST: localhost
+            POSTGRES_PASSWORD: postgres
+            # The default PostgreSQL port
+            POSTGRES_PORT: 5432
