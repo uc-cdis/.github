@@ -33,7 +33,7 @@ jobs:
       # Label used to access the service container
       postgres:
         # Docker Hub image
-        image: postgres
+        image: postgresql-13
         # Provide the password for postgres
         env:
           # trust connections from other jobs in this workflow to access this service
@@ -50,7 +50,7 @@ jobs:
           - 5432:5432
     steps:
       - name: Additional Postgres service configuration
-        # PostgreSQL 15 also revokes the CREATE permission from all users 
+        # PostgreSQL 15 will revoke the CREATE permission from all users 
         # except a database owner from the public (or default) schema.
         # This is required by some services for db setup for testing, so grant
         # that permission to the postgres user.
