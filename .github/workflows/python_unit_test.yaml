@@ -33,7 +33,7 @@ jobs:
       # Label used to access the service container
       postgres:
         # Docker Hub image
-        image: postgres-13
+        image: postgres:13
         # Provide the password for postgres
         env:
           # trust connections from other jobs in this workflow to access this service
