@@ -32,8 +32,9 @@ jobs:
         image: postgres
         # Provide the password for postgres
         env:
+          # trust connections from other jobs in this workflow to access this service
+          # this simplifies the networking to this service 
           POSTGRES_HOST_AUTH_METHOD: trust
-        #   POSTGRES_PASSWORD: postgres
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -44,6 +45,13 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
     steps:
+      - name: Additional Postgres service configuration
+        # PostgreSQL 15 also revokes the CREATE permission from all users 
+        # except a database owner from the public (or default) schema.
+        # This is required by some services for db setup for testing, so grant
+        # that permission to the postgres user.
+        run: |
+          psql -c 'GRANT ALL ON SCHEMA public TO postgres;'
       - name: Check out code
         uses: actions/checkout@v3
         with:
@@ -71,7 +79,6 @@ jobs:
             # The hostname used to communicate with the PostgreSQL service container
             POSTGRES_HOST: localhost
             POSTGRES_PORT: 5432
-            # POSTGRES_PASSWORD: postgres
       - name: Run tests
         run: | 
           if test -f "${{ inputs.test-script }}"; then
@@ -85,4 +92,3 @@ jobs:
             # The hostname used to communicate with the PostgreSQL service container
             POSTGRES_HOST: localhost
             POSTGRES_PORT: 5432
-            # POSTGRES_PASSWORD: postgres
