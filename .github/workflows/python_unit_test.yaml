@@ -53,7 +53,8 @@ jobs:
         # PostgreSQL 15 will revoke the CREATE permission from all users 
         # except a database owner from the public (or default) schema.
         # This is required by some services for db setup for testing, so grant
-        # that permission to the postgres user.
+        # that permission to the postgres user now (even though it's not required
+        # in postgres 13).
         run: |
           echo "Versions"
           psql --version
@@ -61,8 +62,6 @@ jobs:
           
           echo "Grant admin privileges to postgres user"
           psql -U postgres -h localhost -d postgres -c 'GRANT CREATE ON SCHEMA public TO postgres;'
-          psql -U postgres -h localhost -d postgres -c 'GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO postgres;'
-          psql -U postgres -h localhost -d postgres -c 'GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO postgres;'
         env:
             # The hostname used to communicate with the PostgreSQL service container
             POSTGRES_HOST: localhost
