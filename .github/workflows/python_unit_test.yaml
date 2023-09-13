@@ -57,7 +57,7 @@ jobs:
         run: |
           psql --version
           psql -U postgres -h localhost -d postgres -c 'SELECT version();'
-          psql -U postgres -h localhost -d postgres -c 'GRANT ALL ON SCHEMA public TO *;'
+          psql -U postgres -h localhost -d postgres -c 'GRANT ALL ON SCHEMA public TO postgres;'
         env:
             # The hostname used to communicate with the PostgreSQL service container
             POSTGRES_HOST: localhost
