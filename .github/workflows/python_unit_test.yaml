@@ -55,7 +55,7 @@ jobs:
         # This is required by some services for db setup for testing, so grant
         # that permission to the postgres user.
         run: |
-          psql -U postgres -h localhost -d postgres -c 'GRANT ALL ON SCHEMA public TO postgres;'
+          psql -U postgres -h localhost -d postgres -c 'GRANT ALL ON SCHEMA public TO *;'
         env:
             # The hostname used to communicate with the PostgreSQL service container
             POSTGRES_HOST: localhost
