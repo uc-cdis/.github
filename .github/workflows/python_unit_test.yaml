@@ -1,4 +1,8 @@
 name: Run Python unit tests using Poetry, with a Postgres backend
+# This utilizing an architecture where the postgres service is running in a container
+# and the jobs are running in the "runner machine" directly (requiring explicit networking connections
+# to get to the running postgres service). Refer to:
+# https://docs.github.com/en/actions/using-containerized-services/creating-postgresql-service-containers#running-jobs-directly-on-the-runner-machine
 
 on:
   workflow_call:
