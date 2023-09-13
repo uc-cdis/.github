@@ -70,6 +70,7 @@ jobs:
             # The hostname used to communicate with the PostgreSQL service container
             POSTGRES_HOST: localhost
             POSTGRES_PORT: 5432
+            POSTGRES_PASSWORD: postgres
       - name: Run tests
         run: | 
           if test -f "${{ inputs.test-script }}"; then
@@ -83,3 +84,4 @@ jobs:
             # The hostname used to communicate with the PostgreSQL service container
             POSTGRES_HOST: localhost
             POSTGRES_PORT: 5432
+            POSTGRES_PASSWORD: postgres
