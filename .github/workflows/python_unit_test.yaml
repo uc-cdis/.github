@@ -27,10 +27,8 @@ jobs:
   run_tests:
     runs-on: ubuntu-latest
 
-    #Defining a Postgres DB service, for tests that use it
-    # Service containers to run with `container-job`
+    # Defining a Postgres DB service, for tests that use it
     services:
-      # Label used to access the service container
       postgres:
         # Docker Hub image
         image: postgres:13
