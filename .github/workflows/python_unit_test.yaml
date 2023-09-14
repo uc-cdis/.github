@@ -34,7 +34,6 @@ jobs:
       postgres:
         # Docker Hub image
         image: postgres:13
-        # Provide the password for postgres
         env:
           # trust connections from other jobs in this workflow to access this service
           # this simplifies the networking to this service 
@@ -53,7 +52,8 @@ jobs:
         # PostgreSQL 15 will revoke the CREATE permission from all users 
         # except a database owner from the public (or default) schema.
         # This is required by some services for db setup for testing, so grant
-        # that permission to the postgres user now (even though it's not required
+        # that permission to the postgres user now to hopefully avoid headache
+        # when we eventually upgrade to 15 (even though it's not technically required
         # in postgres 13).
         run: |
           echo "Versions"
@@ -75,9 +75,10 @@ jobs:
         with:
           python-version: ${{ inputs.python-version }}
       - name: Install poetry
+        # that is poetry's recommended way to install
         run: |
           pip install --upgrade pip
-          pip install poetry
+          curl -sSL https://install.python-poetry.org | python -
           pip list
           poetry install -vv
           poetry show
