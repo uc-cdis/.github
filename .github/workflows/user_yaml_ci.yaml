@@ -77,7 +77,7 @@ jobs:
         rm lint.py
 
         # run the tests
-        changed_files=$(git diff --name-only HEAD..${{ github.event.pull_request.base.sha }})
+        changed_files=$(git diff --diff-filter=d --name-only ${{ github.event.pull_request.base.sha }}..HEAD)
         # user_yamls=()
         for file in $changed_files; do
           if [[ "$file" == *user.yaml ]]; then
