@@ -89,7 +89,7 @@ jobs:
             uses: actions/upload-artifact@v3
             with:
               name: test-report
-              path: output/report.html
+              path: ~/**/output/report.html
 
           - name: Release CI environment
             if: always()
