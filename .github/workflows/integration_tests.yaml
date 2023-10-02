@@ -80,7 +80,6 @@ jobs:
           - name: Prepare CI environment
             run: |
               mkdir $HOME/.gen3
-              ls -al $HOME
               poetry run python -m gen3_ci.scripts.prepare_ci_environment
 
           - name: Run tests
