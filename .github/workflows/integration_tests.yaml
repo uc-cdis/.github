@@ -83,7 +83,7 @@ jobs:
               poetry run python -m gen3_ci.scripts.prepare_ci_environment
 
           - name: Run tests
-            run: poetry run pytest --html=output/report.html --self-contained-html -n auto -m "not wip"
+            run: poetry run pytest -vv --html=output/report.html --self-contained-html -n auto -m "not wip"
 
           - name: Archive test report
             uses: actions/upload-artifact@v3
