@@ -88,13 +88,23 @@ jobs:
 
           if [[ -z "${{ inputs.OVERRIDE_TAG_NAME }}" ]]
           then
+            IMAGE_TAG_NAME=$(echo ${GITHUB_REF#refs/*/})
+            if [[ ${#IMAGE_TAG_NAME} -gt 63 ]] ; then
+                echo "Image tag name is longer than 63 characters. It will be truncated to ${IMAGE_TAG_NAME:0:63}"
+                IMAGE_TAG_NAME=${IMAGE_TAG_NAME:0:63}
+            fi
             echo "No OVERRIDE_TAG_NAME input provided, defaulting to current branch/tag name..."
-            echo "IMAGE_TAG=$(echo ${GITHUB_REF#refs/*/} | tr / _)"
-            echo "IMAGE_TAG=$(echo ${GITHUB_REF#refs/*/} | tr / _)" >> $GITHUB_ENV
+            echo "IMAGE_TAG=$(echo ${IMAGE_TAG_NAME} | tr / _)"
+            echo "IMAGE_TAG=$(echo ${IMAGE_TAG_NAME} | tr / _)" >> $GITHUB_ENV
           else
             echo "OVERRIDE_TAG_NAME provided, using it for IMAGE_TAG..."
-            echo "IMAGE_TAG=${{ inputs.OVERRIDE_TAG_NAME }}"
-            echo "IMAGE_TAG=${{ inputs.OVERRIDE_TAG_NAME }}" >> $GITHUB_ENV
+            IMAGE_TAG_NAME=$(echo ${{ inputs.OVERRIDE_TAG_NAME }})
+            if [[ ${#IMAGE_TAG_NAME} -gt 63 ]] ; then
+                echo "Image tag name is longer than 63 characters. It will be truncated to ${IMAGE_TAG_NAME:0:63}"
+                IMAGE_TAG_NAME=${IMAGE_TAG_NAME:0:63}
+            fi
+            echo "IMAGE_TAG=${IMAGE_TAG_NAME}"
+            echo "IMAGE_TAG=${IMAGE_TAG_NAME}" >> $GITHUB_ENV
           fi
 
           if [[ -z "${{ inputs.OVERRIDE_REPO_NAME }}" ]]
