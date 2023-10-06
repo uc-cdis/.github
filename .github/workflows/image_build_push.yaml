@@ -92,11 +92,11 @@ jobs:
             if [[ ${#IMAGE_TAG_NAME} -gt 63 ]]; then
                 echo "Image tag name is longer than 63 characters. It will be truncated to ${IMAGE_TAG_NAME:0:63}"
                 IMAGE_TAG_NAME=${IMAGE_TAG_NAME:0:63}
-                if [[ ${IMAGE_TAG_NAME} =~ ^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$ ]]; then
+                if [[ ${IMAGE_TAG_NAME} =~ ^(([A-Za-z0-9][-A-Za-z0-9_.\/]*)?[A-Za-z0-9])?$ ]]; then
                     echo "Image name validation passed"
                 else
-                    NEW_IMAGE_TAG_NAME=${IMAGE_TAG_NAME%?}0
-                    if [[ ${NEW_IMAGE_TAG_NAME} =~ ^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$ ]]; then
+                    NEW_IMAGE_TAG_NAME=$(echo ${IMAGE_TAG_NAME%?}0)
+                    if [[ ${NEW_IMAGE_TAG_NAME} =~ ^(([A-Za-z0-9][-A-Za-z0-9_.\/]*)?[A-Za-z0-9])?$ ]]; then
                         echo "Image name ${IMAGE_TAG_NAME} violates validation, it will be changed to ${NEW_IMAGE_TAG_NAME}"
                         IMAGE_TAG_NAME=${NEW_IMAGE_TAG_NAME}
                     else
@@ -114,11 +114,11 @@ jobs:
             if [[ ${#IMAGE_TAG_NAME} -gt 63 ]]; then
                 echo "Image tag name is longer than 63 characters. It will be truncated to ${IMAGE_TAG_NAME:0:63}"
                 IMAGE_TAG_NAME=${IMAGE_TAG_NAME:0:63}
-                if [[ ${IMAGE_TAG_NAME} =~ ^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$ ]]; then
+                if [[ ${IMAGE_TAG_NAME} =~ ^(([A-Za-z0-9][-A-Za-z0-9_.\/]*)?[A-Za-z0-9])?$ ]]; then
                     echo "Image name validation passed"
                 else
-                    NEW_IMAGE_TAG_NAME=${IMAGE_TAG_NAME%?}0
-                    if [[ ${NEW_IMAGE_TAG_NAME} =~ ^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$ ]]; then
+                    NEW_IMAGE_TAG_NAME=$(echo ${IMAGE_TAG_NAME%?}0)
+                    if [[ ${NEW_IMAGE_TAG_NAME} =~ ^(([A-Za-z0-9][-A-Za-z0-9_.\/]*)?[A-Za-z0-9])?$ ]]; then
                         echo "Image name ${IMAGE_TAG_NAME} violates validation, it will be changed to ${NEW_IMAGE_TAG_NAME}"
                         IMAGE_TAG_NAME=${NEW_IMAGE_TAG_NAME}
                     else
