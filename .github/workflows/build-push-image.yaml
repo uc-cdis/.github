@@ -3,43 +3,53 @@ name: Build Image and Push to Registries
 on:
   workflow_call:
     inputs:
-      DOCKERFILE_LOCATION:
+      USE_AWS_ECR:
+        description: "Set this to true if you want to use Amazon's Elastic Container Registry for storing your Docker images."
         required: false
-        type: string
-        default: "./Dockerfile"
+        type: boolean
+        default: true
       AWS_ECR_REGISTRY:
+        description: "Path to the AWS ECR registry to which the image will be pushed."
         required: false
         type: string
         default: "707767160287.dkr.ecr.us-east-1.amazonaws.com"
       AWS_REGION:
+        description: "The AWS region where your resources are located."
         required: false
         type: string
         default: "us-east-1"
+      USE_QUAY:
+        description: "Set this to true if you want to use Quay.io for storing your Docker images."
+        required: false
+        type: boolean
+        default: true
+      DOCKERFILE_LOCATION:
+        description: "Relative path to the Dockerfile that will be built."
+        required: false
+        type: string
+        default: "./Dockerfile"
       DOCKERFILE_BUILD_CONTEXT:
+        description: "The path to your project directory which contains the Dockerfile."
         required: false
         type: string
         default: "."
       DOCKER_IMAGE_PLACE:
+        description: "The location in the Docker repository where the Docker image will be stored. Used only for AWS ECR."
         required: false
         type: string
         default: "/"
       DOCKER_IMAGE_NAME:
+        description: "The name you want to give to your Docker image."
         required: false
         type: string
         default: ""
       DOCKER_IMAGE_TAG:
+        description: "The tag you want to assign to your Docker image."
         required: false
         type: string
         default: ""
-      USE_AWS_ECR:
-        required: false
-        type: boolean
-        default: true
-      USE_QUAY:
-        required: false
-        type: boolean
-        default: true
       BUILD_PLATFORMS:
+        description: "Indicates the specific platforms for which to build the image. Multiple platforms can be specified, separated by commas."
         required: false
         type: string
         default: "linux/amd64, linux/arm64"
@@ -78,6 +88,7 @@ jobs:
           fi
 
           DOCKER_IMAGE_TAG=$(echo $DOCKER_IMAGE_TAG | tr / _)
+
           DOCKER_IMAGE_PLACE=${{ inputs.DOCKER_IMAGE_PLACE }}
 
           # add "/" at the beginning if it doesn't exist
@@ -91,8 +102,6 @@ jobs:
           then
               DOCKER_IMAGE_PLACE="$DOCKER_IMAGE_PLACE/"
           fi
-
-          echo "DOCKER_IMAGE_PLACE=$DOCKER_IMAGE_PLACE" >> $GITHUB_ENV
 
           if [[ "${{ inputs.USE_AWS_ECR }}" = "true" ]]
           then
@@ -117,6 +126,8 @@ jobs:
           else
             TAGS=""
             CACHE_FROM=""
+            echo "No registries defined, bailing out..."
+            exit 1
           fi
 
           {
@@ -172,9 +183,6 @@ jobs:
       # https://github.com/docker/build-push-action
       - name: Build and push
         uses: docker/build-push-action@v5
-        # if the ECR repository doesn't exist, it will result in the push error for ECR
-        # in this case, run the following command from cdistest:
-        #   aws ecr create-repository --repository-name "<repo name>"
         with:
           context: ${{ inputs.DOCKERFILE_BUILD_CONTEXT }}
           file: ${{ inputs.DOCKERFILE_LOCATION }}
