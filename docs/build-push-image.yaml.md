@@ -47,3 +47,4 @@ Nice new things:
 * Better support for AWS ECR in terms of structuring, old workflow only supported pushing into `/gen3/` which is not the best structure for Docker images.
 * Cleaner & shorter code with minimal dependencies between steps.
 * Clear migration path: just define a new workflow in the repository and disable old one.
+* Clear migration path to AWS ECR only, the old workflow required a lot of code to support both use cases (AWS ECR only and backward compatibility).
