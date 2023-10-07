@@ -87,7 +87,7 @@ jobs:
           if [[ $DOCKER_IMAGE_PLACE != /* ]]
           then
               DOCKER_IMAGE_PLACE="/$DOCKER_IMAGE_PLACE"
-          end
+          fi
 
           # add "/" at the end if it doesn't exist
           if [[ $DOCKER_IMAGE_PLACE != */ ]]
