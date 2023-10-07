@@ -67,9 +67,6 @@ jobs:
           else
             DOCKER_IMAGE_NAME=${{ inputs.DOCKER_IMAGE_NAME }}
           fi
-
-          echo "DOCKER_IMAGE_NAME=$DOCKER_IMAGE_NAME"
-          echo "DOCKER_IMAGE_NAME=$DOCKER_IMAGE_NAME" >> $GITHUB_ENV
           
           if [[ -z "${{ inputs.DOCKER_IMAGE_TAG }}" ]]
           then
@@ -78,8 +75,7 @@ jobs:
             DOCKER_IMAGE_TAG=${{ inputs.DOCKER_IMAGE_TAG }}
           fi
 
-          echo "DOCKER_IMAGE_TAG=$(echo $DOCKER_IMAGE_TAG | tr / _)"
-          echo "DOCKER_IMAGE_TAG=$(echo $DOCKER_IMAGE_TAG | tr / _)" >> $GITHUB_ENV
+          DOCKER_IMAGE_TAG=$(echo $DOCKER_IMAGE_TAG | tr / _)
 
           DOCKER_IMAGE_PLACE=${{ inputs.DOCKER_IMAGE_PLACE }}
 
