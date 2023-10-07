@@ -1,0 +1,186 @@
+name: Build Image and Push to Registries
+
+on:
+  workflow_call:
+    inputs:
+      DOCKERFILE_LOCATION:
+        required: false
+        type: string
+        default: "./Dockerfile"
+      AWS_ECR_REGISTRY:
+        required: false
+        type: string
+        default: "707767160287.dkr.ecr.us-east-1.amazonaws.com"
+      AWS_REGION:
+        required: false
+        type: string
+        default: "us-east-1"
+      DOCKERFILE_BUILD_CONTEXT:
+        required: false
+        type: string
+        default: "."
+      DOCKER_IMAGE_PLACE:
+        required: false
+        type: string
+        default: "/"
+      DOCKER_IMAGE_NAME:
+        required: false
+        type: string
+        default: ""
+      DOCKER_IMAGE_TAG:
+        required: false
+        type: string
+        default: ""
+      USE_AWS_ECR:
+        required: false
+        type: boolean
+        default: true
+      USE_QUAY:
+        required: false
+        type: boolean
+        default: true
+      BUILD_PLATFORMS:
+        required: false
+        type: string
+        default: "linux/amd64, linux/arm64"
+    secrets:
+      ECR_AWS_ACCESS_KEY_ID:
+        required: true
+      ECR_AWS_SECRET_ACCESS_KEY:
+        required: true
+      QUAY_USERNAME:
+        required: true
+      QUAY_ROBOT_TOKEN:
+        required: true
+
+jobs:
+  ci:
+    name: Build Image and Push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set Environmental Variables
+        shell: bash
+        run: |
+          if [[ -n "${{ inputs.DOCKER_IMAGE_NAME }}" ]]
+          then
+            DOCKER_IMAGE_NAME=${{ inputs.DOCKER_IMAGE_NAME }}
+          else
+            DOCKER_IMAGE_NAME=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}')
+          fi
+
+          echo "DOCKER_IMAGE_NAME=$DOCKER_IMAGE_NAME"
+          echo "DOCKER_IMAGE_NAME=$DOCKER_IMAGE_NAME" >> $GITHUB_ENV
+          
+          if [[ -n "${{ inputs.DOCKER_IMAGE_TAG }}" ]]
+          then
+            DOCKER_IMAGE_TAG=${{ inputs.DOCKER_IMAGE_TAG }}
+          else
+            DOCKER_IMAGE_TAG=$(${{ github.head_ref || github.ref_name }} | tr / _)
+          fi
+
+          echo "DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG"
+          echo "DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG" >> $GITHUB_ENV
+
+          if [[ -n "${{ inputs.DOCKER_IMAGE_PLACE }}" ]]
+          then
+            DOCKER_IMAGE_PLACE=${{ inputs.DOCKER_IMAGE_PLACE }}
+          fi
+
+          # add "/" at the beginning if it doesn't exist
+          if [[ $DOCKER_IMAGE_PLACE != /* ]]; then
+              DOCKER_IMAGE_PLACE="/$DOCKER_IMAGE_PLACE"
+          end
+
+          # add "/" at the end if it doesn't exist
+          if [[ $DOCKER_IMAGE_PLACE != */ ]]; then
+              DOCKER_IMAGE_PLACE="$DOCKER_IMAGE_PLACE/"
+          fi
+
+          echo "DOCKER_IMAGE_PLACE=$DOCKER_IMAGE_PLACE"
+          echo "DOCKER_IMAGE_PLACE=$DOCKER_IMAGE_PLACE" >> $GITHUB_ENV
+
+          if [[ -n "${{ inputs.USE_AWS_ECR }}" ]]
+          then
+            AWS_ECR_TAGS="${{ inputs.AWS_ECR_REGISTRY }}${{ env.DOCKER_IMAGE_PLACE }}${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}"
+          fi
+
+          if [[ -n "${{ inputs.USE_QUAY }}" ]]
+          then
+            QUAY_TAGS="quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}"
+          fi
+
+          if [[ -n "$AWS_ECR_TAGS" ]] && [[ -n "$QUAY_TAGS" ]]
+          then
+            TAGS="$AWS_ECR_TAGS\n$QUAY_TAGS"
+            CACHE_FROM="$AWS_ECR_TAGS"
+          elif [[ -n $AWS_ECR_TAGS ]]; then
+            TAGS="$AWS_ECR_TAGS"
+            CACHE_FROM="$AWS_ECR_TAGS"
+          elif [[ -n $QUAY_TAGS ]]; then
+            TAGS="$QUAY_TAGS"
+            CACHE_FROM="$QUAY_TAGS"
+          else
+            TAGS=""
+            CACHE_FROM=""
+          fi
+
+          echo -e "$TAGS" >> $GITHUB_ENV
+          echo -e "$CACHE_FROM" >> $GITHUB_ENV
+
+      # https://github.com/docker/login-action#aws-public-elastic-container-registry-ecr
+      - name: Login to ECR
+        if: ${{ inputs.USE_AWS_ECR }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ inputs.AWS_ECR_REGISTRY }}
+          username: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
+          password: ${{ secrets.ECR_AWS_SECRET_ACCESS_KEY }}
+        env:
+          AWS_REGION: ${{ inputs.AWS_REGION }}
+
+      # https://github.com/docker/login-action#quayio
+      - name: Login to Quay.io
+        if: ${{ inputs.USE_QUAY }}
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_ROBOT_TOKEN }}
+
+      # https://github.com/actions/checkout
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      # https://github.com/docker/setup-buildx-action
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # https://github.com/docker/metadata-action
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.TAGS }}
+
+      # https://github.com/docker/build-push-action
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        # if the ECR repository doesn't exist, it will result in the push error for ECR
+        # in this case, run the following command from cdistest:
+        #   aws ecr create-repository --repository-name "<repo name>"
+        with:
+          context: ${{ inputs.DOCKERFILE_BUILD_CONTEXT }}
+          file: ${{ inputs.DOCKERFILE_LOCATION }}
+          push: true
+          tags: ${{ env.TAGS }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.CACHE_FROM }}
+          cache-to: type=inline
+          platforms: ${{ inputs.BUILD_PLATFORMS }}
