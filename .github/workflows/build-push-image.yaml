@@ -94,12 +94,12 @@ jobs:
           echo "DOCKER_IMAGE_PLACE=$DOCKER_IMAGE_PLACE"
           echo "DOCKER_IMAGE_PLACE=$DOCKER_IMAGE_PLACE" >> $GITHUB_ENV
 
-          if [[ -n "${{ inputs.USE_AWS_ECR }}" ]]
+          if [[ "${{ inputs.USE_AWS_ECR }}" = "true" ]]
           then
             AWS_ECR_TAGS="${{ inputs.AWS_ECR_REGISTRY }}$DOCKER_IMAGE_PLACE$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG"
           fi
 
-          if [[ -n "${{ inputs.USE_QUAY }}" ]]
+          if [[ "${{ inputs.USE_QUAY }}" = "true" ]]
           then
             QUAY_TAGS="quay.io/cdis/$DOCKER_IMAGE_TAG:$DOCKER_IMAGE_TAG"
           fi
