@@ -128,7 +128,7 @@ jobs:
             echo -e "$TAGS"
             echo EOF
           } >> "$GITHUB_ENV"
-          echo -e "$CACHE_FROM" >> $GITHUB_ENV
+          echo "CACHE_FROM=$CACHE_FROM" >> $GITHUB_ENV
 
       # https://github.com/docker/login-action#aws-public-elastic-container-registry-ecr
       - name: Login to ECR
