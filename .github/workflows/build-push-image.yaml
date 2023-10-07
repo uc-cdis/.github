@@ -123,11 +123,13 @@ jobs:
             CACHE_FROM=""
           fi
 
+          echo -e "TAGS=$TAGS"
           {
             echo 'TAGS<<EOF'
             echo -e "$TAGS"
             echo EOF
           } >> "$GITHUB_ENV"
+          echo "CACHE_FROM=$CACHE_FROM"
           echo "CACHE_FROM=$CACHE_FROM" >> $GITHUB_ENV
 
       # https://github.com/docker/login-action#aws-public-elastic-container-registry-ecr
