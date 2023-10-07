@@ -84,12 +84,14 @@ jobs:
           DOCKER_IMAGE_PLACE=${{ inputs.DOCKER_IMAGE_PLACE }}
 
           # add "/" at the beginning if it doesn't exist
-          if [[ $DOCKER_IMAGE_PLACE != /* ]]; then
+          if [[ $DOCKER_IMAGE_PLACE != /* ]]
+          then
               DOCKER_IMAGE_PLACE="/$DOCKER_IMAGE_PLACE"
           end
 
           # add "/" at the end if it doesn't exist
-          if [[ $DOCKER_IMAGE_PLACE != */ ]]; then
+          if [[ $DOCKER_IMAGE_PLACE != */ ]]
+          then
               DOCKER_IMAGE_PLACE="$DOCKER_IMAGE_PLACE/"
           fi
 
@@ -98,12 +100,12 @@ jobs:
 
           if [[ -n "${{ inputs.USE_AWS_ECR }}" ]]
           then
-            AWS_ECR_TAGS="${{ inputs.AWS_ECR_REGISTRY }}${{ env.DOCKER_IMAGE_PLACE }}${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}"
+            AWS_ECR_TAGS="${{ inputs.AWS_ECR_REGISTRY }}$DOCKER_IMAGE_PLACE$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG"
           fi
 
           if [[ -n "${{ inputs.USE_QUAY }}" ]]
           then
-            QUAY_TAGS="quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}"
+            QUAY_TAGS="quay.io/cdis/$DOCKER_IMAGE_TAG:$DOCKER_IMAGE_TAG"
           fi
 
           if [[ -n "$AWS_ECR_TAGS" ]] && [[ -n "$QUAY_TAGS" ]]
