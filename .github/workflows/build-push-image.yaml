@@ -81,10 +81,7 @@ jobs:
           echo "DOCKER_IMAGE_TAG=$(echo $DOCKER_IMAGE_TAG | tr / _)"
           echo "DOCKER_IMAGE_TAG=$(echo $DOCKER_IMAGE_TAG | tr / _)" >> $GITHUB_ENV
 
-          if [[ -n "${{ inputs.DOCKER_IMAGE_PLACE }}" ]]
-          then
-            DOCKER_IMAGE_PLACE=${{ inputs.DOCKER_IMAGE_PLACE }}
-          fi
+          DOCKER_IMAGE_PLACE=${{ inputs.DOCKER_IMAGE_PLACE }}
 
           # add "/" at the beginning if it doesn't exist
           if [[ $DOCKER_IMAGE_PLACE != /* ]]; then
