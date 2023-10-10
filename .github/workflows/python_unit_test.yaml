@@ -82,7 +82,7 @@ jobs:
           pip install --upgrade pip
           curl -sSL https://install.python-poetry.org | python -
           pip list
-          poetry install -vv
+          poetry install -vv --all-extras --no-interaction
           poetry show
       - name: Run the service-specific setup script, if it exists
         run: |
