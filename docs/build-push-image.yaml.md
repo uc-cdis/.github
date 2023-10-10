@@ -27,7 +27,7 @@ on: push
 jobs:
   ci:
     name: Build Image and Push to Quay
-    uses: uc-cdis/.github/.github/workflows/build-push-image.yaml@fix/new-version
+    uses: uc-cdis/.github/.github/workflows/build-push-image.yaml@master
     with:
       DOCKER_IMAGE_PLACE: "/gen3/"
       USE_QUAY: false
