@@ -46,14 +46,6 @@ jobs:
         line_length=120
         EOL
 
-    - name: Create `.github/linters/.mypy.ini`
-      run: |
-        cat <<EOL > .github/linters/.mypy.ini
-        # Global options:
-        [mypy]
-        ignore_missing_imports = True
-        EOL
-
     - name: Create `.github/linters/.python-black`
       run: |
         cat <<EOL > .github/linters/.python-black
