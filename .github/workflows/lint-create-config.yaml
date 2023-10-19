@@ -95,14 +95,14 @@ jobs:
         ignore_missing_imports = True
         EOL
 
-    - name: Create `.python-black`
+    - name: Create `.github/linters/.python-black`
       run: |
-        cat <<EOL > .python-black
+        cat <<EOL > .github/linters/.python-black
         EOL
 
-    - name: Create `.yaml-lint.yml`
+    - name: Create `.github/linters/.yaml-lint.yml`
       run: |
-        cat <<EOL > .yaml-lint.yml
+        cat <<EOL > .github/linters/.yaml-lint.yml
         ---
         ###########################################
         # These are the rules used for            #
@@ -164,9 +164,9 @@ jobs:
           trailing-spaces: disable
         EOL
 
-    - name: Create `.python-lint`
+    - name: Create `.github/linters/.python-lint`
       run: |
-        cat <<EOL > .python-lint
+        cat <<EOL > .github/linters/.python-lint
         [MAIN]
         
         # Analyse import fallback blocks. This can be used to support both Python 2 and

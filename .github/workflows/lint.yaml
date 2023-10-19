@@ -13,7 +13,7 @@ jobs:
           path: .github/linters
 
       - name: Display structure of downloaded linters-config files
-        run: ls -R
+        run: ls -aR
         working-directory: .github/linters
 
       - uses: actions/download-artifact@v3
@@ -23,7 +23,7 @@ jobs:
           path: .github/
 
       - name: Display structure of downloaded super-linter-config file
-        run: ls -R
+        run: ls -aR
         working-directory: .github
 
       - name: Checkout Code
