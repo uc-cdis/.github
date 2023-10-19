@@ -809,10 +809,16 @@ jobs:
         redefining-builtins-modules=six.moves,past.builtins,future.builtins,builtins,io
         EOL
 
-    - name: Check folders for files and `cat` one to make sure it has content
-      run: |
-        cd .github
-        ls
-        cd linters
-        ls
-        cat .isort.cfg
+    - uses: actions/upload-artifact@v3
+      with:
+        name: linters-config
+        path: |
+          .github/linters/
+        if-no-files-found: error
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: super-linter-config
+        path: |
+          .github/super-linter.env
+        if-no-files-found: error

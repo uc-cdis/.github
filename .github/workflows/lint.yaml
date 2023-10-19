@@ -6,11 +6,32 @@ jobs:
     name: CI
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/download-artifact@v3
+        with:
+          # this is uploaded by the lint-create-config.yaml workflow
+          name: linters-config
+          path: .github/linters
+
+      - name: Display structure of downloaded linters-config files
+        run: ls -R
+        working-directory: .github/linters
+
+      - uses: actions/download-artifact@v3
+        with:
+          # this is uploaded by the lint-create-config.yaml workflow
+          name: super-linter-config
+          path: .github/
+
+      - name: Display structure of downloaded super-linter-config file
+        run: ls -R
+        working-directory: .github
+
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
           persist-credentials: false
           fetch-depth: 0
+
       - name: Lint Repo
         uses: github/super-linter/slim@v5
         env:
