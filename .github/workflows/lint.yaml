@@ -1,9 +1,9 @@
 ---
-name: CI
+name: Lint
 on: [workflow_call]
 jobs:
   build:
-    name: CI
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
