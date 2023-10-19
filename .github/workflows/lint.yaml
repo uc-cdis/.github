@@ -18,22 +18,47 @@ jobs:
           name: linters-config
           path: .github/linters
 
-      - name: Display structure of downloaded linters-config files
-        run: ls -aR
-        working-directory: .github/linters
-
-      - uses: actions/download-artifact@v3
-        with:
-          # this is uploaded by the lint-create-config.yaml workflow
-          name: super-linter-config
-          path: .github/
-
-      - name: Display structure of downloaded super-linter-config file
-        run: ls -aR
-        working-directory: .github
+      - name: Display files
+        run: ls -aR 
 
       - name: Lint Repo
         uses: github/super-linter/slim@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LINTER_RULES_PATH: "/linters"
+          LINTER_RULES_PATH: ".github/linters"
+          VALIDATE_ALL_CODEBASE: true
+          LOG_LEVEL: ERROR
+          VALIDATE_BASH: true
+          VALIDATE_BASH_EXEC: true
+          VALIDATE_CSS: true
+          VALIDATE_DOCKERFILE_HADOLINT: true
+          VALIDATE_EDITORCONFIG: true
+          VALIDATE_ENV: true
+          VALIDATE_GITHUB_ACTIONS: true
+          VALIDATE_GO: true
+          VALIDATE_GROOVY: true
+          VALIDATE_HTML: true
+          VALIDATE_JAVA: true
+          VALIDATE_JAVASCRIPT_ES: true
+          VALIDATE_JAVASCRIPT_STANDARD: true
+          VALIDATE_JSCPD: true
+          VALIDATE_JSON: true
+          VALIDATE_KUBERNETES_KUBECONFORM: true
+          VALIDATE_LATEX: true
+          VALIDATE_MARKDOWN: true
+          VALIDATE_OPENAPI: true
+          VALIDATE_PERL: true
+          VALIDATE_POWERSHELL: true
+          VALIDATE_PYTHON: true
+          VALIDATE_PYTHON_BLACK: true
+          VALIDATE_PYTHON_FLAKE8: true
+          VALIDATE_PYTHON_ISORT: true
+          VALIDATE_PYTHON_MYPY: true
+          VALIDATE_PYTHON_PYLINT: true
+          VALIDATE_R: true
+          VALIDATE_RUBY: true
+          VALIDATE_SQL: true
+          VALIDATE_TYPESCRIPT_ES: true
+          VALIDATE_TYPESCRIPT_STANDARD: true
+          VALIDATE_XML: true
+          VALIDATE_YAML: true
