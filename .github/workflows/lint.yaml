@@ -42,6 +42,29 @@ jobs:
           poetry install -vv --all-extras --no-interaction
           poetry show
 
+      - name: Use Python module path to update necessary linter configs
+        run: |
+          virtual_env=$(poetry env info --path)
+          echo "Python Virtual Env Path: $virtual_env"
+
+          site_packages_folder=$(find $virtual_env -type d -name "site-packages" -print -quit)
+          if [ -n "$site_packages_folder" ]; then
+            echo "Found 'site-packages' folder at: $site_packages_folder"
+          else
+            echo "No 'site-packages' folder found in provided virtual env: $virtual_env."
+            exit 1
+          fi
+
+          echo
+          echo "Updating .github/linters/.python-lint"
+          echo "init-hook='import sys; sys.path.append(\"$site_packages_folder\")'"
+          {
+            echo "[MAIN]"
+            echo "init-hook='import sys; sys.path.append(\"$site_packages_folder\")'"
+            tail -n +3 .github/linters/.python-lint
+          } > .github/linters/.python-lint.tmp && mv .github/linters/.python-lint.tmp .github/linters/.python-lint
+
+
       - name: Cat file(s)
         run: cat .github/linters/.python-lint
 

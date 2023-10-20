@@ -444,9 +444,11 @@ confidence=HIGH,
 #           shouldn't be abused. catch misuse in code reviews
 #    missing-module-docstring
 #           while nice to have, don't error on module-level docstrings missing
-#
-#
-#
+#    fixme
+#           this errors on TODOs and we use those to mark where new features 
+#           should go
+#    missing-class-docstring
+#           while nice to have, this isn't a deal breaker
 disable=raw-checker-failed,
         bad-inline-option,
         locally-disabled,
@@ -464,6 +466,8 @@ disable=raw-checker-failed,
         too-few-public-methods,
         too-many-arguments,
         too-many-locals,
+        fixme,
+        missing-class-docstring
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
