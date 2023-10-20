@@ -33,8 +33,8 @@ jobs:
     - name: Checkout Another Repository
       uses: actions/checkout@v4
       with:
-        repository: uc-cdis/.github  # Replace with the username and repository name you want to clone
-        ref: main  # Replace with the branch, tag, or commit you want to check out
+        repository: uc-cdis/.github
+        ref: feat/lint
         persist-credentials: false
         sparse-checkout: |
           .github/linters
