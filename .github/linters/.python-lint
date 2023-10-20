@@ -420,6 +420,31 @@ confidence=HIGH,
 # --enable=similarities". If you want to run only the classes checker, but have
 # no Warning level messages displayed, use "--disable=all --enable=classes
 # --disable=W".
+#
+#
+# Justifications:
+#    too-many-arguments
+#           pytest fixtures don't appropriately get considered so this flags a 
+#           ton of test functions
+#    too-many-locals
+#           has a pretty arbitrary default of 15. for test functions this
+#           gets noisy. Can capture issues with this in code reviews
+#    too-few-public-methods
+#           flags simple test classes, seems arbitrary, can catch issues in 
+#           code reviews
+#    logging-fstring-interpolation
+#           while this will catch issues where a logging call may fail, I find
+#           that fstrings in logging are incredibly helpful.
+#    line-too-long
+#           black formatting does this automatically
+#    broad-exception-caught
+#           there are cases where this is helpful as a catch-all. it still 
+#           shouldn't be abused. catch misuse in code reviews
+#    missing-module-docstring
+#           while nice to have, don't error on module-level docstrings missing
+#
+#
+#
 disable=raw-checker-failed,
         bad-inline-option,
         locally-disabled,
@@ -430,11 +455,13 @@ disable=raw-checker-failed,
         use-symbolic-message-instead,
         locally-disabled,
         multiple-statements,
-        fixme,
         line-too-long,
-        W0718,
+        broad-exception-caught,
         logging-fstring-interpolation,
-        missing-module-docstring
+        missing-module-docstring,
+        too-few-public-methods,
+        too-many-arguments,
+        too-many-locals,
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
