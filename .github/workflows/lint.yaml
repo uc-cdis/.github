@@ -21,6 +21,15 @@ jobs:
       - name: Display files
         run: ls -aR 
 
+      - name: Install poetry so virtual env has imports that pylint can check
+        # that is poetry's recommended way to install
+        run: |
+          pip install --upgrade pip
+          curl -sSL https://install.python-poetry.org | python -
+          pip list
+          poetry install -vv --all-extras --no-interaction
+          poetry show
+
       - name: Lint Repo
         uses: github/super-linter/slim@v5
         env:
