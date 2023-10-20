@@ -22,6 +22,10 @@ name: Lint Create Config
 on: 
   workflow_call:
     inputs:
+      python-virtual-env-path:
+        description: 'Path to virtual env for Python. This is used to add to the linter configs for proper detection of imports'
+        required: false
+        type: string
       python-module-name:
         description: 'Name of top-level Python module. This is used to add to the linter configs for proper detection of imports'
         required: false
@@ -47,6 +51,15 @@ jobs:
 
     - name: Use Python module path to update necessary linter configs
       run: |
+        if test -f "${{ inputs.python-virtual-env-path }}"; then
+          echo "Provided Python Virtual Env Path: ${{ inputs.python-virtual-env-path }}"
+
+          echo
+          echo "Updating .github/linters/.python-lint"
+          echo "init-hook='import sys; sys.path.append(${{ inputs.python-virtual-env-path }})'"
+          echo "init-hook='import sys; sys.path.append(${{ inputs.python-virtual-env-path }})'" >> .github/linters/.python-lint
+        fi
+
         if test -f "${{ inputs.python-module-name }}"; then
           echo "Provided Python Module Name: ${{ inputs.python-module-name }}"
 
