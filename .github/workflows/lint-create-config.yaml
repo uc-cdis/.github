@@ -65,8 +65,8 @@ jobs:
 
           echo
           echo "Updating .github/linters/.isort.cfg"
-          echo "known_first_party=$python_module_name"
-          echo "known_first_party=$python_module_name" >> .github/linters/.isort.cfg
+          echo "known_first_party=${{ inputs.python-module-name }}""
+          echo "known_first_party=${{ inputs.python-module-name }} >> .github/linters/.isort.cfg
         fi
 
     - uses: actions/upload-artifact@v3
