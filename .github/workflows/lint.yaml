@@ -25,6 +25,13 @@ jobs:
         uses: github/super-linter/slim@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          #
+          # !!!!!!!!!
+          # IF YOU UPDATE THESE ENV VARS,
+          # PLEASE ALSO UPDATE
+          # `.github/linters/super-linter.env`
+          # !!!!!!!!!
+          #
           LINTER_RULES_PATH: ".github/linters"
           VALIDATE_ALL_CODEBASE: true
           LOG_LEVEL: ERROR
