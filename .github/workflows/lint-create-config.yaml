@@ -57,8 +57,12 @@ jobs:
 
           echo
           echo "Updating .github/linters/.python-lint"
+          sed -i '/init-hook=\'import sys; sys.path.append("$HOME/.cache/pypoetry/virtualenvs/")\'/d' .github/linters/.python-lint
+          cat .github/linters/.python-lint
+
           echo "init-hook='import sys; sys.path.append(${{ inputs.python-virtual-env-path }})'"
           echo "init-hook='import sys; sys.path.append(${{ inputs.python-virtual-env-path }})'" >> .github/linters/.python-lint
+          cat .github/linters/.python-lint
         fi
 
         if test -f "${{ inputs.python-module-name }}"; then
