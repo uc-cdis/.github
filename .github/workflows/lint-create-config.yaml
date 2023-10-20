@@ -51,7 +51,7 @@ jobs:
 
     - name: Use Python module path to update necessary linter configs
       run: |
-        if test -f "${{ inputs.python-virtual-env-path }}"; then
+        if [ -n "${{ inputs.python-virtual-env-path }}" ]; then
           echo "Provided Python Virtual Env Path: ${{ inputs.python-virtual-env-path }}"
 
           echo
@@ -60,7 +60,7 @@ jobs:
           echo "init-hook='import sys; sys.path.append(\"${{ inputs.python-virtual-env-path }}\")'" >> .github/linters/.python-lint
         fi
 
-        if test -f "${{ inputs.python-module-name }}"; then
+        if [ -n "${{ inputs.python-module-name }}" ]; then
           echo "Provided Python Module Name: ${{ inputs.python-module-name }}"
 
           echo
