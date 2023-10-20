@@ -1,5 +1,5 @@
 [MAIN]
-init-hook='import sys; sys.path.append("/home/runner/.cache/pypoetry/virtualenvs")'
+init-hook='import sys; sys.path.append("."); sys.path.append("/tmp/lint");'
 
 # Analyse import fallback blocks. This can be used to support both Python 2 and
 # 3 compatible code, which means that the block might have code that exists
