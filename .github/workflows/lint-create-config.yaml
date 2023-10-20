@@ -19,7 +19,13 @@
 #
 ---
 name: Lint Create Config
-on: [workflow_call]
+on: 
+  workflow_call:
+    inputs:
+      python-module-path:
+        description: 'Path to where the __init__.py is for the top-level Python module. This is used to add to the linter configs for proper detection of imports'
+        required: false
+        type: string
 jobs:
   create-files:
     runs-on: ubuntu-latest
@@ -38,6 +44,24 @@ jobs:
         persist-credentials: false
         sparse-checkout: |
           .github/linters
+
+    - name: Use Python module path to update necessary linter configs
+      run: |
+        if test -f "${{ inputs.python-module-path }}"; then
+          echo "Provided Python Module Path: ${{ inputs.python-module-path }}"
+
+          echo
+          echo "Updating .github/linters/.python-lint"
+          echo "init-hook='import sys; sys.path.append(${{ inputs.python-module-path }})'"
+          echo "init-hook='import sys; sys.path.append(${{ inputs.python-module-path }})'" >> .github/linters/.python-lint
+        
+          echo
+          echo "Updating .github/linters/.isort.cfg"
+          path="${{ inputs.python-module-path }}"
+          python_module_name=$(basename "$path")
+          echo "known_first_party=$python_module_name"
+          echo "known_first_party=$python_module_name" >> .github/linters/.isort.cfg
+        fi
 
     - uses: actions/upload-artifact@v3
       with:
