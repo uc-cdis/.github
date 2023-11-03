@@ -34,13 +34,25 @@ extension-pkg-allow-list=
 # for backward compatibility.)
 extension-pkg-whitelist=
 
+################################################################################
+######### ADD NEW ERRORS WHICH SHOULD FAIL THE SCRIPT IN fail-on HERE ##########
+################################################################################
+
 # Return non-zero exit code if any of these messages/categories are detected,
 # even if score is above --fail-under value. Syntax same as enable. Messages
 # specified are enabled, while categories only check already-enabled messages.
-fail-on=
+fail-on=missing-function-docstring,
+        invalid-name,
+        protected-access,
+        undefined-variable,
+
+        #### NEW ERRORS YOU WANT TO FAIL ON? ADD ABOVE THIS
+
+#### fail-under as 0 effectively makes it never fail, only the above errors will
+#### ensure script failure
 
 # Specify a score threshold under which the program will exit with error.
-fail-under=10
+fail-under=0
 
 # Interpret the stdin as a python script, whose filename needs to be passed as
 # the module_or_package argument.
@@ -338,7 +350,7 @@ indent-after-paren=4
 indent-string='    '
 
 # Maximum number of characters on a single line.
-max-line-length=120
+max-line-length=100
 
 # Maximum number of lines in a module.
 max-module-lines=1000
@@ -395,7 +407,7 @@ preferred-modules=
 
 # The type of string formatting that logging methods do. `old` means using %
 # formatting, `new` is for `{}` formatting.
-logging-format-style=old
+logging-format-style=new
 
 # Logging modules to check that the string format arguments are in logging
 # function parameter format.

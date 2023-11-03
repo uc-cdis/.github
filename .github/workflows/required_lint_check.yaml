@@ -1,5 +1,17 @@
 ---
-name: Lint
+name: Required Lint Check
+# this is intended to block on a limited set of required lint remove
+#
+# For only the optional and more verbose feedback, use the 
+# `optional_lint_check.yaml`.
+#
+# The intention is that thi required lint check, is, well, required to pass and 
+# WILL block merges and builds,
+# but is much more opinioned and slim in what we error on.
+#
+# The optional lint check runs on all PRs to provide info
+# but doesn't actually block any merge or build
+#
 on: 
   workflow_call:
     inputs:
@@ -72,45 +84,10 @@ jobs:
         uses: github/super-linter/slim@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          #
-          # !!!!!!!!!
-          # IF YOU UPDATE THESE ENV VARS,
-          # PLEASE ALSO UPDATE
-          # `.github/linters/super-linter.env`
-          # !!!!!!!!!
-          #
           VALIDATE_ALL_CODEBASE: true
           LOG_LEVEL: ERROR
-          VALIDATE_BASH: true
-          VALIDATE_BASH_EXEC: true
-          VALIDATE_CSS: true
-          VALIDATE_DOCKERFILE_HADOLINT: true
-          VALIDATE_EDITORCONFIG: true
-          VALIDATE_ENV: true
-          VALIDATE_GITHUB_ACTIONS: true
           VALIDATE_GO: true
-          VALIDATE_GROOVY: true
-          VALIDATE_HTML: true
-          VALIDATE_JAVA: true
-          VALIDATE_JAVASCRIPT_ES: true
-          VALIDATE_JAVASCRIPT_STANDARD: true
-          VALIDATE_JSCPD: true
-          VALIDATE_JSON: true
-          VALIDATE_KUBERNETES_KUBECONFORM: true
-          VALIDATE_LATEX: true
-          VALIDATE_MARKDOWN: true
-          VALIDATE_OPENAPI: true
-          VALIDATE_PERL: true
-          VALIDATE_POWERSHELL: true
           VALIDATE_PYTHON: true
           VALIDATE_PYTHON_BLACK: true
           VALIDATE_PYTHON_FLAKE8: true
-          VALIDATE_PYTHON_ISORT: true
           VALIDATE_PYTHON_PYLINT: true
-          VALIDATE_R: true
-          VALIDATE_RUBY: true
-          VALIDATE_SQL: true
-          VALIDATE_TYPESCRIPT_ES: true
-          VALIDATE_TYPESCRIPT_STANDARD: true
-          VALIDATE_XML: true
-          VALIDATE_YAML: true
