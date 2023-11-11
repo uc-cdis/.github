@@ -124,7 +124,7 @@ jobs:
           - name: Render md report to the PR
             if: always()
             run: |
-              gh pr comment $PR_NUM --body-file output/report.md
+              gh pr comment $PR_NUM --body-file output/report.md -R $REPO
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -140,7 +140,7 @@ jobs:
           - name: Publish allure report link to the PR
             if: always()
             run: |
-              gh pr comment $PR_NUM --body "Please find the detailed integration test report [here](https://qa.planx-pla.net/dashboard/Secure/gen3-ci-reports/$REPO/$PR_NUM/$RUN_NUM/index.html)"
+              gh pr comment $PR_NUM -R --body "Please find the detailed integration test report [here](https://qa.planx-pla.net/dashboard/Secure/gen3-ci-reports/$REPO/$PR_NUM/$RUN_NUM/index.html)" -R $REPO
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -153,7 +153,7 @@ jobs:
             if: always()
             run: |
               echo $POD_LOGS_URL
-              gh pr comment $PR_NUM --body "Please find the ci env pod logs [here]($POD_LOGS_URL)"
+              gh pr comment $PR_NUM --body "Please find the ci env pod logs [here]($POD_LOGS_URL)" -R $REPO
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
