@@ -26,6 +26,10 @@ on:
         required: false
         default: false
         type: boolean
+      use-cache:
+        required: false
+        default: true
+        type: boolean
 
 jobs:
   run_tests:
@@ -79,6 +83,7 @@ jobs:
 
       # cache the dependencies based on a hash of the lock file
       - name: Poetry cache
+        if: inputs.use-cache
         id: cache-poetry
         uses: actions/cache@v3
         with:
@@ -97,6 +102,7 @@ jobs:
           poetry show
 
       - name: Save poetry cache if cache miss
+        if: inputs.use-cache
         if: steps.cache-poetry.outputs.cache-hit != 'true'
         run: echo "Cache miss, saving the cache"
 
