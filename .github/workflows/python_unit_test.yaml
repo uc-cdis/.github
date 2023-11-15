@@ -102,8 +102,7 @@ jobs:
           poetry show
 
       - name: Save poetry cache if cache miss
-        if: inputs.use-cache
-        if: steps.cache-poetry.outputs.cache-hit != 'true'
+        if: inputs.use-cache && steps.cache-poetry.outputs.cache-hit != 'true'
         run: echo "Cache miss, saving the cache"
 
       - name: Run the service-specific setup script, if it exists
