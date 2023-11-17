@@ -1,13 +1,12 @@
 ---
 name: Required Lint Check
-# this is intended to block on a limited set of required lint remove
+# this is intended to block on a limited set of required lint to remove
 #
 # For only the optional and more verbose feedback, use the 
 # `optional_lint_check.yaml`.
 #
-# The intention is that thi required lint check, is, well, required to pass and 
-# WILL block merges and builds,
-# but is much more opinioned and slim in what we error on.
+# The required lint check, is, well, required to pass and WILL block merges and builds,
+# but is much more opinionated and slim (there are only a few things we error on).
 #
 # The optional lint check runs on all PRs to provide info
 # but doesn't actually block any merge or build

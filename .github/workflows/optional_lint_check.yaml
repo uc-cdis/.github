@@ -3,14 +3,15 @@ name: Optional Lint Check
 # this is intended to show informational lint to inform updates, but the verbosity
 # of this may be too much to fail/prevent a merge because of these
 #
-# For only the REQUIRED linting checks with little verbosity, use the 
+# If you only want the REQUIRED linting checks with little verbosity, use the 
 # `required_lint_check.yaml`.
 #
 # The intention is that this optional lint check runs on all PRs to provide info
-# but doesn't actually block any merge or build
+# but doesn't actually block any merge or build, but lets devs know key areas to 
+# to improve
 #
 # The required lint check, is, well, required to pass and WILL block merges and builds,
-# but is much more opinioned and slim in what we error on.
+# but is much more opinionated and slim (there are only a few things we error on).
 on: 
   workflow_call:
     inputs:

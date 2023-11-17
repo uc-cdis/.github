@@ -1,4 +1,6 @@
-# Linting with GitHub's Super Linter Locally
+# Workflow Info
+
+## `required_lint_check.yaml` & `optional_lint_check.yaml`: Linting with GitHub's Super Linter Locally
 
 The workflows for linting utilize Github's Super Linter. You can run it locally.
 
@@ -6,7 +8,7 @@ See how to set up with [Visual Studio Code](https://github.com/super-linter/supe
 
 And/or use Docker to run locally.
 
-## Setup
+### Setup
 
 First we need to get the same linter config that GitHub is using. It's 
 stored alongside our other global workflows and defaults in 
@@ -16,11 +18,11 @@ our `.github` repo. Let's clone that and move to a local, central location in `~
 git clone git@github.com:uc-cdis/.github.git ~/.gen3/.github
 ```
 
-## Modifying the Linter configs
+### Modifying the Linter configs
 
 Some linters require per-service/library configuration to properly format and parse. 
 
-## Edit the `~/.gen3/linters/.isort.cfg` 
+### Edit the `~/.gen3/linters/.isort.cfg` 
 
 Add the module name(s) as a comma-separated list to the bottom of the config. Example:
 
@@ -28,7 +30,7 @@ Add the module name(s) as a comma-separated list to the bottom of the config. Ex
 known_first_party=gen3discoveryai,anotherone
 ```
 
-## Edit the `~/.gen3/linters/.python-lint` 
+### Edit the `~/.gen3/linters/.python-lint` 
 
 There's a utility to modify this appropriately. Make sure you're in your virtual env
 or the root of the repo you're trying to lint first.
@@ -51,7 +53,7 @@ docker run --rm \
     ghcr.io/super-linter/super-linter:slim-v5
 ```
 
-## What the heck was all that setup?
+### What was all that setup?
 
 Basically you just replicated what GitHub Actions is doing, except locally.
 
