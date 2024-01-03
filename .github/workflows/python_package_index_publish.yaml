@@ -76,7 +76,7 @@ jobs:
       - name: Set up python
         uses: actions/setup-python@v4
         with:
-          PYTHON_VERSION: ${{ inputs.PYTHON_VERSION }}
+          python-version: ${{ inputs.PYTHON_VERSION }}
 
       - name: Install poetry
         # that is poetry's recommended way to install
