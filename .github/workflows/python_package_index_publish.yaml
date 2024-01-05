@@ -19,33 +19,11 @@ name: "PyPI Poetry Publish"
 #      uses: uc-cdis/.github/.github/workflows/python_package_index_publish.yaml@feat/pypi
 #      with:
 #          PYTHON_VERSION: '3.9'
-#          IS_TEST_PUBLISH: false
+#          DO_TEST_PUBLISH_FIRST: true
 #      secrets:
 #        PYPI_TEST_API_TOKEN: ${{ secrets.PYPI_TEST_API_TOKEN }}
 #        PYPI_PROD_API_TOKEN: ${{ secrets.PYPI_PROD_API_TOKEN }}
 #
-#
-# For using Test PyPI, you can have another GH Action that uses the same template
-# but runs on all branches:
-#
-#  name: PyPI Test
-#  on:
-#    push:
-#      branches:
-#        - '*'
-#      tags:
-#        - '*'
-#  jobs:
-#    PyPIPoetryPublish:
-#      name: PyPI Poetry Publish
-#      uses: uc-cdis/.github/.github/workflows/python_package_index_publish.yaml@feat/pypi
-#      with:
-#          PYTHON_VERSION: '3.9'
-#          IS_TEST_PUBLISH: true
-#      secrets:
-#        PYPI_TEST_API_TOKEN: ${{ secrets.PYPI_TEST_API_TOKEN }}
-#        PYPI_PROD_API_TOKEN: ${{ secrets.PYPI_PROD_API_TOKEN }}
-
 on:
   workflow_call:
     inputs:
@@ -54,8 +32,8 @@ on:
         required: false
         default: '3.9'
         type: string
-      IS_TEST_PUBLISH:
-        description: 'Whether or not to test publishing to Test PyPI on non-real releases'
+      DO_TEST_PUBLISH_FIRST:
+        description: 'Whether or not to test publishing to Test PyPI first'
         required: true
         default: true
         type: boolean
@@ -85,7 +63,6 @@ jobs:
           curl -sSL https://install.python-poetry.org | python -
           pip list
           poetry show
-
       - name: Install dependencies
         run: |
           poetry install -vv --all-extras --no-interaction --no-cache
@@ -104,13 +81,13 @@ jobs:
         shell: bash
 
       - name: Publish to Test PyPI
-        if: ${{ inputs.IS_TEST_PUBLISH && !contains(github.ref, 'refs/heads/main') && !contains(github.ref, 'refs/heads/master') && !startsWith(github.ref, 'refs/tags/') }}
+        id: test-pypi
+        if: ${{ inputs.DO_TEST_PUBLISH_FIRST && (contains(github.ref, 'refs/heads/main') || contains(github.ref, 'refs/heads/master')) && startsWith(github.ref, 'refs/tags/') }}
         run: |
-          echo "Since this is not a tagged release on the main branch, do a test publish"
+          echo "Attempting a test publish before a real one"
           poetry publish -n -vv -r testpypi
-
       - name: Publish to PyPI
-        if: ${{ !inputs.IS_TEST_PUBLISH && (contains(github.ref, 'refs/heads/main') || contains(github.ref, 'refs/heads/master')) && startsWith(github.ref, 'refs/tags/') }}
+        if: ${{ (!inputs.DO_TEST_PUBLISH_FIRST || (inputs.DO_TEST_PUBLISH_FIRST && steps.test-pypi.outcome == 'success')) && (contains(github.ref, 'refs/heads/main') || contains(github.ref, 'refs/heads/master')) && startsWith(github.ref, 'refs/tags/') }}
         run: |
           echo "Since this is a tagged release on the main branch, do a real publish"
           poetry publish -n -vv
