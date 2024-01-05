@@ -36,12 +36,12 @@ jobs:
         steps:
           # Checkout current branch of gen3-code-vigil if it is the repo under test
           - name: Checkout integration test code from dev branch
-            if: github.event.repository.name == 'gen3-code-vigil'
+            if: ${{ github.event.repository.name == 'gen3-code-vigil' }}
             uses: actions/checkout@v4
 
           # Checkout master branch of gen3-code-vigil when another repo is under test
           - name: Checkout integration test code from master branch
-            if: github.event.repository.name  != 'gen3-code-vigil'
+            if: ${{ github.event.repository.name  != 'gen3-code-vigil' }}
             uses: actions/checkout@v4
             with:
               repository: uc-cdis/gen3-code-vigil
@@ -92,6 +92,6 @@ jobs:
               path: ~/**/output/report.html
 
           - name: Release CI environment
-            if: always()
+            if: ${{ always() }}
             run: |
               poetry run python -m gen3_ci.scripts.release_ci_environment
