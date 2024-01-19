@@ -97,7 +97,7 @@ jobs:
           echo poetry publish -n -vv
 
       - name: Publish to PyPI Status Check
-        if: ${{ steps.prod-pypi.outcome != 'success')) }}
+        if: ${{ steps.prod-pypi.outcome != 'success' }}
         run: |
           echo "Since this is a tagged release, and the real publish failed or didn't run, fail the job"
           exit 1
