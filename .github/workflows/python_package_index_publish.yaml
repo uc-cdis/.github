@@ -8,9 +8,6 @@ name: "PyPI Poetry Publish"
 #  name: PyPI
 #  on:
 #    push:
-#      branches:
-#        - main
-#        - master
 #      tags:
 #        - '*'
 #  jobs:
@@ -87,12 +84,12 @@ jobs:
 
       - name: Publish to Test PyPI
         id: test-pypi
-        if: ${{ inputs.DO_TEST_PUBLISH_FIRST }}
+        if: ${{ inputs.DO_TEST_PUBLISH_FIRST && startsWith(github.ref, 'refs/pull/') }}
         run: |
           echo "Attempting a test publish before a real one. Note that a real one will only trigger on tags"
-          poetry publish -n -vv -r testpypi
+          echo poetry publish -n -vv -r testpypi
       - name: Publish to PyPI
         if: ${{ (!inputs.DO_TEST_PUBLISH_FIRST || (inputs.DO_TEST_PUBLISH_FIRST && steps.test-pypi.outcome == 'success')) && startsWith(github.ref, 'refs/pull/') }}
         run: |
           echo "Since this is a tagged release, do a real publish"
-          poetry publish -n -vv
+          echo poetry publish -n -vv
