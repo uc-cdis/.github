@@ -78,6 +78,7 @@ jobs:
           poetry config pypi-token.testpypi $PYPI_TEST_API_TOKEN
           poetry config pypi-token.pypi $PYPI_PROD_API_TOKEN
           poetry build
+          echo ${{ github.ref }}
         shell: bash
 
       - name: Publish to Test PyPI
