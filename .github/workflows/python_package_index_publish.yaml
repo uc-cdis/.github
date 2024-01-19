@@ -88,8 +88,16 @@ jobs:
         run: |
           echo "Attempting a test publish before a real one. Note that a real one will only trigger on tags"
           echo poetry publish -n -vv -r testpypi
+
       - name: Publish to PyPI
+        id: prod-pypi
         if: ${{ (!inputs.DO_TEST_PUBLISH_FIRST || (inputs.DO_TEST_PUBLISH_FIRST && steps.test-pypi.outcome == 'success')) && startsWith(github.ref, 'refs/pull/') }}
         run: |
           echo "Since this is a tagged release, do a real publish"
           echo poetry publish -n -vv
+
+      - name: Publish to PyPI Status Check
+        if: ${{ steps.prod-pypi.outcome != 'success')) }}
+        run: |
+          echo "Since this is a tagged release, and the real publish failed or didn't run, fail the job"
+          exit 1
