@@ -31,14 +31,21 @@ jobs:
         python-version: 3.9
     - name: Install AWS CLI
       uses: chrislennon/action-aws-cli@1.1
-    - name: Install Dependencies
+    - name: Install poetry
+      # that is poetry's recommended way to install
       run: |
+        python3.9 -m venv env
+        source env/bin/activate
         pip install --upgrade pip
+        curl -sSL https://install.python-poetry.org | python -
         pip list
-        pip install dictionaryutils
-        pip freeze
-    - name: Run Tests and Dump Schema
+        poetry install -vv --all-extras --no-interaction
+        poetry show
+    - name: Initialize Packages
       run: |
+        python3.9 -m venv env
+        source env/bin/activate
+        git clone https://github.com/uc-cdis/dictionaryutils; cd dictionaryutils
         ./run_tests.sh
         aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME/schema.json --region ${{ inputs.REGION }}
       env:
