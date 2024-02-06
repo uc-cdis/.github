@@ -34,17 +34,20 @@ jobs:
     - name: Install poetry
       # that is poetry's recommended way to install
       run: |
-        python3.9 -m venv env
-        source env/bin/activate
         pip install --upgrade pip
         curl -sSL https://install.python-poetry.org | python -
         pip list
     - name: Initialize Packages
+      # dictionaryutils is a poetry package and confusingly, the run_tests.sh script
+      # does an install. But in order to ensure the correctly virtual env usage, we're
+      # going to run poetry install ourselves and then call the run test script
       run: |
-        python3.9 -m venv env
-        source env/bin/activate
         git clone https://github.com/uc-cdis/dictionaryutils; cd dictionaryutils
-        ./run_tests.sh
+        poetry install -vv --all-extras --no-interaction
+        echo "dependencies before run_test"
+        poetry show
+        poetry run ./run_tests.sh
+        echo "dependencies after run_test"
         poetry show
         aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME/schema.json --region ${{ inputs.REGION }}
       env:
