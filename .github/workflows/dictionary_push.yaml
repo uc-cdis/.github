@@ -39,14 +39,13 @@ jobs:
         pip install --upgrade pip
         curl -sSL https://install.python-poetry.org | python -
         pip list
-        poetry install -vv --all-extras --no-interaction
-        poetry show
     - name: Initialize Packages
       run: |
         python3.9 -m venv env
         source env/bin/activate
         git clone https://github.com/uc-cdis/dictionaryutils; cd dictionaryutils
         ./run_tests.sh
+        poetry show
         aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME/schema.json --region ${{ inputs.REGION }}
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.DICT_AWS_ACCESS_KEY_ID }}
