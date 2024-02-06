@@ -61,11 +61,11 @@ jobs:
         git clone https://github.com/uc-cdis/dictionaryutils
         cd dictionaryutils
         poetry install -vv --all-extras --no-interaction
-        echo "installing the dictionary as `gdcdictionary`"
     - name: Attempt pip install of dictionary as `gdcdictionary`
       # this will only work when the dictionary is using a pip setup with setup.py
       run: |
         cd dictionaryutils
+        echo "installing the dictionary as `gdcdictionary`"
         poetry run pip install -e ..
     - name: Run dictionary tests, dump schema, and move to S3
       run: |
