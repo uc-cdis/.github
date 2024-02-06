@@ -1,5 +1,18 @@
 name: Test and deploy dictionaries
 
+# OVERVIEW
+#
+# dictionaryutils is a poetry package and confusingly, the run_tests.sh script
+# does an install. Also confusingly, the test script relies on a library `gdcdictionary`
+# existing as the source for testing against. In order to ensure the correct virtual env usage, we're
+# going to run poetry install ourselves after cloning dictionaryutils, then we're going to 
+# `pip install -e` the dictionary we're testing (since they don't all have poetry setup) which ensures
+# that the dictionary is installed as `gdcdictionary`,
+# and then we're going to call the run test script WITHIN THE POETRY VIRTUAL ENV which will:
+#    - redundantly install deps from dictionaryutils (but this is nice when you have the libary by itself I guess?)
+#    - run the dictionary tests from dictionaryutils which expects `gdcdictionary` library as the unit to test
+#    - run the dump schemas to move it to the /artifacts folder
+
 on:
   workflow_call:
     inputs:
@@ -37,21 +50,21 @@ jobs:
         pip install --upgrade pip
         curl -sSL https://install.python-poetry.org | python -
         pip list
-    - name: Get dictionaryutils library, install, run tests, and dump schemas
-      # dictionaryutils is a poetry package and confusingly, the run_tests.sh script
-      # does an install. Also confusingly, the test script relies on a library `gdcdictionary`
-      # existing as the source for testing against. In order to ensure the correctly virtual env usage, we're
-      # going to run poetry install ourselves on dictionaryutils, then we're going to 
-      # `pip install -e` the dictionary we're testing (since they don't all have poetry setup),
-      # and then we're going to call the run test script WITHIN THE POETRY VIRTUAL ENV which will:
-      #    - redundantly install deps from dictionaryutils (but this is nice when you have the libary by itself I guess?)
-      #    - run the dictionary tests from dictionaryutils which expects `gdcdictionary` library as the unit to test
-      #    - run the dump schemas to move it to the /artifacts folder
+    - name: Attempt poetry install of dictionary as `gdcdictionary`
+      # this will only work when the dictionary is using a poetry setup with pyproject.toml
+      run: |
+        poetry install -vv --all-extras --no-interaction || true
+    - name: Get dictionaryutils library and install
       run: |
         git clone https://github.com/uc-cdis/dictionaryutils; cd dictionaryutils
         poetry install -vv --all-extras --no-interaction
         echo "installing the dictionary as `gdcdictionary`"
+    - name: Attempt pip install of dictionary as `gdcdictionary`
+      # this will only work when the dictionary is using a pip setup with setup.py
+      run: |
         poetry run pip install -e ..
+    - name: Run dictionary tests, dump schema, and move to S3
+      run: |
         echo "dependencies before run_test"
         poetry show
         poetry run ./run_tests.sh
