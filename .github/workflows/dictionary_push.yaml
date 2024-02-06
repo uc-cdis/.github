@@ -58,15 +58,18 @@ jobs:
         poetry install -vv --all-extras --no-interaction || true
     - name: Get dictionaryutils library and install
       run: |
-        git clone https://github.com/uc-cdis/dictionaryutils; cd dictionaryutils
+        git clone https://github.com/uc-cdis/dictionaryutils
+        cd dictionaryutils
         poetry install -vv --all-extras --no-interaction
         echo "installing the dictionary as `gdcdictionary`"
     - name: Attempt pip install of dictionary as `gdcdictionary`
       # this will only work when the dictionary is using a pip setup with setup.py
       run: |
+        cd dictionaryutils
         poetry run pip install -e ..
     - name: Run dictionary tests, dump schema, and move to S3
       run: |
+        cd dictionaryutils
         echo "dependencies before run_test"
         poetry show
         poetry run ./run_tests.sh
