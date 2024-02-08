@@ -20,6 +20,10 @@ on:
         required: false
         default: '3.9'
         type: string
+      use-cache:
+        required: false
+        default: true
+        type: boolean
 jobs:
   build:
     name: Lint
@@ -45,6 +49,17 @@ jobs:
       - name: Display files
         run: ls -aR 
 
+      # cache the dependencies based on a hash of the lock file
+      - name: Poetry cache
+        if: inputs.use-cache
+        id: cache-poetry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
       - name: Install poetry so virtual env has imports that pylint can check
         # that is poetry's recommended way to install
         run: |
@@ -53,6 +68,10 @@ jobs:
           pip list
           poetry install -vv --all-extras --no-interaction
           poetry show
+
+      - name: Save poetry cache if cache miss
+        if: inputs.use-cache && steps.cache-poetry.outputs.cache-hit != 'true'
+        run: echo "Cache miss, saving the cache"
 
       - name: Use Python module path to update necessary linter configs
         run: |
