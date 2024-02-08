@@ -1,5 +1,20 @@
 name: Test and deploy dictionaries
 
+# OVERVIEW
+#
+# dictionaryutils is a poetry package and confusingly, the run_tests.sh script
+# does an install. Also confusingly, the test script relies on a library `gdcdictionary`
+# existing as the source for testing against. In order to ensure the correct virtual env usage and 
+# compatibility with both pyproject.yaml and setup.py for the dictionary repos, we're
+# going to try to poetry install the dictionary as `gdcdictionary`, 
+# then run poetry install ourselves after cloning dictionaryutils, then we're going to 
+# `pip install -e` the dictionary we're testing (since they don't all have poetry setup) which ensures
+# that the dictionary is installed as `gdcdictionary`,
+# and then we're going to call the run test script WITHIN THE POETRY VIRTUAL ENV which will:
+#    - redundantly install deps from dictionaryutils (but this is nice when you have the libary by itself I guess?)
+#    - run the dictionary tests from dictionaryutils which expects `gdcdictionary` library as the unit to test
+#    - run the dump schemas to move it to the /artifacts folder
+
 on:
   workflow_call:
     inputs:
@@ -31,14 +46,35 @@ jobs:
         python-version: 3.9
     - name: Install AWS CLI
       uses: chrislennon/action-aws-cli@1.1
-    - name: Initialize Packages
+    - name: Install poetry
+      # that is poetry's recommended way to install
       run: |
-        python3.9 -m venv env
-        source env/bin/activate
         pip install --upgrade pip
-        yes | python setup.py install
-        git clone https://github.com/uc-cdis/dictionaryutils; cd dictionaryutils
-        ./run_tests.sh
+        curl -sSL https://install.python-poetry.org | python -
+        pip list
+    - name: Attempt poetry install of dictionary as `gdcdictionary`
+      # this will only work when the dictionary is using a poetry setup with pyproject.toml
+      run: |
+        poetry install -vv --all-extras --no-interaction || true
+    - name: Get dictionaryutils library and install
+      run: |
+        git clone https://github.com/uc-cdis/dictionaryutils
+        cd dictionaryutils
+        poetry install -vv --all-extras --no-interaction
+    - name: Attempt pip install of dictionary as `gdcdictionary`
+      # this will only work when the dictionary is using a pip setup with setup.py
+      run: |
+        cd dictionaryutils
+        echo "installing the dictionary as `gdcdictionary`"
+        poetry run pip install -e ..
+    - name: Run dictionary tests, dump schema, and move to S3
+      run: |
+        cd dictionaryutils
+        echo "dependencies before run_test"
+        poetry show
+        poetry run ./run_tests.sh
+        echo "dependencies after run_test"
+        poetry show
         aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME/schema.json --region ${{ inputs.REGION }}
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.DICT_AWS_ACCESS_KEY_ID }}
