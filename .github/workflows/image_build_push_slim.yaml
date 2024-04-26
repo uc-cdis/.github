@@ -172,7 +172,7 @@ jobs:
       - name: Push (Quay only)
         # if: ${{ inputs.USE_QUAY_ONLY }}
         run: |
-          docker image push ${{ github.repository }}${{ env.IMAGE_TAG }}-slim
+          docker image push quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}-slim
 
       # Dump the report
       - name: Report
