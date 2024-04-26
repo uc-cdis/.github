@@ -160,7 +160,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ inputs.BUILD_PLATFORMS }}
 
-      - name: Slim (Quay only)
+      - name: Slimmm (Quay only)
         # if: ${{ inputs.USE_QUAY_ONLY }}
         uses: kitabisa/docker-slim-action@v1
         with:
