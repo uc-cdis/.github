@@ -154,10 +154,9 @@ jobs:
         with:
           context: ${{ inputs.DOCKERFILE_BUILD_CONTEXT }}
           file: ${{ inputs.DOCKERFILE_LOCATION }}
-          push: false
+          push: true
           tags: |
             quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
-          load: true
           # labels: ${{ steps.meta.outputs.labels }}
           # cache-from: type=registry,ref=quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
           # cache-to: type=inline
