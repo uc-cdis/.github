@@ -167,15 +167,10 @@ jobs:
           target: quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
           tag: ${{ env.IMAGE_TAG }}-slim
         env:
-          DSLIM_HTTP_PROBE: false
+          DSLIM_HTTP_PROBE: true
+          DSLIM_INCLUDE_PATH_FILE: "/usr/bin/sort:/usr/bin/find:/bin/rm:/bin/tar
 
       - name: Push (Quay only)
         # if: ${{ inputs.USE_QUAY_ONLY }}
         run: |
           docker image push quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}-slim
-
-      # Dump the report
-      - name: Report
-        run: echo "${REPORT}"
-        env:
-          REPORT: ${{ steps.slim.outputs.report }}
