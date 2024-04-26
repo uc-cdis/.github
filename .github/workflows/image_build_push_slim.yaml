@@ -168,7 +168,7 @@ jobs:
           tag: ${{ env.IMAGE_TAG }}-slim
         env:
           DSLIM_HTTP_PROBE: true
-          DSLIM_INCLUDE_BIN_FILE: "/usr/bin/sort:/usr/bin/find:/bin/rm:/bin/tar"
+          DSLIM_INCLUDE_BIN_FILE: "/usr/bin/sort"
 
       - name: Push (Quay only)
         # if: ${{ inputs.USE_QUAY_ONLY }}
