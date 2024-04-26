@@ -154,25 +154,26 @@ jobs:
         with:
           context: ${{ inputs.DOCKERFILE_BUILD_CONTEXT }}
           file: ${{ inputs.DOCKERFILE_LOCATION }}
-          push: true
+          push: false
+          load: true
           tags: |
             quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ inputs.BUILD_PLATFORMS }}
 
-      - name: Slimmm (Quay only)
+      - name: Slim (Quay only)
         # if: ${{ inputs.USE_QUAY_ONLY }}
         uses: kitabisa/docker-slim-action@v1
         with:
           target: quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
-          tag: "slim"
+          tag: ${{ env.IMAGE_TAG }}-Slim
         env:
           DSLIM_HTTP_PROBE: false
 
       - name: Push (Quay only)
         # if: ${{ inputs.USE_QUAY_ONLY }}
         run: |
-          docker image push "${{ github.repository }}" --all-tags
+          docker image push ${{ github.repository }}${{ env.IMAGE_TAG }}-Slim
 
       # Dump the report
       - name: Report
