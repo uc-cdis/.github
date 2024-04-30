@@ -1,6 +1,0 @@
-/usr/bin/sort
-/usr/bin/curl
-/usr/bin/find
-/bin/rm
-/usr/local/bin/python
-/bin/tar
