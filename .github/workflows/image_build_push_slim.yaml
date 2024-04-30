@@ -173,6 +173,7 @@ jobs:
           # DSLIM_INCLUDE_EXE_FILE: ${{ github.workspace }}/.github/workflows/include-executables.txt
           DSLIM_INCLUDE_PATH: /var/tmp/uwsgi_flask_metrics
           DSLIM_DEP_INCLUDE_COMPOSE_SVC_DEPS: true
+          DSLIM_PRESERVE_PATH: /var/www/fence/
 
       - name: Push (Quay only)
         # if: ${{ inputs.USE_QUAY_ONLY }}
