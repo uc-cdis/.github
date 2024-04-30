@@ -171,6 +171,7 @@ jobs:
           DSLIM_INCLUDE_BIN_FILE: ${{ github.workspace }}/.github/workflows/include-binaries.txt
           DSLIM_INCLUDE_PATH_FILE: ${{ github.workspace }}/.github/workflows/include-files.txt
           # DSLIM_INCLUDE_EXE_FILE: ${{ github.workspace }}/.github/workflows/include-executables.txt
+          DSLIM_INCLUDE_PATH: /var/tmp/uwsgi_flask_metrics
 
       - name: Push (Quay only)
         # if: ${{ inputs.USE_QUAY_ONLY }}
