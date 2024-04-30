@@ -168,7 +168,8 @@ jobs:
           tag: ${{ env.IMAGE_TAG }}-slim
         env:
           DSLIM_HTTP_PROBE: true
-          DSLIM_INCLUDE_BIN_FILE: ${{ github.workspace }}/include-binaries.txt
+          DSLIM_INCLUDE_BIN_FILE: ${{ github.workspace }}/.github/workflows/include-binaries.txt
+          DSLIM_PRESERVE_PATH_FILE: ${{ github.workspace }}/.github/workflows/include-files.txt
 
       - name: Push (Quay only)
         # if: ${{ inputs.USE_QUAY_ONLY }}
