@@ -74,6 +74,15 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
+      - name: List files in the repository
+        run: ls -alh
+      - name: Show contents of the include-binaries.txt
+        run: cat include-binaries.txt
+      - name: Run DockerSlim
+        run: docker-slim build --http-probe=false my-app
+        env:
+          DSLIM_INCLUDE_BIN_FILE: ${{ github.workspace }}/include-binaries.txt
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
