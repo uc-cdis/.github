@@ -174,7 +174,7 @@ jobs:
           # DSLIM_INCLUDE_EXE_FILE: ${{ github.workspace }}/.github/workflows/include-executables.txt
           DSLIM_INCLUDE_PATH: /var/tmp/uwsgi_flask_metrics
           DSLIM_DEP_INCLUDE_COMPOSE_SVC_DEPS: true
-          DSLIM_NEW_WORKDIR: /fence
+          # DSLIM_NEW_WORKDIR: /fence
           DSLIM_RUN_TAS_USER: false
 
       - name: Push (Quay only)
