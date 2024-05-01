@@ -167,7 +167,7 @@ jobs:
           target: quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
           tag: ${{ env.IMAGE_TAG }}-slim
         env:
-          DSLIM_HTTP_PROBE: true
+          DSLIM_HTTP_PROBE: false
           DSLIM_INCLUDE_BIN_FILE: ${{ github.workspace }}/.github/workflows/include-binaries.txt
           # DSLIM_INCLUDE_PATH_FILE: ${{ github.workspace }}/.github/workflows/include-files.txt
           DSLIM_PRESERVE_PATH_FILE: ${{ github.workspace }}/.github/workflows/preserve-files.txt
