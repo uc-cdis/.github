@@ -172,7 +172,7 @@ jobs:
           DSLIM_INCLUDE_PATH_FILE: ${{ github.workspace }}/.github/workflows/include-files.txt
           DSLIM_PRESERVE_PATH_FILE: ${{ github.workspace }}/.github/workflows/preserve-files.txt
           # DSLIM_INCLUDE_EXE_FILE: ${{ github.workspace }}/.github/workflows/include-executables.txt
-          DSLIM_INCLUDE_PATH: /usr/bin/
+          DSLIM_INCLUDE_PATH: /
           DSLIM_DEP_INCLUDE_COMPOSE_SVC_DEPS: true
           # DSLIM_NEW_WORKDIR: /fence
           DSLIM_RUN_TAS_USER: false
