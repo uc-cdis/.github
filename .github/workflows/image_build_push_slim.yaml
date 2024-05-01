@@ -148,17 +148,17 @@ jobs:
       #   run: |
       #     docker image push "${{ github.repository }}" --all-tags
 
-      # - name: Build and push (Quay only)
-      #   # if: ${{ inputs.USE_QUAY_ONLY }}
-      #   uses: docker/build-push-action@v5
-      #   with:
-      #     context: ${{ inputs.DOCKERFILE_BUILD_CONTEXT }}
-      #     file: ${{ inputs.DOCKERFILE_LOCATION }}
-      #     push: true
-      #     tags: |
-      #       quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
-      #     labels: ${{ steps.meta.outputs.labels }}
-      #     platforms: ${{ inputs.BUILD_PLATFORMS }}
+      - name: Build and push (Quay only)
+        # if: ${{ inputs.USE_QUAY_ONLY }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ inputs.DOCKERFILE_BUILD_CONTEXT }}
+          file: ${{ inputs.DOCKERFILE_LOCATION }}
+          push: true
+          tags: |
+            quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: ${{ inputs.BUILD_PLATFORMS }}
 
       - name: Slim (Quay only)
         # if: ${{ inputs.USE_QUAY_ONLY }}
