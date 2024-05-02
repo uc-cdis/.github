@@ -178,7 +178,7 @@ jobs:
           DSLIM_DEP_INCLUDE_COMPOSE_SVC_DEPS: true
           # DSLIM_NEW_WORKDIR: /fence
           DSLIM_RUN_TAS_USER: false
-          # DSLIM_INCLUDE_SHELL: true
+          DSLIM_INCLUDE_SHELL: true
 
       - name: Push (Quay only)
         # if: ${{ inputs.USE_QUAY_ONLY }}
