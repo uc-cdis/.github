@@ -116,49 +116,49 @@ jobs:
             quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
             ${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
 
-      # - name: Build
-      #   if: ${{ !inputs.USE_QUAY_ONLY }}
-      #   uses: docker/build-push-action@v3
-      #   # You may get ECR-push errors when first adding the workflow to a github repo.
-      #   # If so, run the following in dev/qa to create the ECR repository:
-      #   # qaplanetv1@cdistest_dev_admin:~$ aws ecr create-repository --repository-name "gen3/<repo name>" --image-scanning-configuration scanOnPush=true
-      #   with:
-      #     context: ${{ inputs.DOCKERFILE_BUILD_CONTEXT }}
-      #     file: ${{ inputs.DOCKERFILE_LOCATION }}
-      #     push: false
-      #     tags: |
-      #       quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
-      #       ${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
-      #     labels: ${{ steps.meta.outputs.labels }}
-      #     cache-from: type=registry,ref=${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
-      #     cache-to: type=inline
-      #     platforms: ${{ inputs.BUILD_PLATFORMS }}
+      - name: Build
+        if: ${{ !inputs.USE_QUAY_ONLY }}
+        uses: docker/build-push-action@v3
+        # You may get ECR-push errors when first adding the workflow to a github repo.
+        # If so, run the following in dev/qa to create the ECR repository:
+        # qaplanetv1@cdistest_dev_admin:~$ aws ecr create-repository --repository-name "gen3/<repo name>" --image-scanning-configuration scanOnPush=true
+        with:
+          context: ${{ inputs.DOCKERFILE_BUILD_CONTEXT }}
+          file: ${{ inputs.DOCKERFILE_LOCATION }}
+          push: false
+          tags: |
+            quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
+            ${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
+          cache-to: type=inline
+          platforms: ${{ inputs.BUILD_PLATFORMS }}
 
-      # - name: Slim
-      #   if: ${{ !inputs.USE_QUAY_ONLY }}
-      #   uses: kitabisa/docker-slim-action@v1
-      #   with:
-      #     target: ${{ github.repository }}:latest
-      #     tag: "slim"
-      #   env:
-      #     DSLIM_HTTP_PROBE: false
+      - name: Slim
+        if: ${{ !inputs.USE_QUAY_ONLY }}
+        uses: kitabisa/docker-slim-action@v1
+        with:
+          target: ${{ github.repository }}:latest
+          tag: "slim"
+        env:
+          DSLIM_HTTP_PROBE: false
 
-      # - name: Push
-      #   if: ${{ !inputs.USE_QUAY_ONLY }}
-      #   run: |
-      #     docker image push "${{ github.repository }}" --all-tags
+      - name: Push
+        if: ${{ !inputs.USE_QUAY_ONLY }}
+        run: |
+          docker image push "${{ github.repository }}" --all-tags
 
-      # - name: Build and push (Quay only)
-      #   # if: ${{ inputs.USE_QUAY_ONLY }}
-      #   uses: docker/build-push-action@v5
-      #   with:
-      #     context: ${{ inputs.DOCKERFILE_BUILD_CONTEXT }}
-      #     file: ${{ inputs.DOCKERFILE_LOCATION }}
-      #     push: true
-      #     tags: |
-      #       quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
-      #     labels: ${{ steps.meta.outputs.labels }}
-      #     platforms: ${{ inputs.BUILD_PLATFORMS }}
+      - name: Build and push (Quay only)
+        # if: ${{ inputs.USE_QUAY_ONLY }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ inputs.DOCKERFILE_BUILD_CONTEXT }}
+          file: ${{ inputs.DOCKERFILE_LOCATION }}
+          push: true
+          tags: |
+            quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: ${{ inputs.BUILD_PLATFORMS }}
 
       - name: Slim (Quay only)
         # if: ${{ inputs.USE_QUAY_ONLY }}
@@ -168,15 +168,8 @@ jobs:
           tag: ${{ env.IMAGE_TAG }}-slim
         env:
           DSLIM_HTTP_PROBE: false
-          # DSLIM_NEW_EXPOSE: 8080
-          # DSLIM_HTTP_PROBE_CMD: "gunicorn -c deployment/wsgi/gunicorn.conf.py"
-          # DSLIM_INCLUDE_BIN_FILE: ${{ github.workspace }}/.github/workflows/include-binaries.txt
-          # DSLIM_INCLUDE_PATH_FILE: ${{ github.workspace }}/.github/workflows/include-files.txt
           DSLIM_PRESERVE_PATH_FILE: ${{ github.workspace }}/.github/workflows/preserve-files.txt
-          # DSLIM_INCLUDE_EXE_FILE: ${{ github.workspace }}/.github/workflows/include-files.txt
-          # DSLIM_INCLUDE_PATH: /
           DSLIM_DEP_INCLUDE_COMPOSE_SVC_DEPS: true
-          # DSLIM_NEW_WORKDIR: /fence
           DSLIM_RUN_TAS_USER: false
           DSLIM_INCLUDE_SHELL: true
 
@@ -184,9 +177,3 @@ jobs:
         # if: ${{ inputs.USE_QUAY_ONLY }}
         run: |
           docker image push quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}-slim
-
-      # Dump the report
-      - name: Report
-        run: echo "${REPORT}"
-        env:
-          REPORT: ${{ steps.slim.outputs.report }}
