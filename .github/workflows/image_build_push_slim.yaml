@@ -170,7 +170,7 @@ jobs:
           DSLIM_HTTP_PROBE: false
           # DSLIM_NEW_EXPOSE: 8080
           # DSLIM_HTTP_PROBE_CMD: "gunicorn -c deployment/wsgi/gunicorn.conf.py"
-          DSLIM_INCLUDE_BIN_FILE: ${{ github.workspace }}/.github/workflows/include-binaries.txt
+          # DSLIM_INCLUDE_BIN_FILE: ${{ github.workspace }}/.github/workflows/include-binaries.txt
           # DSLIM_INCLUDE_PATH_FILE: ${{ github.workspace }}/.github/workflows/include-files.txt
           DSLIM_PRESERVE_PATH_FILE: ${{ github.workspace }}/.github/workflows/preserve-files.txt
           # DSLIM_INCLUDE_EXE_FILE: ${{ github.workspace }}/.github/workflows/include-files.txt
@@ -178,7 +178,7 @@ jobs:
           DSLIM_DEP_INCLUDE_COMPOSE_SVC_DEPS: true
           # DSLIM_NEW_WORKDIR: /fence
           DSLIM_RUN_TAS_USER: false
-          # DSLIM_INCLUDE_SHELL: true
+          DSLIM_INCLUDE_SHELL: true
 
       - name: Push (Quay only)
         # if: ${{ inputs.USE_QUAY_ONLY }}
