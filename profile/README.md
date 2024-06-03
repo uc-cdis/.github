@@ -8,31 +8,41 @@ The University of Chicago, Center for Translational Data Science is the maintain
 
 ## Gen3 community
 
-Join the Gen3 community on [slack](https://docs.google.com/forms/d/e/1FAIpQLSczyhhOXeCK9FdVtpQpelOHYnRj1EAq1rwwnm9q6cPAe5a7ug/viewform) or via the [discussion board](https://forums.gen3.org/) to ask questions about how to use or contribute to Gen3.
-
-## Contributing code to Gen3
+### Contributing code to Gen3
 
 Gen3 software is completely open-source.  Please refer to our [Contributor Guidelines](https://uc-cdis.github.io/gen3-docs/docs/Contributor%20Guidelines/) for how to contribute code to our repositories.
 
-## Gen3 releases
+### Chat with Gen3 staff and the community
 
-The lastest Gen3 releases and release notes can be found [here](https://github.com/uc-cdis/cdis-manifest/blob/master/releases/2024/06/gen3-release-notes.md).
+If you have questions about operating or using a Gen3 system please contact us.  We can be reached on [slack](https://docs.google.com/forms/d/e/1FAIpQLSczyhhOXeCK9FdVtpQpelOHYnRj1EAq1rwwnm9q6cPAe5a7ug/viewform), [discussion board](https://forums.gen3.org/), or via email (support@datacommons.io).
 
-## Setting up and operating a Gen3 data commons or mesh
+### Events
+
+We hold regular forums on a variety of topics to engage with and hear from the community.  You find previous and upcomings [here](https://gen3.org/community/events/).
+
+### Gen3 releases
+
+Gen3 releases typically happen every month.  The lastest release notes can be found [here](https://github.com/uc-cdis/cdis-manifest/blob/master/releases/2024/06/gen3-release-notes.md).
+
+## User Guides
+
+### Setting up and operating a Gen3 data commons or mesh
 
 Gen3 on [Helm](https://github.com/uc-cdis/gen3-helm) is the new preferred way to run a Gen3 commons on a single laptop, desktop, or VM. Using Helm, a package manager for Kubernetes, Gen3 can be installed against any cluster, including a local one such as Minikube or Rancher Desktop. This option is suitable for those that wish to experiment with Gen3, develop against it on their machines, or other non-production uses. At this time, the Helm deployment is not considered production-ready. If you are ready to get started, you can follow our guide [here](https://github.com/uc-cdis/gen3-helm/blob/doc/gen3Setup/gen3ForDevs/gen3HelmForDevelopers.md). 
 
 To learn more please refer to our [Operator's Guidelines](https://gen3.org/resources/operator/).
 
-## Using a Gen3 system
+### Using a Gen3 system
 
-Please refer to our user guide found [here](https://gen3.org/resources/user/).
+To learn more about interacting with a Gen3 data commons or mesh including how to create a data dictionary, upload data and metadata, indexing files, and other topics please refer to our user guide found [here](https://gen3.org/resources/user/).
 
-## Learn More about Gen3
+## Additional References
+
+### Learn More about Gen3
 
 Check out [gen3.org](https://gen3.org/).
 
-## Learn More about the Center for Translational Data Science
+### Learn More about the Center for Translational Data Science
 
 The Center for Translational Data Science at the University of Chicago is developing the discipline of data science and its applications to problems in biology, medicine, healthcare and the environment. We develop and operate large scale data platforms to support research in topics of societal interest including cancer, cardiovascular disease, inflammatory bowel disease (IBD), birth defects, veterans’ health, pain management, opioid use disorder, and environmental science. We also develop new machine learning and AI algorithms over the data in our platforms. 
 
