@@ -18,7 +18,7 @@ If you have questions about operating or using a Gen3 system please contact us. 
 
 ### Events
 
-We hold regular forums on a variety of topics to engage with and hear from the community.  You find previous and upcomings [here](https://gen3.org/community/events/).
+We hold regular forums on a variety of topics to engage with and hear from the community.  You can find previous and upcoming events [here](https://gen3.org/community/events/).
 
 ### Gen3 releases
 
