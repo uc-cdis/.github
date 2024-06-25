@@ -34,7 +34,7 @@ on:
       BUILD_PLATFORMS:
         required: false
         type: string
-        default: "linux/amd64"
+        default: "linux/amd64, linux/arm64"
     secrets:
       ECR_AWS_ACCESS_KEY_ID:
         required: true
@@ -52,7 +52,7 @@ jobs:
     steps:
       # https://github.com/docker/login-action#quayio
       - name: Login to Quay.io
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
@@ -60,7 +60,7 @@ jobs:
 
       # https://github.com/docker/login-action#aws-public-elastic-container-registry-ecr
       - name: Login to ECR
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ inputs.AWS_ECR_REGISTRY }}
           username: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
@@ -69,16 +69,16 @@ jobs:
           AWS_REGION: ${{ inputs.AWS_REGION }}
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.3.0
 
       - name: Set Variables
         shell: bash
@@ -110,7 +110,7 @@ jobs:
 
       - name: Extract metadata
         id: meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v5
         with:
           images: |
             quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
@@ -118,7 +118,7 @@ jobs:
 
       - name: Build and push
         if: ${{ !inputs.USE_QUAY_ONLY }}
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         # You may get ECR-push errors when first adding the workflow to a github repo.
         # If so, run the following in dev/qa to create the ECR repository:
         # qaplanetv1@cdistest_dev_admin:~$ aws ecr create-repository --repository-name "gen3/<repo name>" --image-scanning-configuration scanOnPush=true
@@ -136,7 +136,7 @@ jobs:
 
       - name: Build and push (Quay only)
         if: ${{ inputs.USE_QUAY_ONLY }}
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ${{ inputs.DOCKERFILE_BUILD_CONTEXT }}
           file: ${{ inputs.DOCKERFILE_LOCATION }}
