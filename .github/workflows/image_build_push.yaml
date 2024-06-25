@@ -130,8 +130,8 @@ jobs:
             ${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
             quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:cache
-          cache-to: type=registry,ref=${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:cache,mode=max,image-manifest=true,oci-mediatypes=true
+          #cache-from: type=registry,ref=${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:cache
+          #cache-to: type=registry,ref=${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:cache,mode=max,image-manifest=true,oci-mediatypes=true
           platforms: ${{ inputs.BUILD_PLATFORMS }}
 
       - name: Build and push (Quay only)
