@@ -1,12 +1,12 @@
 <p align="center">
-<img src="Gen3_Logo-01_blue.png" alt="Gen3 logo" width="500" style="display: block; margin: auto; "/>
+<img src="Gen3_Logo-01_blue_no_commons.png" alt="Gen3 logo" width="500" style="display: block; margin: auto; "/>
 </p>
 
 # Gen3
 
 The University of Chicago, Center for Translational Data Science is the maintainer organization for the open-source Gen3 Data Platform.  Some useful references are included below to help you learn more about Gen3.
 
-## Gen3 community
+## Gen3 Community
 
 ### Contributing code to Gen3
 
