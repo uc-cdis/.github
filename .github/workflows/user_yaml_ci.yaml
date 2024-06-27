@@ -41,8 +41,9 @@ jobs:
         python-version: 3.9
     - name: Install dependencies
       run: |
+        pip install --upgrade pip
         pip install gen3users
-        pip install pyyaml==5.4
+        pip install pyyaml
     - name: Checkout, lint and test
       run: |
         # checkout the code - this supports checking out from a private fork
