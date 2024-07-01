@@ -22,7 +22,7 @@ We hold regular forums on a variety of topics to engage with and hear from the c
 
 ### Gen3 releases
 
-Gen3 releases typically happen every month.  The lastest release notes can be found [here](https://github.com/uc-cdis/cdis-manifest/blob/master/releases/2024/06/gen3-release-notes.md).
+Gen3 releases typically happen every month.  The lastest release notes can be found [here](https://github.com/uc-cdis/cdis-manifest/tree/master/releases).
 
 ## User Guides
 
