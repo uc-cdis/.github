@@ -43,6 +43,12 @@ jobs:
       run: |
         pip install gen3users
         pip install pyyaml==5.4
+        pip install yamllint
+    - name: Checkout linter config
+      uses: actions/download-artifact@v3
+      with:
+        name: linters-config
+        path: .github/linters/.yamllint.yml
     - name: Checkout, lint and test
       run: |
         # checkout the code - this supports checking out from a private fork
@@ -58,7 +64,11 @@ jobs:
           git checkout localbranch
         fi
 
-        # lint the files
+        # lint the files using yamllint
+        yamllint ./users/anvilstaging/*
+        yamllint ./users/datastageinternalstaging/*
+        yamllint ./users/stagingdatastage/*
+        # lint the files for cosmetic
         cat - > lint.py <<EOM
         import os
         import yaml
