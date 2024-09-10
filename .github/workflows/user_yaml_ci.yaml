@@ -45,10 +45,13 @@ jobs:
         pip install pyyaml==5.4
         pip install yamllint
     - name: Checkout linter config
-      uses: actions/download-artifact@v3
+      uses: actions/checkout@v4
       with:
-        name: linters-config
-        path: .github/linters/.yamllint.yml
+        repository: uc-cdis/.github
+        persist-credentials: false
+        sparse-checkout: |
+          .github/linters/.yamllint.yml
+        sparse-checkout-cone-mode: false
     - name: Checkout, lint and test
       run: |
         # checkout the code - this supports checking out from a private fork
