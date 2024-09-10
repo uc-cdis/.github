@@ -44,14 +44,6 @@ jobs:
         pip install gen3users
         pip install pyyaml==5.4
         pip install yamllint
-    - name: Checkout linter config
-      uses: actions/checkout@v4
-      with:
-        repository: uc-cdis/.github
-        persist-credentials: false
-        sparse-checkout: |
-          .github/linters/.yamllint.yml
-        sparse-checkout-cone-mode: false
     - name: Checkout, lint and test
       run: |
         # checkout the code - this supports checking out from a private fork
