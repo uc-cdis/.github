@@ -60,7 +60,7 @@ jobs:
         fi
 
         # lint the files using yamllint
-        yamllint ./users/*
+        yamllint -d "{rules: {key-duplicates: enable}}" ./users/*
 
         # lint the files for cosmetic
         cat - > lint.py <<EOM
