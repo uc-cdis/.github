@@ -60,6 +60,7 @@ jobs:
         fi
 
         # lint the files using yamllint
+        # this is the only rule that we care about user yaml, to prevent unexpected changes due to duplicated keys
         yamllint -d "{rules: {key-duplicates: enable}}" ./users/*
 
         # lint the files for cosmetic
