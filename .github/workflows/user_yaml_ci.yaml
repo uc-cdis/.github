@@ -60,9 +60,8 @@ jobs:
         fi
 
         # lint the files using yamllint
-        yamllint ./users/anvilstaging/*
-        yamllint ./users/datastageinternalstaging/*
-        yamllint ./users/stagingdatastage/*
+        yamllint ./users/*
+
         # lint the files for cosmetic
         cat - > lint.py <<EOM
         import os
