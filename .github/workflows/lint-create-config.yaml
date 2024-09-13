@@ -19,7 +19,7 @@
 #
 ---
 name: Lint Create Config
-on: 
+on:
   workflow_call:
     inputs:
       python-module-name:
@@ -55,9 +55,10 @@ jobs:
           echo "known_first_party=${{ inputs.python-module-name }}" >> .github/linters/.isort.cfg
         fi
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: linters-config
         path: |
           .github/linters/
         if-no-files-found: error
+        include-hidden-files: true

@@ -2,7 +2,7 @@
 name: Required Lint Check
 # this is intended to block on a limited set of required lint to remove
 #
-# For only the optional and more verbose feedback, use the 
+# For only the optional and more verbose feedback, use the
 # `optional_lint_check.yaml`.
 #
 # The required lint check, is, well, required to pass and WILL block merges and builds,
@@ -11,7 +11,7 @@ name: Required Lint Check
 # The optional lint check runs on all PRs to provide info
 # but doesn't actually block any merge or build
 #
-on: 
+on:
   workflow_call:
     inputs:
       python-version:
@@ -39,14 +39,14 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           # this is uploaded by the lint-create-config.yaml workflow
           name: linters-config
           path: .github/linters
 
       - name: Display files
-        run: ls -aR 
+        run: ls -aR
 
       # cache the dependencies based on a hash of the lock file
       - name: Poetry cache
