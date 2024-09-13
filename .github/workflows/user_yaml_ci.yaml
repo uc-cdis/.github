@@ -43,6 +43,7 @@ jobs:
       run: |
         pip install gen3users
         pip install pyyaml==5.4
+        pip install yamllint
     - name: Checkout, lint and test
       run: |
         # checkout the code - this supports checking out from a private fork
@@ -58,7 +59,11 @@ jobs:
           git checkout localbranch
         fi
 
-        # lint the files
+        # lint the files using yamllint
+        # this is the only rule that we care about user yaml, to prevent unexpected changes due to duplicated keys
+        yamllint -d "{rules: {key-duplicates: enable}}" ./users/*
+
+        # lint the files for cosmetic
         cat - > lint.py <<EOM
         import os
         import yaml

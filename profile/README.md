@@ -14,7 +14,7 @@ Gen3 software is completely open-source.  Please refer to our [Contributor Guide
 
 ### Chat with Gen3 staff and the community
 
-If you have questions about operating or using a Gen3 system please contact us.  We can be reached on [slack](https://docs.google.com/forms/d/e/1FAIpQLSczyhhOXeCK9FdVtpQpelOHYnRj1EAq1rwwnm9q6cPAe5a7ug/viewform), [discussion board](https://forums.gen3.org/), or via email (support@datacommons.io).
+If you have questions about operating or using a Gen3 system please contact us.  We can be reached on [slack](https://docs.google.com/forms/d/e/1FAIpQLSczyhhOXeCK9FdVtpQpelOHYnRj1EAq1rwwnm9q6cPAe5a7ug/viewform), [discussion board](https://forums.gen3.org/), or via email (support@gen3.org).
 
 ### Events
 
@@ -44,9 +44,9 @@ Check out [gen3.org](https://gen3.org/).
 
 ### Learn More about the Center for Translational Data Science
 
-The Center for Translational Data Science at the University of Chicago is developing the discipline of data science and its applications to problems in biology, medicine, healthcare and the environment. We develop and operate large scale data platforms to support research in topics of societal interest including cancer, cardiovascular disease, inflammatory bowel disease (IBD), birth defects, veterans’ health, pain management, opioid use disorder, and environmental science. We also develop new machine learning and AI algorithms over the data in our platforms. 
+The Center for Translational Data Science at the University of Chicago is developing the discipline of data science and its applications to problems in biology, medicine, healthcare and the environment. We develop and operate large scale data platforms to support research in topics of societal interest including cancer, cardiovascular disease, inflammatory bowel disease (IBD), birth defects, veterans’ health, pain management, opioid use disorder, and environmental science. We also develop new machine learning and AI algorithms over the data in our platforms.
 
-Our center has been at the forefront of data sharing by continuously leveraging new approaches and new technology to enable world class science in a variety of fields. We have developed a number of important firsts: including one of the first large scale data clouds (NSF supported Open Science Data Cloud (2010-2016)), the first data cloud designed to host biomedical data and approved as a NIH Trusted Partner (Bionimbus Protected Data Cloud (2013-present)), the first large scale data commons (National Cancer Institute’s Genomic Data Commons (2016-present)), and the first set of services to create data ecosystems or meshes for biomedical data (Data Commons Frameworks Services for the Cancer Research Data Commons (2020-present)). 
+Our center has been at the forefront of data sharing by continuously leveraging new approaches and new technology to enable world class science in a variety of fields. We have developed a number of important firsts: including one of the first large scale data clouds (NSF supported Open Science Data Cloud (2010-2016)), the first data cloud designed to host biomedical data and approved as a NIH Trusted Partner (Bionimbus Protected Data Cloud (2013-present)), the first large scale data commons (National Cancer Institute’s Genomic Data Commons (2016-present)), and the first set of services to create data ecosystems or meshes for biomedical data (Data Commons Frameworks Services for the Cancer Research Data Commons (2020-present)).
 
 Today with our partners, we operate a data ecosystem comprising over 20 data commons that make over 17 PB of data available to the research community from nearly 1.7M patients. We provide access to this data via secure and compliant workspaces, while protecting patient privacy. These are all based on the open-source Gen3 data platform, that includes the Gen3 data commons, Gen3 Framework Services, and Gen3 Workspaces.
 
