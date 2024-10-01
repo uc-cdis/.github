@@ -3,16 +3,16 @@ name: Optional Lint Check
 # this is intended to show informational lint to inform updates, but the verbosity
 # of this may be too much to fail/prevent a merge because of these
 #
-# If you only want the REQUIRED linting checks with little verbosity, use the 
+# If you only want the REQUIRED linting checks with little verbosity, use the
 # `required_lint_check.yaml`.
 #
 # The intention is that this optional lint check runs on all PRs to provide info
-# but doesn't actually block any merge or build, but lets devs know key areas to 
+# but doesn't actually block any merge or build, but lets devs know key areas to
 # to improve
 #
 # The required lint check, is, well, required to pass and WILL block merges and builds,
 # but is much more opinionated and slim (there are only a few things we error on).
-on: 
+on:
   workflow_call:
     inputs:
       python-version:
@@ -40,14 +40,14 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           # this is uploaded by the lint-create-config.yaml workflow
           name: linters-config
           path: .github/linters
 
       - name: Display files
-        run: ls -aR 
+        run: ls -aR
 
       # cache the dependencies based on a hash of the lock file
       - name: Poetry cache
