@@ -72,6 +72,7 @@ jobs:
           PYPI_PROD_API_TOKEN: ${{ secrets.PYPI_PROD_API_TOKEN }}
         run: |
           poetry config repositories.testpypi https://test.pypi.org/legacy/
+          echo $DO_TEST_PUBLISH_FIRST
           if [ "$DO_TEST_PUBLISH_FIRST" = "true" ]; then
             poetry config pypi-token.testpypi $PYPI_TEST_API_TOKEN
           fi
