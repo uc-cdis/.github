@@ -36,7 +36,7 @@ on:
         type: boolean
     secrets:
       PYPI_TEST_API_TOKEN:
-        required: true
+        required: false
       PYPI_PROD_API_TOKEN:
         required: true
 jobs:
@@ -66,13 +66,19 @@ jobs:
           poetry show -vv
         shell: bash
 
-      - name: Configure PyPI Repos in Poetry and Poetry Build
+      - name: Configure Test PyPI Repo
+        if: ${{ inputs.DO_TEST_PUBLISH_FIRST }}
         env:
           PYPI_TEST_API_TOKEN: ${{ secrets.PYPI_TEST_API_TOKEN }}
+        run: |
+          poetry config pypi-token.testpypi $PYPI_TEST_API_TOKEN
+        shell: bash
+
+      - name: Configure Prod PyPI Repo and Poetry Build
+        env:
           PYPI_PROD_API_TOKEN: ${{ secrets.PYPI_PROD_API_TOKEN }}
         run: |
           poetry config repositories.testpypi https://test.pypi.org/legacy/
-          poetry config pypi-token.testpypi $PYPI_TEST_API_TOKEN
           poetry config pypi-token.pypi $PYPI_PROD_API_TOKEN
           poetry build
         shell: bash
