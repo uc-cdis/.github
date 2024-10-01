@@ -106,4 +106,4 @@ jobs:
         if: ${{ steps.prod-pypi.outcome != 'success' }}
         run: |
           echo "Since this is a tagged release, and the real publish failed or didn't run, fail the job"
-      #     exit 1
+          exit 1
