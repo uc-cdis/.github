@@ -4,10 +4,10 @@ name: Test and deploy dictionaries
 #
 # dictionaryutils is a poetry package and confusingly, the run_tests.sh script
 # does an install. Also confusingly, the test script relies on a library `gdcdictionary`
-# existing as the source for testing against. In order to ensure the correct virtual env usage and 
+# existing as the source for testing against. In order to ensure the correct virtual env usage and
 # compatibility with both pyproject.yaml and setup.py for the dictionary repos, we're
-# going to try to poetry install the dictionary as `gdcdictionary`, 
-# then run poetry install ourselves after cloning dictionaryutils, then we're going to 
+# going to try to poetry install the dictionary as `gdcdictionary`,
+# then run poetry install ourselves after cloning dictionaryutils, then we're going to
 # `pip install -e` the dictionary we're testing (since they don't all have poetry setup) which ensures
 # that the dictionary is installed as `gdcdictionary`,
 # and then we're going to call the run test script WITHIN THE POETRY VIRTUAL ENV which will:
@@ -67,6 +67,10 @@ jobs:
         cd dictionaryutils
         echo "installing the dictionary as `gdcdictionary`"
         poetry run pip install -e ..
+    - name: Attempt poetry install of dictionary as `gdcdictionary`
+      # this will only work when the dictionary is using a poetry setup with pyproject.toml
+      run: |
+        poetry install -vv --all-extras --no-interaction || true
     - name: Run dictionary tests, dump schema, and move to S3
       run: |
         cd dictionaryutils
