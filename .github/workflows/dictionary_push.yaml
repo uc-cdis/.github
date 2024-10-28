@@ -65,7 +65,7 @@ jobs:
         git clone https://github.com/uc-cdis/dictionaryutils
         cd dictionaryutils
         poetry install -vv --all-extras --no-interaction
-    - name: Attempt poetry/pip re-install of dictionary as `gdcdictionary`
+    - name: Attempt poetry or pip re-install of dictionary as `gdcdictionary`
       # install via pip or poetry conditionally
       run: |
         echo "installing the dictionary as 'gdcdictionary'"
