@@ -65,6 +65,8 @@ jobs:
         git clone https://github.com/uc-cdis/dictionaryutils
         cd dictionaryutils
         poetry install -vv --all-extras --no-interaction
+        echo "Removing 'gdcdictionary' and re-installing in following step"
+        poetry remove gdcdictionary
     - name: Attempt poetry or pip re-install of dictionary as `gdcdictionary`
       # install via pip or poetry conditionally
       run: |
