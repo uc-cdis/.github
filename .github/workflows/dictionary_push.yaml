@@ -62,7 +62,7 @@ jobs:
         poetry install -vv --all-extras --no-interaction || true
     - name: Get dictionaryutils library and install
       run: |
-        git clone https://github.com/uc-cdis/dictionaryutils
+        git clone --branch fix/remove-gen3dictionary-uninstall https://github.com/uc-cdis/dictionaryutils
         cd dictionaryutils
         poetry install -vv --all-extras --no-interaction
         echo "Removing 'gdcdictionary' and re-installing in following step"
