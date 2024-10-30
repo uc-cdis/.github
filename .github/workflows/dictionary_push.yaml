@@ -62,18 +62,21 @@ jobs:
         poetry install -vv --all-extras --no-interaction || true
     - name: Get dictionaryutils library and install
       run: |
-        git clone --branch 3.4.10 https://github.com/uc-cdis/dictionaryutils
+        git clone https://github.com/uc-cdis/dictionaryutils
         cd dictionaryutils
         poetry install -vv --all-extras --no-interaction
+        echo "Removing 'gdcdictionary' and re-installing in following step"
+        poetry remove gdcdictionary
     - name: Attempt poetry or pip re-install of dictionary as `gdcdictionary`
       # install via pip or poetry conditionally
       run: |
         echo "installing the dictionary as 'gdcdictionary'"
         if [ -f setup.py ]; then
-          cd dictionaryutils
-          pip install -e ..
+          echo "Install via pip"
+          pip install .
         fi
         if [ -f pyproject.toml ]; then
+          echo "Install via poetry"
           poetry install -vv --all-extras --no-interaction || true
         fi
     - name: Run dictionary tests, dump schema, and move to S3
