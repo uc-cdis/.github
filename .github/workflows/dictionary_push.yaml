@@ -72,7 +72,8 @@ jobs:
       run: |
         echo "installing the dictionary as 'gdcdictionary'"
         if [ -f setup.py ]; then
-          pip install -e .
+          cd dictionaryutils
+          pip install -e ..
         fi
         if [ -f pyproject.toml ]; then
           poetry install -vv --all-extras --no-interaction || true
@@ -86,6 +87,8 @@ jobs:
         echo "dependencies after run_test"
         poetry show
         aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME/schema.json --region ${{ inputs.REGION }}
+        echo "Schema dir for artifact: "
+        python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.DICT_AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.DICT_AWS_SECRET_ACCESS_KEY }}
