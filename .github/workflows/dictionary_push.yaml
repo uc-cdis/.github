@@ -62,7 +62,7 @@ jobs:
         poetry install -vv --all-extras --no-interaction || true
     - name: Get dictionaryutils library and install
       run: |
-        git clone https://github.com/uc-cdis/dictionaryutils
+        git clone --branch 3.4.10 https://github.com/uc-cdis/dictionaryutils
         cd dictionaryutils
         poetry install -vv --all-extras --no-interaction
     - name: Attempt poetry or pip re-install of dictionary as `gdcdictionary`
