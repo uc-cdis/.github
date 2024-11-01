@@ -65,14 +65,18 @@ jobs:
         git clone https://github.com/uc-cdis/dictionaryutils
         cd dictionaryutils
         poetry install -vv --all-extras --no-interaction
+        echo "Removing 'gdcdictionary' and re-installing in following step"
+        poetry remove gdcdictionary
     - name: Attempt poetry or pip re-install of dictionary as `gdcdictionary`
       # install via pip or poetry conditionally
       run: |
         echo "installing the dictionary as 'gdcdictionary'"
         if [ -f setup.py ]; then
-          pip install -e .
+          echo "Install via pip"
+          pip install .
         fi
         if [ -f pyproject.toml ]; then
+          echo "Install via poetry"
           poetry install -vv --all-extras --no-interaction || true
         fi
     - name: Run dictionary tests, dump schema, and move to S3
@@ -84,6 +88,8 @@ jobs:
         echo "dependencies after run_test"
         poetry show
         aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME/schema.json --region ${{ inputs.REGION }}
+        echo "Schema dir for artifact: "
+        python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.DICT_AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.DICT_AWS_SECRET_ACCESS_KEY }}
