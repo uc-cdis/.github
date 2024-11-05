@@ -2,16 +2,20 @@ name: Test and deploy dictionaries
 
 # OVERVIEW
 #
-# dictionaryutils is a poetry package and confusingly, the run_tests.sh script
-# does an install. Also confusingly, the test script relies on a library `gdcdictionary`
-# existing as the source for testing against. In order to ensure the correct virtual env usage and 
-# compatibility with both pyproject.yaml and setup.py for the dictionary repos, we're
-# going to try to poetry install the dictionary as `gdcdictionary`, 
-# then run poetry install ourselves after cloning dictionaryutils, then we're going to 
-# `pip install -e` the dictionary we're testing (since they don't all have poetry setup) which ensures
-# that the dictionary is installed as `gdcdictionary`,
-# and then we're going to call the run test script WITHIN THE POETRY VIRTUAL ENV which will:
-#    - redundantly install deps from dictionaryutils (but this is nice when you have the libary by itself I guess?)
+# The `dictionaryutils` package is used for dumping the schemas from the parent dictionary repo.
+# Dependencies on both `gen3dictionary` and `gdcdictionary`
+# cause conflict in importing the correct `SCHEMA_DIR` used for dumping schemas.
+#
+# There are two steps to ensure setting the correct source:
+#  - Re-install the dictionary in the parent repo as `gdcdictionary` after the install of `dictionaryutils`
+#  - uninstall `gen3dictionary` as part of the `run_test.sh` script.
+#
+# In order to ensure the correct virtual env usage and
+# compatibility with both pyproject.yaml and setup.py for the dictionary repos, we
+# conditionally select `poetry` or `pip` when installing the dictionary as `gdcdictionary`,
+#
+# Then the `run_tests.sh` script will:
+#    - uninstall `gen3dictionary`
 #    - run the dictionary tests from dictionaryutils which expects `gdcdictionary` library as the unit to test
 #    - run the dump schemas to move it to the /artifacts folder
 
@@ -61,12 +65,20 @@ jobs:
         git clone https://github.com/uc-cdis/dictionaryutils
         cd dictionaryutils
         poetry install -vv --all-extras --no-interaction
-    - name: Attempt pip install of dictionary as `gdcdictionary`
-      # this will only work when the dictionary is using a pip setup with setup.py
+        echo "Removing 'gdcdictionary' and re-installing in following step"
+        poetry remove gdcdictionary
+    - name: Attempt poetry or pip re-install of dictionary as `gdcdictionary`
+      # install via pip or poetry conditionally
       run: |
-        cd dictionaryutils
-        echo "installing the dictionary as `gdcdictionary`"
-        poetry run pip install -e ..
+        echo "installing the dictionary as 'gdcdictionary'"
+        if [ -f setup.py ]; then
+          echo "Install via pip"
+          pip install .
+        fi
+        if [ -f pyproject.toml ]; then
+          echo "Install via poetry"
+          poetry install -vv --all-extras --no-interaction || true
+        fi
     - name: Run dictionary tests, dump schema, and move to S3
       run: |
         cd dictionaryutils
@@ -76,6 +88,8 @@ jobs:
         echo "dependencies after run_test"
         poetry show
         aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME/schema.json --region ${{ inputs.REGION }}
+        echo "Schema dir for artifact: "
+        python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.DICT_AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.DICT_AWS_SECRET_ACCESS_KEY }}
