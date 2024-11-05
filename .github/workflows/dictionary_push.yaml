@@ -89,13 +89,14 @@ jobs:
           echo "via poetry"
           poetry install -vv --all-extras --no-interaction
         fi
+    - name: Run dictionary tests, dump schema, and move to S3
+      run: |
+        cd dictionaryutils
         echo "Schema dir for artifact"
         python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"
         echo "Schemas"
         ls `python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"`
-    - name: Run dictionary tests, dump schema, and move to S3
-      run: |
-        cd dictionaryutils
+
         echo "dependencies before run_test"
         poetry show
         poetry run ./run_tests.sh
