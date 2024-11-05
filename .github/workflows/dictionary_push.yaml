@@ -81,7 +81,14 @@ jobs:
     - name: Attempt pip re-install of dictionary as `gdcdictionary`
       run: |
         echo "Re-installing the dictionary as 'gdcdictionary'"
-        pip install .
+        if [ -f setup.py ]; then
+          echo "via pip"
+          pip install .
+        fi
+        if [ -f pyproject.toml ]; then
+          echo "via poetry"
+          poetry install -vv --all-extras --no-interaction
+        fi
         echo "Schema dir for artifact"
         python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"
         echo "Schemas"
