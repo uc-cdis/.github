@@ -56,7 +56,7 @@ jobs:
         pip install --upgrade pip
         curl -sSL https://install.python-poetry.org | python -
         pip list
-    - name: Attempt poetry install of dictionary as `gdcdictionary`
+    - name: Create setup.py if we have a pyproject.toml
       # Force parent to use setup.py like openaccess_dictionary
       run: |
         if [ -f pyproject.toml ]; then
@@ -87,9 +87,6 @@ jobs:
           rm poetry.lock
 
         fi
-        echo "Setup file"
-        cat setup.py
-        # poetry install -vv --all-extras --no-interaction || true
     - name: Get dictionaryutils library and install
       run: |
         git clone https://github.com/uc-cdis/dictionaryutils
@@ -134,8 +131,7 @@ jobs:
         echo "Schemas"
         ls `python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"`
         poetry run ./run_tests.sh
-        # Temporarily disable the S3 copy for testing
-        # aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME/schema.json --region ${{ inputs.REGION }}
+        aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME/schema.json --region ${{ inputs.REGION }}
 
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.DICT_AWS_ACCESS_KEY_ID }}
