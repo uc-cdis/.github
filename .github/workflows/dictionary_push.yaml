@@ -64,6 +64,8 @@ jobs:
       run: |
         git clone https://github.com/uc-cdis/dictionaryutils
         cd dictionaryutils
+        sed -i 's/\, develop = true//' pyproject.toml
+        rm poetry.lock
         poetry install -vv --all-extras --no-interaction
     - name: Uninstall gdcdictionary
       # remove gdcdictionary or gen3dictionary conditionally
