@@ -130,8 +130,25 @@ jobs:
         python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"
         echo "Schemas"
         ls `python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"`
+        echo "Schema dir under poetry"
+        poetry run python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"
+
         poetry run ./run_tests.sh
-        aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME/schema.json --region ${{ inputs.REGION }}
+        echo "Number of schemas in artifact"
+        grep -o ".yaml\"" artifacts/schema.json | wc -l
+
+        echo "Create artifact under poetry"
+        poetry run python bin/dump_schema.py
+        echo "Number of schemas in artifact"
+        grep -o ".yaml\"" artifacts/schema.json | wc -l
+
+        echo "Create artifact directly"
+        python bin/dump_schema.py
+        echo "Number of schemas in artifact"
+        grep -o ".yaml\"" artifacts/schema.json | wc -l
+
+        # Temporarily disable s3 copy
+        # aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME/schema.json --region ${{ inputs.REGION }}
 
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.DICT_AWS_ACCESS_KEY_ID }}
