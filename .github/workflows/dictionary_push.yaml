@@ -90,7 +90,7 @@ jobs:
           pip install .
           poetry install -vv --all-extras --no-interaction
           cd dictionaryutils
-          poetry install --without-dev
+          poetry install --without dev
         fi
     - name: Run dictionary tests, dump schema, and move to S3
       run: |
