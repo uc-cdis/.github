@@ -57,15 +57,43 @@ jobs:
         curl -sSL https://install.python-poetry.org | python -
         pip list
     - name: Attempt poetry install of dictionary as `gdcdictionary`
-      # this will only work when the dictionary is using a poetry setup with pyproject.toml
+      # Force parent to use setup.py like openaccess_dictionary
       run: |
-        poetry install -vv --all-extras --no-interaction || true
+        if [ -f pyproject.toml ]; then
+          cat <<EOT >> setup.py
+          from setuptools import setup, find_packages
+
+          setup(
+              name='gdcdictionary',
+              version='0.0.0',
+              packages=find_packages(),
+              install_requires=[
+                  'dictionaryutils',
+              ],
+              dependency_links=[
+                "git+https://github.com/uc-cdis/dictionaryutils.git@1.2.0#egg=dictionaryutils",
+              ],
+              package_data={
+                  "gdcdictionary": [
+                      "schemas/*.yaml",
+                      "schemas/projects/*.yaml",
+                      "schemas/projects/*/*.yaml",
+                  ]
+              },
+          )
+          EOT
+
+          rm pyproject.toml
+          rm poetry.lock
+
+        fi
+        echo "Setup file"
+        cat setup.py
+        # poetry install -vv --all-extras --no-interaction || true
     - name: Get dictionaryutils library and install
       run: |
         git clone https://github.com/uc-cdis/dictionaryutils
         cd dictionaryutils
-        sed -i 's/\, develop = true//' pyproject.toml
-        rm poetry.lock
         poetry install -vv --all-extras --no-interaction
     - name: Uninstall gdcdictionary
       # remove gdcdictionary or gen3dictionary conditionally
@@ -74,6 +102,7 @@ jobs:
           cd dictionaryutils
           echo "Removing 'gdcdictionary' via poetry"
           poetry remove gdcdictionary
+          pip uninstall -y gen3dictionary
           cd ..
         fi
         if [ -f pyproject.toml ]; then
@@ -87,7 +116,8 @@ jobs:
         echo "Re-installing the dictionary as 'gdcdictionary'"
         if [ -f setup.py ]; then
           echo "via pip"
-          pip install .
+          cd dictionaryutils
+          pip install ..
         fi
         if [ -f pyproject.toml ]; then
           echo "via pip in dictionaryutils"
