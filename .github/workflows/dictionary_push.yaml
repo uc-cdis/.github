@@ -81,7 +81,7 @@ jobs:
                   ]
               },
           )
-          EOT
+        EOT
 
           rm pyproject.toml
           rm poetry.lock
