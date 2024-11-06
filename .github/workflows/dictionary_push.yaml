@@ -74,6 +74,7 @@ jobs:
           cd dictionaryutils
           echo "Removing 'gdcdictionary' via poetry"
           poetry remove gdcdictionary
+          cd ..
         fi
         if [ -f pyproject.toml ]; then
           cd dictionaryutils
