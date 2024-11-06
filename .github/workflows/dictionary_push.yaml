@@ -132,16 +132,18 @@ jobs:
         ls `python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"`
         echo "Schema dir under poetry"
         poetry run python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"
+        echo "Schemas"
+        ls `poetry run python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"`
 
         echo "Run tests under poetry"
         poetry run ./run_tests.sh
         echo "Number of schemas in artifact"
         grep -o ".yaml\"" artifacts/schema.json | wc -l
 
-        echo "Run tests directly"
-        bash ./run_tests.sh
-        echo "Number of schemas in artifact"
-        grep -o ".yaml\"" artifacts/schema.json | wc -l
+        # echo "Run tests directly"
+        # bash ./run_tests.sh
+        # echo "Number of schemas in artifact"
+        # grep -o ".yaml\"" artifacts/schema.json | wc -l
 
         echo "Create artifact under poetry"
         poetry run python bin/dump_schema.py
