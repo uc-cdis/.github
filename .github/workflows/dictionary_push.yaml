@@ -77,6 +77,7 @@ jobs:
           cd dictionaryutils
           echo "Removing 'gen3dictionary' via pip"
           pip uninstall -y gen3dictionary
+          pip uninstall -y gdcdictionary
         fi
     - name: Attempt pip re-install of dictionary as `gdcdictionary`
       run: |
@@ -86,11 +87,9 @@ jobs:
           pip install .
         fi
         if [ -f pyproject.toml ]; then
-          echo "via poetry"
-          pip install .
-          poetry install -vv --all-extras --no-interaction
+          echo "via pip in dictionaryutils"
           cd dictionaryutils
-          poetry install --without dev
+          pip install ..
         fi
     - name: Run dictionary tests, dump schema, and move to S3
       run: |
