@@ -93,13 +93,12 @@ jobs:
     - name: Run dictionary tests, dump schema, and move to S3
       run: |
         cd dictionaryutils
+        echo "dependencies before run_test"
+        poetry show
         echo "Schema dir for artifact"
         python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"
         echo "Schemas"
         ls `python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"`
-
-        echo "dependencies before run_test"
-        poetry show
         poetry run ./run_tests.sh
         # Temporarily disable the S3 copy for testing
         # aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME/schema.json --region ${{ inputs.REGION }}
