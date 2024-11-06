@@ -7,8 +7,8 @@ name: Test and deploy dictionaries
 # cause conflict in importing the correct `SCHEMA_DIR` used for dumping schemas.
 #
 # There are two steps to ensure setting the correct source:
-#  - Re-install the dictionary in the parent repo as `gdcdictionary` after the install of `dictionaryutils`
-#  - uninstall `gen3dictionary` as part of the `run_test.sh` script.
+#  - uninstall `gen3dictionary` after the dictionaryutils install.
+#  - Re-install the dictionary in the parent repo as `gdcdictionary`
 #
 # In order to ensure the correct virtual env usage and
 # compatibility with both pyproject.yaml and setup.py for the dictionary repos, we
@@ -87,6 +87,7 @@ jobs:
         fi
         if [ -f pyproject.toml ]; then
           echo "via poetry"
+          pip install .
           poetry install -vv --all-extras --no-interaction
         fi
     - name: Run dictionary tests, dump schema, and move to S3
