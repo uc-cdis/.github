@@ -71,26 +71,25 @@ jobs:
         if [ -f pyproject.toml ]; then
           cd dictionaryutils
           echo "Removing 'gen3dictionary' via pip"
-          pip uninstall -y gen3dictionary
-          pip uninstall -y gdcdictionary
+          poetry run pip uninstall -y gen3dictionary
+          poetry run pip uninstall -y gdcdictionary
         elif [ -f setup.py ]; then
           cd dictionaryutils
           echo "Removing 'gdcdictionary' via poetry"
           poetry remove gdcdictionary
-          pip uninstall -y gen3dictionary
+          poetry run pip uninstall -y gen3dictionary
         fi
     - name: Attempt re-install of dictionary as `gdcdictionary`
       run: |
         echo "Re-installing the dictionary as 'gdcdictionary'"
         if [ -f pyproject.toml ]; then
-          echo "via poetry"
-          poetry install -vv --all-extras --no-interaction || true
-          echo "Poetry show after install"
-          poetry show
+          echo "via pip"
+          cd dictionaryutils
+          poetry run pip install ..
         elif [ -f setup.py ]; then
           echo "via pip"
           cd dictionaryutils
-          pip install ..
+          poetry run pip install ..
         fi
 
     - name: Run dictionary tests, dump schema, and move to S3
