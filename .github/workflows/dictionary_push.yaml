@@ -72,6 +72,7 @@ jobs:
           cd dictionaryutils
           echo "Removing 'gen3dictionary' via pip"
           pip uninstall -y gen3dictionary
+          pip uninstall -y gdcdictionary
         elif [ -f setup.py ]; then
           cd dictionaryutils
           echo "Removing 'gdcdictionary' via poetry"
