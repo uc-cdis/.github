@@ -7,8 +7,9 @@ name: Test and deploy dictionaries
 # Dependencies on both `gen3dictionary` and `gdcdictionary`
 # cause conflict in importing the correct `SCHEMA_DIR` used for dumping schemas.
 #
-# The purpose of this script is to arrange that dumped schemas are from
-# the parent dictionary repo and are not from those installed by dictionaryutils.
+# The purpose of this workflow is to set up a virtual environment where dumped
+# schemas are from the parent dictionary repo and are not from those
+# installed by dictionaryutils.
 #
 # There are two steps to ensure setting the correct source:
 #  - uninstall `gen3dictionary` and `gdcdictionary` after the dictionaryutils install.
@@ -85,16 +86,8 @@ jobs:
     - name: Attempt re-install of dictionary as `gdcdictionary`
       run: |
         echo "Re-installing the dictionary as 'gdcdictionary'"
-        if [ -f pyproject.toml ]; then
-          echo "via pip"
-          cd dictionaryutils
-          poetry run pip install ..
-        elif [ -f setup.py ]; then
-          echo "via pip"
-          cd dictionaryutils
-          poetry run pip install ..
-        fi
-
+        cd dictionaryutils
+        poetry run pip install ..
     - name: Run dictionary tests, dump schema, and move to S3
       run: |
         cd dictionaryutils
