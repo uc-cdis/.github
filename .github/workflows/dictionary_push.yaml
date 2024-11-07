@@ -101,8 +101,7 @@ jobs:
         poetry run ./run_tests.sh
         echo "Number of schemas in artifact"
         grep -o ".yaml\"" artifacts/schema.json | wc -l
-        # Temporarily disable s3 copy
-        # aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME/schema.json --region ${{ inputs.REGION }}
+        aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME/schema.json --region ${{ inputs.REGION }}
 
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.DICT_AWS_ACCESS_KEY_ID }}
