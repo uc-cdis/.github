@@ -56,37 +56,10 @@ jobs:
         pip install --upgrade pip
         curl -sSL https://install.python-poetry.org | python -
         pip list
-    - name: Create setup.py if we have a pyproject.toml
-      # Force parent to use setup.py like openaccess_dictionary
+    - name: Attempt poetry install of dictionary as `gdcdictionary`
+      # this will only work when the dictionary is using a poetry setup with pyproject.toml
       run: |
-        if [ -f pyproject.toml ]; then
-        cat <<EOT >> setup.py
-        from setuptools import setup, find_packages
-
-        setup(
-            name='gdcdictionary',
-            version='0.0.0',
-            packages=find_packages(),
-            install_requires=[
-                'dictionaryutils',
-            ],
-            dependency_links=[
-              "git+https://github.com/uc-cdis/dictionaryutils.git@1.2.0#egg=dictionaryutils",
-            ],
-            package_data={
-                "gdcdictionary": [
-                    "schemas/*.yaml",
-                    "schemas/projects/*.yaml",
-                    "schemas/projects/*/*.yaml",
-                ]
-            },
-        )
-        EOT
-
-          rm pyproject.toml
-          rm poetry.lock
-
-        fi
+        poetry install -vv --all-extras --no-interaction || true
     - name: Get dictionaryutils library and install
       run: |
         git clone https://github.com/uc-cdis/dictionaryutils
@@ -95,63 +68,42 @@ jobs:
     - name: Uninstall gdcdictionary
       # remove gdcdictionary or gen3dictionary conditionally
       run: |
-        if [ -f setup.py ]; then
-          cd dictionaryutils
-          echo "Removing 'gdcdictionary' via poetry"
-          poetry remove gdcdictionary
-          pip uninstall -y gen3dictionary
-          cd ..
-        fi
         if [ -f pyproject.toml ]; then
           cd dictionaryutils
           echo "Removing 'gen3dictionary' via pip"
           pip uninstall -y gen3dictionary
-          pip uninstall -y gdcdictionary
+        elif [ -f setup.py ]; then
+          cd dictionaryutils
+          echo "Removing 'gdcdictionary' via poetry"
+          poetry remove gdcdictionary
+          pip uninstall -y gen3dictionary
         fi
-    - name: Attempt pip re-install of dictionary as `gdcdictionary`
+    - name: Attempt re-install of dictionary as `gdcdictionary`
       run: |
         echo "Re-installing the dictionary as 'gdcdictionary'"
-        if [ -f setup.py ]; then
+        if [ -f pyproject.toml ]; then
+          echo "via poetry"
+          poetry install -vv --all-extras --no-interaction || true
+          echo "Poetry show after install"
+          poetry show
+        elif [ -f setup.py ]; then
           echo "via pip"
           cd dictionaryutils
           pip install ..
         fi
-        if [ -f pyproject.toml ]; then
-          echo "via pip in dictionaryutils"
-          cd dictionaryutils
-          pip install ..
-        fi
+
     - name: Run dictionary tests, dump schema, and move to S3
       run: |
         cd dictionaryutils
         echo "dependencies before run_test"
         poetry show
         echo "Schema dir for artifact"
-        python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"
-        echo "Schemas"
-        ls `python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"`
-        echo "Schema dir under poetry"
         poetry run python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"
         echo "Schemas"
         ls `poetry run python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"`
 
         echo "Run tests under poetry"
         poetry run ./run_tests.sh
-        echo "Number of schemas in artifact"
-        grep -o ".yaml\"" artifacts/schema.json | wc -l
-
-        # echo "Run tests directly"
-        # bash ./run_tests.sh
-        # echo "Number of schemas in artifact"
-        # grep -o ".yaml\"" artifacts/schema.json | wc -l
-
-        echo "Create artifact under poetry"
-        poetry run python bin/dump_schema.py
-        echo "Number of schemas in artifact"
-        grep -o ".yaml\"" artifacts/schema.json | wc -l
-
-        echo "Create artifact directly"
-        python bin/dump_schema.py
         echo "Number of schemas in artifact"
         grep -o ".yaml\"" artifacts/schema.json | wc -l
 
