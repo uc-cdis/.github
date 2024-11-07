@@ -2,22 +2,25 @@ name: Test and deploy dictionaries
 
 # OVERVIEW
 #
-# The `dictionaryutils` package is used for dumping the schemas from the parent dictionary repo.
+# The `dictionaryutils` package is used for dumping the schemas from the
+# parent dictionary repo.
 # Dependencies on both `gen3dictionary` and `gdcdictionary`
 # cause conflict in importing the correct `SCHEMA_DIR` used for dumping schemas.
 #
+# The purpose of this script is to arrange that dumped schemas are from
+# the parent dictionary repo and are not from those installed by dictionaryutils.
+#
 # There are two steps to ensure setting the correct source:
-#  - uninstall `gen3dictionary` after the dictionaryutils install.
+#  - uninstall `gen3dictionary` and `gdcdictionary` after the dictionaryutils install.
 #  - Re-install the dictionary in the parent repo as `gdcdictionary`
 #
-# In order to ensure the correct virtual env usage and
-# compatibility with both pyproject.yaml and setup.py for the dictionary repos, we
-# conditionally select `poetry` or `pip` when installing the dictionary as `gdcdictionary`,
-#
 # Then the `run_tests.sh` script will:
-#    - uninstall `gen3dictionary`
-#    - run the dictionary tests from dictionaryutils which expects `gdcdictionary` library as the unit to test
-#    - run the dump schemas to move it to the /artifacts folder
+#   - run the dictionary tests from dictionaryutils which expects `gdcdictionary`
+#     library as the unit to test
+#   - run the dump schemas to move it to the /artifacts folder
+#
+# All commands should be run under `poetry run` to ensure that changes take
+# place in the poetry virtual env.
 
 on:
   workflow_call:
@@ -101,12 +104,10 @@ jobs:
         poetry run python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"
         echo "Schemas"
         ls `poetry run python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"`
-
         echo "Run tests under poetry"
         poetry run ./run_tests.sh
         echo "Number of schemas in artifact"
         grep -o ".yaml\"" artifacts/schema.json | wc -l
-
         # Temporarily disable s3 copy
         # aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME/schema.json --region ${{ inputs.REGION }}
 
