@@ -166,19 +166,6 @@ jobs:
                 poetry run python -m gen3_ci.scripts.select_ci_environment
               fi
 
-          # TODO: Improve the logic to do differential updates to the env, not roll all services
-          # Apply the changes to the manifest of the selected CI environment, roll the pods and run usersync
-          # Generate API keys for test users for the environment
-          - name: Prepare CI environment
-            id: prep_ci_env
-            if: ${{ env.SKIP_TESTS != 'true' && steps.select_ci_env.outcome == 'success' }}
-            continue-on-error: true  # if this fails, we still need to run clean-up steps
-            run: |
-              mkdir $HOME/.gen3
-              poetry run python -m gen3_ci.scripts.prepare_ci_environment
-            env:
-              QUAY_REPO: ${{ inputs.QUAY_REPO }}
-
           # This is used for running specific test suites by labeling the PR with the test class
           # Multiple suites can be executed by adding multiple labels
           - name: Get test labels
