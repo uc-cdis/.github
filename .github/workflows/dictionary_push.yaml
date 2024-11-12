@@ -2,22 +2,26 @@ name: Test and deploy dictionaries
 
 # OVERVIEW
 #
-# The `dictionaryutils` package is used for dumping the schemas from the parent dictionary repo.
+# The `dictionaryutils` package is used for dumping the schemas from the
+# parent dictionary repo.
 # Dependencies on both `gen3dictionary` and `gdcdictionary`
 # cause conflict in importing the correct `SCHEMA_DIR` used for dumping schemas.
 #
-# There are two steps to ensure setting the correct source:
-#  - Re-install the dictionary in the parent repo as `gdcdictionary` after the install of `dictionaryutils`
-#  - uninstall `gen3dictionary` as part of the `run_test.sh` script.
+# The purpose of this workflow is to set up a virtual environment where dumped
+# schemas are from the parent dictionary repo and are not from those
+# installed by dictionaryutils.
 #
-# In order to ensure the correct virtual env usage and
-# compatibility with both pyproject.yaml and setup.py for the dictionary repos, we
-# conditionally select `poetry` or `pip` when installing the dictionary as `gdcdictionary`,
+# There are two steps to ensure setting the correct source:
+#  - uninstall `gen3dictionary` and `gdcdictionary` after the dictionaryutils install.
+#  - Re-install the dictionary in the parent repo as `gdcdictionary`
 #
 # Then the `run_tests.sh` script will:
-#    - uninstall `gen3dictionary`
-#    - run the dictionary tests from dictionaryutils which expects `gdcdictionary` library as the unit to test
-#    - run the dump schemas to move it to the /artifacts folder
+#   - run the dictionary tests from dictionaryutils which expects `gdcdictionary`
+#     library as the unit to test
+#   - run the dump schemas to move it to the /artifacts folder
+#
+# All commands should be run under `poetry run` to ensure that changes take
+# place in the poetry virtual env.
 
 on:
   workflow_call:
@@ -65,31 +69,40 @@ jobs:
         git clone https://github.com/uc-cdis/dictionaryutils
         cd dictionaryutils
         poetry install -vv --all-extras --no-interaction
-        echo "Removing 'gdcdictionary' and re-installing in following step"
-        poetry remove gdcdictionary
-    - name: Attempt poetry or pip re-install of dictionary as `gdcdictionary`
-      # install via pip or poetry conditionally
+    - name: Uninstall gdcdictionary
+      # remove gdcdictionary or gen3dictionary conditionally
       run: |
-        echo "installing the dictionary as 'gdcdictionary'"
-        if [ -f setup.py ]; then
-          echo "Install via pip"
-          pip install .
-        fi
         if [ -f pyproject.toml ]; then
-          echo "Install via poetry"
-          poetry install -vv --all-extras --no-interaction || true
+          cd dictionaryutils
+          echo "Removing 'gen3dictionary' via pip"
+          poetry run pip uninstall -y gen3dictionary
+          poetry run pip uninstall -y gdcdictionary
+        elif [ -f setup.py ]; then
+          cd dictionaryutils
+          echo "Removing 'gdcdictionary' via poetry"
+          poetry remove gdcdictionary
+          poetry run pip uninstall -y gen3dictionary
         fi
+    - name: Attempt re-install of dictionary as `gdcdictionary`
+      run: |
+        echo "Re-installing the dictionary as 'gdcdictionary'"
+        cd dictionaryutils
+        poetry run pip install ..
     - name: Run dictionary tests, dump schema, and move to S3
       run: |
         cd dictionaryutils
         echo "dependencies before run_test"
         poetry show
+        echo "Schema dir for artifact"
+        poetry run python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"
+        echo "Schemas"
+        ls `poetry run python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"`
+        echo "Run tests under poetry"
         poetry run ./run_tests.sh
-        echo "dependencies after run_test"
-        poetry show
+        echo "Number of schemas in artifact"
+        grep -o ".yaml\"" artifacts/schema.json | wc -l
         aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$GITHUB_REF_NAME/schema.json --region ${{ inputs.REGION }}
-        echo "Schema dir for artifact: "
-        python -c "from gdcdictionary import SCHEMA_DIR; print(SCHEMA_DIR)"
+
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.DICT_AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.DICT_AWS_SECRET_ACCESS_KEY }}
