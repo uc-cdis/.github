@@ -104,7 +104,7 @@ jobs:
           cp ${{github.workspace}}/.github/linters/.python-lint ${{github.workspace}}/../.github/linters/.python-lint
 
       - name: Lint Repo
-        uses: github/super-linter/slim@v7.2.0
+        uses: super-linter/super-linter/slim@v7.2.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # LINTER_RULES_PATH is relative to DEFAULT_WORKSPACE, which is the GITHUB_WORKSPACE
