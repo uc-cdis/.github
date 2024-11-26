@@ -438,13 +438,13 @@ confidence=HIGH,
 #
 # Justifications:
 #    too-many-arguments
-#           pytest fixtures don't appropriately get considered so this flags a 
+#           pytest fixtures don't appropriately get considered so this flags a
 #           ton of test functions
 #    too-many-locals
 #           has a pretty arbitrary default of 15. for test functions this
 #           gets noisy. Can capture issues with this in code reviews
 #    too-few-public-methods
-#           flags simple test classes, seems arbitrary, can catch issues in 
+#           flags simple test classes, seems arbitrary, can catch issues in
 #           code reviews
 #    logging-fstring-interpolation
 #           while this will catch issues where a logging call may fail, I find
@@ -452,12 +452,12 @@ confidence=HIGH,
 #    line-too-long
 #           black formatting does this automatically
 #    broad-exception-caught
-#           there are cases where this is helpful as a catch-all. it still 
+#           there are cases where this is helpful as a catch-all. it still
 #           shouldn't be abused. catch misuse in code reviews
 #    missing-module-docstring
 #           while nice to have, don't error on module-level docstrings missing
 #    fixme
-#           this errors on TODOs and we use those to mark where new features 
+#           this errors on TODOs and we use those to mark where new features
 #           should go
 #    missing-class-docstring
 #           while nice to have, this isn't a deal breaker
@@ -479,7 +479,8 @@ disable=raw-checker-failed,
         too-many-arguments,
         too-many-locals,
         fixme,
-        missing-class-docstring
+        missing-class-docstring,
+        unnecessary-lambda-assignment
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
