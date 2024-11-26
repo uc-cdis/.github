@@ -99,7 +99,6 @@ jobs:
 
       - name: Move config to possible places it should be
         run: |
-          cp ${{github.workspace}}/.github/linters/.python-lint ./.github/linters/.python-lint
           cp ${{github.workspace}}/.github/linters/.python-lint .github/linters/.python-lint
           cp ${{github.workspace}}/.github/linters/.python-lint ${{github.workspace}}/../.github/linters/.python-lint
 
