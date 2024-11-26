@@ -44,7 +44,6 @@ jobs:
           # this is uploaded by the lint-create-config.yaml workflow
           name: linters-config
           path: ${{github.workspace}}/.github/linters
-          include-hidden-files: true
 
       - name: Display files
         run: ls -aR
@@ -97,6 +96,12 @@ jobs:
 
       - name: Cat file(s)
         run: cat ${{github.workspace}}/.github/linters/.python-lint
+
+      - name: Move config to possible places it should be
+        run: |
+          cp ${{github.workspace}}/.github/linters/.python-lint ./.github/linters/.python-lint
+          cp ${{github.workspace}}/.github/linters/.python-lint .github/linters/.python-lint
+          cp ${{github.workspace}}/.github/linters/.python-lint ${{github.workspace}}/../.github/linters/.python-lint
 
       - name: Lint Repo
         uses: github/super-linter/slim@v5
