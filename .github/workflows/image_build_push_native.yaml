@@ -113,6 +113,7 @@ jobs:
             ${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
 
       - name: Build and push by digest
+        id: build
         uses: docker/build-push-action@v6
         # You may get ECR-push errors when first adding the workflow to a github repo.
         # If so, run the following in dev/qa to create the ECR repository:
