@@ -125,7 +125,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: ${{ matrix.platform }}
-          outputs: type=image,name=quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=quay.io/cdis/${{ env.REPO_NAME }},push-by-digest=true,name-canonical=true,push=true
 
       - name: Export digest
         run: |
