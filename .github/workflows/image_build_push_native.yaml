@@ -120,6 +120,15 @@ jobs:
             quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
             ${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
 
+      - name: Set image repositories
+        id: set-repos
+        run: |
+          if [ "${{ inputs.QUAY_ONLY }}" = "true" ]; then
+            echo "repos=quay.io/cdis/${{ env.REPO_NAME }}" >> $GITHUB_ENV
+          else
+            echo "repos=quay.io/cdis/${{ env.REPO_NAME }},${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}" >> $GITHUB_ENV
+          fi
+
       - name: Build and push by digest
         id: build
         uses: docker/build-push-action@v6
@@ -133,7 +142,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: ${{ matrix.platform }}
-          outputs: type=image,name=quay.io/cdis/${{ env.REPO_NAME }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ env.repos }}},push-by-digest=true,name-canonical=true,push=true
 
       - name: Export digest
         run: |
