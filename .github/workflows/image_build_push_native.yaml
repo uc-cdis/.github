@@ -142,7 +142,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: ${{ matrix.platform }}
-          outputs: type=image,name=${{ env.repos }}},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ env.repos }},push-by-digest=true,name-canonical=true,push=true
 
       - name: Export digest
         run: |
