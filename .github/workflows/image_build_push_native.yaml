@@ -222,20 +222,20 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
 
-      - name: Create manifest list and push (Quay)
+      - name: Create manifest list and push to registries
         working-directory: ${{ runner.temp }}/digests
         run: |
+          # Push to Quay
           docker buildx imagetools create \
             -t quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }} \
             $(printf 'quay.io/cdis/${{ env.REPO_NAME }}@sha256:%s ' *)
 
-      - name: Create manifest list and push (ECR)
-        if: ${{ !inputs.USE_QUAY_ONLY }}
-        working-directory: ${{ runner.temp }}/digests
-        run: |
-          docker buildx imagetools create \
-            -t ${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }} \
-            $(printf '${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}@sha256:%s ' *)
+          # Conditionally push to ECR
+          if [ "${{ inputs.USE_QUAY_ONLY }}" != "true" ]; then
+            docker buildx imagetools create \
+              -t ${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }} \
+              $(printf '${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}@sha256:%s ' *)
+          fi
 
       - name: Inspect image
         run: |
