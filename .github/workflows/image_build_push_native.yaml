@@ -240,10 +240,10 @@ jobs:
       - name: Inspect image
         run: |
           docker buildx imagetools inspect \
-            quay.io/cdis/${{ env.REPO_NAME }}:${{ steps.meta.outputs.version }}
+            quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
 
       - name: Inspect image (ECR)
         if: ${{ !inputs.USE_QUAY_ONLY }}
         run: |
           docker buildx imagetools inspect \
-            ${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ steps.meta.outputs.version }}
+            ${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
