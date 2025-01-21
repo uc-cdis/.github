@@ -226,7 +226,7 @@ jobs:
         working-directory: ${{ runner.temp }}/digests
         run: |
           docker buildx imagetools create \
-            -t quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
+            -t quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }} \
             $(printf 'quay.io/cdis/${{ env.REPO_NAME }}@sha256:%s ' *)
 
       - name: Create manifest list and push (ECR)
