@@ -214,22 +214,36 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ inputs.USE_QUAY_ONLY != 'true' && format('{0}/gen3/{1}:{2}', inputs.AWS_ECR_REGISTRY, env.REPO_NAME, env.IMAGE_TAG) || '' }}
-            quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
+            ${{ inputs.USE_QUAY_ONLY != 'true' && format('{0}/gen3/{1}', inputs.AWS_ECR_REGISTRY, env.REPO_NAME) || '' }}
+            quay.io/cdis/${{ env.REPO_NAME }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
 
-      - name: Create manifest list and push
+      - name: Create manifest list and push (Quay)
         working-directory: ${{ runner.temp }}/digests
         run: |
           docker buildx imagetools create \
-            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "${{ steps.meta.outputs.json }}") \
-            ${{ steps.meta.outputs.images }}
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf 'quay.io/cdis/${{ env.REPO_NAME }}@sha256:%s ' *)
+
+      - name: Create manifest list and push (ECR)
+        if: ${{ !inputs.USE_QUAY_ONLY }}
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}@sha256:%s ' *)
 
       - name: Inspect image
         run: |
           docker buildx imagetools inspect \
             quay.io/cdis/${{ env.REPO_NAME }}:${{ steps.meta.outputs.version }}
+
+      - name: Inspect image (ECR)
+        if: ${{ !inputs.USE_QUAY_ONLY }}
+        run: |
+          docker buildx imagetools inspect \
+            ${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ steps.meta.outputs.version }}
