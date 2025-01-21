@@ -226,7 +226,7 @@ jobs:
         working-directory: ${{ runner.temp }}/digests
         run: |
           docker buildx imagetools create \
-            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
             $(printf 'quay.io/cdis/${{ env.REPO_NAME }}@sha256:%s ' *)
 
       - name: Create manifest list and push (ECR)
@@ -234,7 +234,7 @@ jobs:
         working-directory: ${{ runner.temp }}/digests
         run: |
           docker buildx imagetools create \
-            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            ${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }} \
             $(printf '${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}@sha256:%s ' *)
 
       - name: Inspect image
