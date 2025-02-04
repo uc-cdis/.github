@@ -10,7 +10,9 @@ The University of Chicago, Center for Translational Data Science is the maintain
 
 ### Contributing code to Gen3
 
-Gen3 software is completely open-source.  Please refer to our [Contributor Guidelines](https://uc-cdis.github.io/gen3-docs/docs/Contributor%20Guidelines/) for how to contribute code to our repositories.
+Gen3 software is completely open-source.  Please refer to our
+[Contributor Guidelines](https://docs.gen3.org/gen3-resources/developer-guide/contribute/)
+for how to contribute code to our repositories.
 
 ### Chat with Gen3 staff and the community
 
