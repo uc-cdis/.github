@@ -62,7 +62,7 @@ jobs:
             fi
           fi
         fi
-    - name: checkout
+    - name: Checkout
       run: |
         # checkout the code - this supports checking out from a private fork
         git clone https://Bot:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.event.repository.full_name }}
@@ -91,15 +91,18 @@ jobs:
     - name: Attempt poetry install of dictionary as `gdcdictionary`
       # this will only work when the dictionary is using a poetry setup with pyproject.toml
       run: |
+        cd ${{ github.event.repository.name }}
         poetry install -vv --all-extras --no-interaction || true
     - name: Get dictionaryutils library and install
       run: |
+        cd ${{ github.event.repository.name }}
         git clone https://github.com/uc-cdis/dictionaryutils
         cd dictionaryutils
         poetry install -vv --all-extras --no-interaction
     - name: Uninstall gdcdictionary
       # remove gdcdictionary or gen3dictionary conditionally
       run: |
+        cd ${{ github.event.repository.name }}
         if [ -f pyproject.toml ]; then
           cd dictionaryutils
           echo "Removing 'gen3dictionary' via pip"
@@ -113,12 +116,13 @@ jobs:
         fi
     - name: Attempt re-install of dictionary as `gdcdictionary`
       run: |
+        cd ${{ github.event.repository.name }}
         echo "Re-installing the dictionary as 'gdcdictionary'"
         cd dictionaryutils
         poetry run pip install ..
     - name: Run dictionary tests, dump schema, and move to S3
       run: |
-        cd dictionaryutils
+        cd ${{ github.event.repository.name }}/dictionaryutils
         echo "dependencies before run_test"
         poetry show
         echo "Schema dir for artifact"
@@ -135,6 +139,7 @@ jobs:
         else
           branch=$GITHUB_REF_NAME
         fi
+        echo "Uploading file at: 's3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$branch/schema.json'"
         aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$branch/schema.json --region ${{ inputs.REGION }}
 
       env:
