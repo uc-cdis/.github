@@ -139,7 +139,7 @@ jobs:
         else
           branch=$GITHUB_REF_NAME
         fi
-        echo "Uploading file at: 's3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$branch/schema.json'"
+        echo "Uploading file to: 's3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$branch/schema.json'"
         aws s3 cp artifacts/schema.json s3://${{ inputs.BUCKET }}/${{ inputs.DIRECTORY }}/$branch/schema.json --region ${{ inputs.REGION }}
 
       env:
