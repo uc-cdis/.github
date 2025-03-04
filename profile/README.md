@@ -1,5 +1,5 @@
 <p align="center">
-<img src="Gen3_Logo-01_blue_no_commons.png" alt="Gen3 logo" width="500" style="display: block; margin: auto; "/>
+<img src="Gen3_Logo-01_blue_no_commons.png" alt="Gen3 logo" width="200" style="display: block; margin: auto; "/>
 </p>
 
 # Gen3
