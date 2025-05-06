@@ -79,6 +79,8 @@ jobs:
           CLOUD_AUTO_BRANCH: ${{ inputs.CLOUD_AUTO_BRANCH }}
           SLACK_CHANNEL: ${{ secrets.CI_SLACK_CHANNEL_ID }}
           SFTP_QA_HOSTNAME: "sftp-qa.planx-pla.net"
+          SFTP_QA_HOSTNAME_2: "s-5745d53f10e1421eb.server.transfer.us-east-1.amazonaws.com"
+
 
         steps:
           # Ensure the PR is run under the same org as an Internal PR
@@ -177,6 +179,7 @@ jobs:
             run: |
               mkdir -p ~/.ssh
               ssh-keyscan -p 22 $SFTP_QA_HOSTNAME >> ~/.ssh/known_hosts
+              ssh-keyscan -p 22 $SFTP_QA_HOSTNAME_2 >> ~/.ssh/known_hosts
 
           - name: Get commit time
             if: ${{ env.SKIP_TESTS != 'true' }}
