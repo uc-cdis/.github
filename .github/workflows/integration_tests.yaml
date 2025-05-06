@@ -78,6 +78,7 @@ jobs:
           CI_TEST_RAS_2_PASSWORD: ${{ secrets.CI_TEST_RAS_2_PASSWORD }}
           CLOUD_AUTO_BRANCH: ${{ inputs.CLOUD_AUTO_BRANCH }}
           SLACK_CHANNEL: ${{ secrets.CI_SLACK_CHANNEL_ID }}
+          SFTP_QA_HOSTNAME: "sftp-qa.planx-pla.net"
 
         steps:
           # Ensure the PR is run under the same org as an Internal PR
@@ -168,6 +169,14 @@ jobs:
               poetry install
               poetry show
               poetry run playwright install chromium
+
+          # Workaround for Paramiko RejectPolicy: pre-load the SFTP host key to avoid connection failure during dbGaP user sync
+          # Without this, Paramiko will reject the host since known_hosts is empty in CI
+          - name: Add SFTP host key to known_hosts
+            if: ${{ env.SKIP_TESTS != 'true' }}
+            run: |
+              mkdir -p ~/.ssh
+              ssh-keyscan -p 22 $SFTP_QA_HOSTNAME >> ~/.ssh/known_hosts
 
           - name: Get commit time
             if: ${{ env.SKIP_TESTS != 'true' }}
