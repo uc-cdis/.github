@@ -330,7 +330,7 @@ jobs:
               echo $GEN3_INSTANCE_TYPE
               mkdir $HOME/.gen3
               if [[ "$GEN3_INSTANCE_TYPE" == "ADMINVM_REMOTE" ]]; then
-                HOSTNAME="${NAMESPACE}.planx-pla.net"
+                HOSTNAME=${NAMESPACE}.planx-pla.net
                 echo "HOSTNAME=$HOSTNAME" >> $GITHUB_ENV
               fi
               poetry run python -m gen3_ci.scripts.prepare_ci_environment
