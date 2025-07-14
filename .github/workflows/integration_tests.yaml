@@ -101,6 +101,8 @@ jobs:
           GH_WORKSPACE: ${{ github.workspace }}
           HELM_BRANCH: ${{ inputs.HELM_BRANCH }}
           QUAY_REPO: ${{ inputs.QUAY_REPO }}
+          CI_AWS_ACCESS_KEY_ID: ${{ secrets.CI_AWS_ACCESS_KEY_ID }}
+          CI_AWS_SECRET_ACCESS_KEY: ${{ secrets.CI_AWS_SECRET_ACCESS_KEY }}
 
         steps:
           # Ensure the PR is run under the same org as an Internal PR
