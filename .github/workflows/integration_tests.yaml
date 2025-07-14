@@ -31,7 +31,7 @@ on:
       GEN3_INSTANCE_TYPE:
         required: false
         type: string
-        default: ADMINVM_REMOTE
+        default: HELM_LOCAL
       WORKING_DIR:
         required: false
         type: string
