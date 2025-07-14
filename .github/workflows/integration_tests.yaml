@@ -35,12 +35,12 @@ on:
       WORKING_DIR:
         required: false
         type: string
-        default: gen3-integration-tests
+        default: gen3-code-vigil/gen3-integration-tests
     secrets:
       CI_AWS_ACCESS_KEY_ID:
-        required: true
+        required: false
       CI_AWS_SECRET_ACCESS_KEY:
-        required: true
+        required: false
       JENKINS_API_TOKEN:
         required: true
       QA_DASHBOARD_S3_PATH:
@@ -232,7 +232,7 @@ jobs:
 
           # Configure credentials to access cluster.
           - name: Configure AWS Credentials
-            if: ${{ env.SKIP_TESTS != 'true' }}
+            if: ${{ env.SKIP_TESTS != 'true' && env.GEN3_INSTANCE_TYPE == 'HELM_LOCAL' }}
             uses: aws-actions/configure-aws-credentials@v3
             with:
                 role-to-assume: arn:aws:iam::707767160287:role/github-action-role
@@ -329,6 +329,10 @@ jobs:
               echo "Instance Type"
               echo $GEN3_INSTANCE_TYPE
               mkdir $HOME/.gen3
+              if [[ "$GEN3_INSTANCE_TYPE" == "ADMINVM_REMOTE" ]]; then
+                HOSTNAME="${NAMESPACE}.planx-pla.net"
+                echo "HOSTNAME=$HOSTNAME" >> $GITHUB_ENV
+              fi
               poetry run python -m gen3_ci.scripts.prepare_ci_environment
               if [ $? -ne 0 ]; then
                 echo "PR_ERROR_MSG=Failed to Prepare CI environment" >> $GITHUB_ENV
@@ -365,7 +369,6 @@ jobs:
               if [ $? -ne 0 ]; then
                 echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
               fi
-              poetry run python -m gen3_ci.scripts.teardown_helm_env
 
           - name: Run tests
             id: run_tests
@@ -377,7 +380,6 @@ jobs:
               if [ $? -ne 0 ]; then
                 echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
               fi
-              poetry run python -m gen3_ci.scripts.teardown_helm_env
 
           - name: Debug logging
             if: ${{ env.SKIP_TESTS != 'true' }}
@@ -402,7 +404,11 @@ jobs:
             if: ${{ env.SKIP_TESTS != 'true' && steps.generate_allure_report.outcome == 'success' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
             run: |
-              aws s3 sync ./allure-report ${{ secrets.QA_DASHBOARD_S3_PATH }}/$REPO/$PR_NUM/$RUN_NUM
+              if [[ "$GEN3_INSTANCE_TYPE" == "ADMINVM_REMOTE" ]]; then
+                AWS_ACCESS_KEY_ID="${{ secrets.CI_AWS_ACCESS_KEY_ID }}" AWS_SECRET_ACCESS_KEY="${{ secrets.CI_AWS_SECRET_ACCESS_KEY }}" aws s3 sync ./allure-report ${{ secrets.QA_DASHBOARD_S3_PATH }}/$REPO/$PR_NUM/$RUN_NUM
+              else
+                aws s3 sync ./allure-report ${{ secrets.QA_DASHBOARD_S3_PATH }}/$REPO/$PR_NUM/$RUN_NUM
+              fi
               if [ $? -ne 0 ]; then
                 echo "PR_ERROR_MSG=Failed to upload allure report to s3 bucket" >> $GITHUB_ENV
               fi
@@ -473,4 +479,8 @@ jobs:
           - name: Cleanup
             if: ${{ env.SKIP_TESTS != 'true' && env.GEN3_INSTANCE_TYPE == 'ADMINVM_REMOTE' }}
             run: |
+              if [[ "$GEN3_INSTANCE_TYPE" == "ADMINVM_REMOTE" ]]; then
                 poetry run python -m gen3_ci.scripts.clean_up_jenkins
+              elif [[ "$GEN3_INSTANCE_TYPE" == "HELM_LOCAL" ]]; then
+                poetry run python -m gen3_ci.scripts.teardown_helm_env
+              fi
