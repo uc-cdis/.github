@@ -64,6 +64,12 @@ on:
       EKS_CLUSTER_NAME:
         required: false
 
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+  issues: write
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.repository.name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
