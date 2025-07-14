@@ -38,9 +38,9 @@ on:
         default: gen3-code-vigil/gen3-integration-tests
     secrets:
       CI_AWS_ACCESS_KEY_ID:
-        required: true
+        required: false
       CI_AWS_SECRET_ACCESS_KEY:
-        required: true
+        required: false
       JENKINS_API_TOKEN:
         required: true
       QA_DASHBOARD_S3_PATH:
