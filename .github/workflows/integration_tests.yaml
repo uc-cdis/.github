@@ -274,8 +274,6 @@ jobs:
               if [ $? -ne 0 ]; then
                 echo "PR_ERROR_MSG=Failed to select CI environment" >> $GITHUB_ENV
               fi
-              HOSTNAME=${NAMESPACE}.planx-pla.net
-              echo "HOSTNAME=$HOSTNAME" >> $GITHUB_ENV
 
           # Ensure we do not cross the threshold of maximum number of CI envs allowed
           # The workflow waits if CI infrastructure is at capacity (MAX_ENVS, set to 10)
@@ -331,6 +329,10 @@ jobs:
               echo "Instance Type"
               echo $GEN3_INSTANCE_TYPE
               mkdir $HOME/.gen3
+              if [[ "$GEN3_INSTANCE_TYPE" == "ADMINVM_REMOTE" ]]; then
+                HOSTNAME="${NAMESPACE}.planx-pla.net"
+                echo "HOSTNAME=$HOSTNAME" >> $GITHUB_ENV
+              fi
               poetry run python -m gen3_ci.scripts.prepare_ci_environment
               if [ $? -ne 0 ]; then
                 echo "PR_ERROR_MSG=Failed to Prepare CI environment" >> $GITHUB_ENV
