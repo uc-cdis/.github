@@ -250,7 +250,7 @@ jobs:
           - name: Update kube config
             if: ${{ env.SKIP_TESTS != 'true' && env.GEN3_INSTANCE_TYPE == 'HELM_LOCAL' }}
             run: |
-              aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region "us-east-1"
+              aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --region "us-east-1"
 
           # Create PR namespace and PR hostname env var
           - name: Create namespace and env vars
