@@ -233,8 +233,8 @@ jobs:
               if [[ "$REPO" == "data-simulator" ]]; then
                 sed -i "s|\(data-simulator[[:space:]]*=[[:space:]]*{[^}]*rev[[:space:]]*=[[:space:]]*\"\)[^\"]*\(.*\)|\1$BRANCH\2|" pyproject.toml
               fi
-              poetry lock
               pip install poetry
+              poetry lock
               poetry install
               poetry show
               sudo apt update && poetry run playwright install-deps && poetry run playwright install --with-deps chromium
