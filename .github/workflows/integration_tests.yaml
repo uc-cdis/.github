@@ -230,6 +230,9 @@ jobs:
               sudo wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY}.tar.gz -O - |\
               tar xz && sudo mv ${YQ_BINARY} /usr/bin/yq
               python -m pip install --upgrade pip
+              if [[ "$REPO" == "data-simulator" ]]; then
+                sed -i "s|rev = .*|rev = \"$BRANCH_NAME\"|" pyproject.toml
+              fi
               pip install poetry
               poetry install
               poetry show
