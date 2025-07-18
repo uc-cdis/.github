@@ -233,6 +233,7 @@ jobs:
               if [[ "$REPO" == "data-simulator" ]]; then
                 sed -i "s|rev = .*|rev = \"$BRANCH_NAME\"|" pyproject.toml
               fi
+              cat pyproject.toml
               pip install poetry
               poetry install
               poetry show
