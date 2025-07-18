@@ -234,6 +234,7 @@ jobs:
                 sed -i "s|\(data-simulator[[:space:]]*=[[:space:]]*{[^}]*rev[[:space:]]*=[[:space:]]*\"\)[^\"]*\(.*\)|\1$BRANCH\2|" pyproject.toml
               fi
               cat pyproject.toml
+              poetry lock
               pip install poetry
               poetry install
               poetry show
