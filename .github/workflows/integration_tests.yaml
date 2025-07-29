@@ -235,6 +235,7 @@ jobs:
                 sed -i "s|\(data-simulator[[:space:]]*=[[:space:]]*{[^}]*rev[[:space:]]*=[[:space:]]*\"\)[^\"]*\(.*\)|\1$BRANCH\2|" pyproject.toml
               fi
               if [[ "$REPO" == "gen3sdk-python" ]]; then
+                ls -a $GH_WORKSPACE
                 echo "CHECKING GEN3SDK-PYTHON"
                 GEN3_VERSION=$(more pyproject.toml | sed -n 's/^version[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p')
                 echo $GEN3_VERSION
