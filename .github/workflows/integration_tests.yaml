@@ -231,6 +231,7 @@ jobs:
               tar xz && sudo mv ${YQ_BINARY} /usr/bin/yq
               python -m pip install --upgrade pip
               if [[ "$REPO" == "data-simulator" ]]; then
+                echo "CHECKING DATA-SIMULATOR"
                 sed -i "s|\(data-simulator[[:space:]]*=[[:space:]]*{[^}]*rev[[:space:]]*=[[:space:]]*\"\)[^\"]*\(.*\)|\1$BRANCH\2|" pyproject.toml
               fi
               if [[ "$REPO" == "gen3sdk-python" ]]; then
