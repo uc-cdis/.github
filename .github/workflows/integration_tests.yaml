@@ -235,7 +235,7 @@ jobs:
               fi
               if [[ "$REPO" == "gen3sdk-python" ]]; then
                 cat pyproject.toml | grep version
-                GEN3_VERSION=$(git show "$BRANCH":pyproject.toml | sed -n 's/^version[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p')
+                GEN3_VERSION=$(git show "$BRANCH":pyproject.toml)
                 echo $GEN3_VERSION
                 sed -i'' -E "s|^gen3[[:space:]]*=.*|gen3 = \"$GEN3_VERSION\"|" pyproject.toml
               fi
