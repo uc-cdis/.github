@@ -236,7 +236,7 @@ jobs:
               fi
               if [[ "$REPO" == "gen3sdk-python" ]]; then
                 echo "CHECKING GEN3SDK-PYTHON"
-                cat pyproject.toml | grep version
+                ls -a
               fi
               pip install poetry
               poetry lock
