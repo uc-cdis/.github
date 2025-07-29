@@ -234,10 +234,8 @@ jobs:
                 sed -i "s|\(data-simulator[[:space:]]*=[[:space:]]*{[^}]*rev[[:space:]]*=[[:space:]]*\"\)[^\"]*\(.*\)|\1$BRANCH\2|" pyproject.toml
               fi
               if [[ "$REPO" == "gen3sdk-python" ]]; then
+                echo "CHECKING GEN3SDK-PYTHON"
                 cat pyproject.toml | grep version
-                GEN3_VERSION=$(git show "$BRANCH":pyproject.toml)
-                echo $GEN3_VERSION
-                sed -i'' -E "s|^gen3[[:space:]]*=.*|gen3 = \"$GEN3_VERSION\"|" pyproject.toml
               fi
               pip install poetry
               poetry lock
