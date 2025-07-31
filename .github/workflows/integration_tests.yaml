@@ -42,7 +42,7 @@ on:
       CI_AWS_SECRET_ACCESS_KEY:
         required: false
       JENKINS_API_TOKEN:
-        required: true
+        required: false
       QA_DASHBOARD_S3_PATH:
         required: true
       CI_TEST_ORCID_USERID:
@@ -233,6 +233,9 @@ jobs:
               if [[ "$REPO" == "data-simulator" ]]; then
                 sed -i "s|\(data-simulator[[:space:]]*=[[:space:]]*{[^}]*rev[[:space:]]*=[[:space:]]*\"\)[^\"]*\(.*\)|\1$BRANCH\2|" pyproject.toml
               fi
+              if [[ "$REPO" == "gen3sdk-python" ]]; then
+                sed -i "s|^gen3 = \".*\"|gen3 = \"{git = "https://github.com/uc-cdis/gen3sdk-python", rev = "$BRANCH"}\"|" pyproject.toml
+              fi
               pip install poetry
               poetry lock
               poetry install
@@ -262,7 +265,7 @@ jobs:
             # Change the HOSTNAME with full domain name
             run: |
               NAMESPACE=${REPO}-pr-${PR_NUM}
-              HOSTNAME=${REPO}-pr${PR_NUM}.ci.planx-pla.net
+              HOSTNAME=${REPO}-pr-${PR_NUM}.ci.planx-pla.net
               echo "NAMESPACE=$NAMESPACE" >> $GITHUB_ENV
               echo "HOSTNAME=$HOSTNAME" >> $GITHUB_ENV
               kubectl create namespace $NAMESPACE || true
