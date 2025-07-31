@@ -42,7 +42,7 @@ on:
       CI_AWS_SECRET_ACCESS_KEY:
         required: false
       JENKINS_API_TOKEN:
-        required: true
+        required: false
       QA_DASHBOARD_S3_PATH:
         required: true
       CI_TEST_ORCID_USERID:
@@ -160,6 +160,15 @@ jobs:
               ref: ${{ inputs.TEST_REPO_BRANCH }}
               path: gen3-code-vigil
 
+          # Checkout gen3-gitops repo
+          - name: Checkout gen3-gitops repo
+            if: ${{ env.SKIP_TESTS != 'true' }}
+            uses: actions/checkout@v4
+            with:
+              repository: uc-cdis/gen3-gitops
+              ref: 'master'
+              path: gen3-gitops-ci
+
           - name: Get commit time
             if: ${{ env.SKIP_TESTS != 'true' }}
             run: |
@@ -262,7 +271,7 @@ jobs:
             # Change the HOSTNAME with full domain name
             run: |
               NAMESPACE=${REPO}-pr-${PR_NUM}
-              HOSTNAME=${REPO}-pr${PR_NUM}.ci.planx-pla.net
+              HOSTNAME=${REPO}-pr-${PR_NUM}.ci.planx-pla.net
               echo "NAMESPACE=$NAMESPACE" >> $GITHUB_ENV
               echo "HOSTNAME=$HOSTNAME" >> $GITHUB_ENV
               kubectl create namespace $NAMESPACE || true
