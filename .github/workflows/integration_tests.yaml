@@ -160,6 +160,15 @@ jobs:
               ref: ${{ inputs.TEST_REPO_BRANCH }}
               path: gen3-code-vigil
 
+          # Checkout gen3-gitops repo
+          - name: Checkout gen3-gitops repo
+            if: ${{ env.SKIP_TESTS != 'true' }}
+            uses: actions/checkout@v4
+            with:
+              repository: uc-cdis/gen3-gitops
+              ref: 'master'
+              path: gen3-gitops-ci
+
           - name: Get commit time
             if: ${{ env.SKIP_TESTS != 'true' }}
             run: |
@@ -295,7 +304,7 @@ jobs:
             if: ${{ env.SKIP_TESTS != 'true' && env.GEN3_INSTANCE_TYPE == 'HELM_LOCAL' }}
             id: wait_for_ci_env
             run: |
-              MAX_ENVS=20
+              MAX_ENVS=10
               MAX_WAIT_SECONDS=3600
               WAIT_INTERVAL=30
               WAITED=0
