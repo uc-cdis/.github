@@ -235,6 +235,7 @@ jobs:
               fi
               if [[ "$REPO" == "gen3sdk-python" ]]; then
                 sed -i "s|^gen3 = \".*\"|gen3 = \"{git = \\\"https://github.com/uc-cdis/gen3sdk-python\\\", rev = \\\"$BRANCH\\\"}\"|" pyproject.toml
+                cat pyproject.toml
               fi
               pip install poetry
               poetry lock
