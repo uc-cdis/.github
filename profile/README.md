@@ -4,7 +4,7 @@
 
 # Gen3
 
-The University of Chicago, Center for Translational Data Science is the maintainer organization for the open-source Gen3 Data Platform.  Some useful references are included below to help you learn more about Gen3.
+The University of Chicago, Center for Translational Data Science is the maintainer organization for the open-source Gen3 Data Platform. Learn how to set up and use Gen3 from our [docs](https://docs.gen3.org/). Additional useful references are included below to help you learn more about Gen3.
 
 ## Gen3 Community
 
