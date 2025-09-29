@@ -51,7 +51,7 @@ on:
       JENKINS_API_TOKEN:
         required: false
       QA_DASHBOARD_S3_PATH:
-        required: true
+        required: false
       CI_TEST_ORCID_USERID:
         required: true
       CI_TEST_ORCID_PASSWORD:
@@ -118,16 +118,17 @@ jobs:
           QUAY_REPO: ${{ inputs.QUAY_REPO }}
           IS_NIGHTLY_RUN: ${{ inputs.IS_NIGHTLY_RUN }}
           TEST_LABELS: ${{ inputs.TEST_LABELS }}
+          SKIP_TESTS: 'false'
 
         steps:
-          # Ensure the PR is run under the same org as an Internal PR
-          # and not by external forks/PRs
-          - name: Check if PR is from the same organization
-            if: ${{ github.repository_owner != 'uc-cdis' }}
+          # External PRs will not have access to secrets, so tests cannot run
+          - name: Skip integration tests for external PRs
+            if: ${{ github.event.pull_request.head.repo.fork == true && github.event_name == 'pull_request' }}
             working-directory: ${{ github.workspace }}
             run:  |
-              echo "github.repository_owner - ${{ github.repository_owner }}"
-              echo "Skip pull requests from repositories not within the same organization"
+              echo "Current repo: ${{ github.event.repository.full_name }}"
+              echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
+              echo "Skipping integration tests for external PRs"
               echo "SKIP_TESTS=true" >> $GITHUB_ENV
 
           # Skip integration tests when the following PR labels are present:
@@ -208,7 +209,7 @@ jobs:
 
           # Setup kubectl
           - name: Set Up kubectl
-            if: ${{  env.GEN3_INSTANCE_TYPE == 'HELM_LOCAL' }}
+            if: ${{ env.SKIP_TESTS != 'true' && env.GEN3_INSTANCE_TYPE == 'HELM_LOCAL' }}
             uses: azure/setup-kubectl@v3
             with:
               version: latest
@@ -311,6 +312,7 @@ jobs:
           # Create PR namespace and PR hostname env var
           - name: Create namespace and env vars
             if: ${{ env.SKIP_TESTS != 'true' && env.GEN3_INSTANCE_TYPE == 'HELM_LOCAL' }}
+            id: create_ns
             # Change the HOSTNAME with full domain name
             run: |
               if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
@@ -322,13 +324,13 @@ jobs:
               fi
               echo "NAMESPACE=$NAMESPACE" >> $GITHUB_ENV
               echo "HOSTNAME=$HOSTNAME" >> $GITHUB_ENV
-              namespace_exists=$(kubectl get namespace "$NAMESPACE" --no-headers --ignore-not-found)
-              if [ -n "$namespace_exists" ]; then
-                echo "Namespace $NAMESPACE exists, performing teardown..."
-                helm delete $NAMESPACE -n $NAMESPACE || true
-                kubectl delete ns $NAMESPACE
-              fi
-              kubectl create namespace $NAMESPACE
+              # namespace_exists=$(kubectl get namespace "$NAMESPACE" --no-headers --ignore-not-found)
+              # if [ -n "$namespace_exists" ]; then
+              #   echo "Namespace $NAMESPACE exists, performing teardown..."
+              #   helm delete $NAMESPACE -n $NAMESPACE || true
+              #   kubectl delete ns $NAMESPACE
+              # fi
+              kubectl create namespace $NAMESPACE || true
 
           # Select an unlocked environment
           # If an env is specified in a PR label use it, else pick one from the pool
@@ -366,7 +368,7 @@ jobs:
           # Generate API keys for test users for the environment
           - name: Prepare CI environment
             id: prep_ci_env
-            if: ${{ env.SKIP_TESTS != 'true' && steps.select_ci_env.outcome == 'success' || env.GEN3_INSTANCE_TYPE == 'HELM_LOCAL' }}
+            if: ${{ env.SKIP_TESTS != 'true' && (steps.create_ns.outcome == 'success' || steps.select_ci_env.outcome == 'success') }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
             run: |
               echo $UPDATED_FOLDERS
