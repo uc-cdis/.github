@@ -1,4 +1,4 @@
-name: "PyPI Poetry Publish"
+name: "PyPI Publish"
 
 # This expects tags to be available and assumes that the main branch is either
 # named `main` or `master`
@@ -11,8 +11,8 @@ name: "PyPI Poetry Publish"
 #      tags:
 #        - '*'
 #  jobs:
-#    PyPIPoetryPublish:
-#      name: PyPI Poetry Publish
+#    PyPIPublish:
+#      name: PyPI Publish
 #      uses: uc-cdis/.github/.github/workflows/python_package_index_publish.yaml@master
 #      with:
 #          PYTHON_VERSION: '3.9'
@@ -38,15 +38,32 @@ on:
         description: 'Overrides official name to avoid name conflicts in Test PyPI'
         required: false
         type: string
+      USE_UV:
+        description: 'Whether or not to use `uv` instead of `poetry`'
+        required: false
+        default: false
+        type: boolean
     secrets:
       PYPI_TEST_API_TOKEN:
         required: false
       PYPI_PROD_API_TOKEN:
-        required: true
+        # required for poetry, not for uv
+        required: false
 jobs:
   pypi:
     runs-on: ubuntu-latest
     steps:
+      - name: Checking configuration
+        if: ${{ !inputs.USE_UV }}
+        env:
+          PYPI_PROD_API_TOKEN: ${{ secrets.PYPI_PROD_API_TOKEN }}
+        run: |
+           if [[ -z "${PYPI_PROD_API_TOKEN}" ]]; then
+             echo "Invalid configuration. If you're not using `uv`, you must supply a PyPI Prod API token in a secret (PYPI_PROD_API_TOKEN)."
+             exit 1
+           fi
+        shell: bash
+
       - name: Check out code
         uses: actions/checkout@v4
         with:
@@ -57,21 +74,30 @@ jobs:
         with:
           python-version: ${{ inputs.PYTHON_VERSION }}
 
+      - name: Getting information
+        run: |
+          echo github.ref=${{ github.ref }}
+        shell: bash
+
+      ### Poetry ###
       - name: Install poetry
+        if: ${{ !inputs.USE_UV }}
         # that is poetry's recommended way to install
         run: |
           pip install --upgrade pip
           curl -sSL https://install.python-poetry.org | python -
           pip list
           poetry show
-      - name: Install dependencies
+
+      - name: Install poetry dependencies
+        if: ${{ !inputs.USE_UV }}
         run: |
           poetry install -vv --all-extras --no-interaction --no-cache
           poetry show -vv
         shell: bash
 
-      - name: Configure Test PyPI Repo
-        if: ${{ inputs.DO_TEST_PUBLISH_FIRST }}
+      - name: Configure Test PyPI Repo for Poetry
+        if: ${{ !inputs.USE_UV && inputs.DO_TEST_PUBLISH_FIRST }}
         env:
           PYPI_TEST_API_TOKEN: ${{ secrets.PYPI_TEST_API_TOKEN }}
         run: |
@@ -81,22 +107,17 @@ jobs:
       - name: Configure Prod PyPI Repo and Poetry Build
         env:
           PYPI_PROD_API_TOKEN: ${{ secrets.PYPI_PROD_API_TOKEN }}
+        if: ${{ !inputs.USE_UV }}
         run: |
           poetry config repositories.testpypi https://test.pypi.org/legacy/
           poetry config pypi-token.pypi $PYPI_PROD_API_TOKEN
           poetry build
         shell: bash
 
-      - name: Getting information
-        run: |
-          echo github.ref=${{ github.ref }}
-        shell: bash
-
       - name: Rename and rebuild for Test PyPI
         id: rename-test-pypi
         if: ${{ inputs.TEST_PYPI_PACKAGE_NAME && inputs.DO_TEST_PUBLISH_FIRST && startsWith(github.ref, 'refs/tags/') }}
         run: |
-
           echo "Backing up original pyproject.toml"
           cp pyproject.toml pyproject.toml.orig
 
@@ -111,18 +132,53 @@ jobs:
           echo "Moving original source folder ${ORIGINAL_PACKAGE} to ${{ inputs.TEST_PYPI_PACKAGE_NAME }}"
           mv ${ORIGINAL_PACKAGE} ${{ inputs.TEST_PYPI_PACKAGE_NAME }}
 
+      # note: we don't need a separate uv step for rebuiling b/c the uv build hasn't happened yet
+      - name: Poetry Rebuild for Test PyPI
+        id: rebuild-poetry-test-pypi
+        if: ${{ !inputs.USE_UV && inputs.TEST_PYPI_PACKAGE_NAME && inputs.DO_TEST_PUBLISH_FIRST && startsWith(github.ref, 'refs/tags/') }}
+        run: |
           echo "Rebuilding dist for Test PyPI"
           rm -rf dist/*
           poetry build -n
 
       - name: Publish to Test PyPI
         id: test-pypi
-        if: ${{ inputs.DO_TEST_PUBLISH_FIRST && startsWith(github.ref, 'refs/tags/') }}
+        if: ${{ !inputs.USE_UV && inputs.DO_TEST_PUBLISH_FIRST && startsWith(github.ref, 'refs/tags/') }}
         run: |
           echo "Publishing to Test PyPI"
           poetry publish -n -vv -r testpypi
 
-      - name: Restore name and rebuild for Real PyPI
+      ### uv ###
+      # following uv's official guide: https://docs.astral.sh/uv/guides/integration/github/
+      # relies on Trusted Publishing so no tokens are required. See: https://docs.pypi.org/trusted-publishers/
+      - name: Install uv
+        if: ${{ inputs.USE_UV }}
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install uv dependencies
+        if: ${{ inputs.USE_UV }}
+        run: |
+          uv sync --locked --all-extras
+          uv tree
+
+      - name: uv Build
+        env:
+          PYPI_PROD_API_TOKEN: ${{ secrets.PYPI_PROD_API_TOKEN }}
+        if: ${{ inputs.USE_UV }}
+        run: |
+          uv build -v
+        shell: bash
+
+      - name: uv Publish to Test PyPI
+        id: test-pypi-uv
+        if: ${{ inputs.USE_UV && inputs.DO_TEST_PUBLISH_FIRST && startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          echo "Attempting a test publish before a real one. Note that a real one will only trigger on tags"
+          uv publish -v --index testpypi
+
+      ##### Final publishing for both poetry and uv #####
+
+      - name: Restore name for Real PyPI
         id: undo-rename-pypi
         env:
           PYPI_PROD_API_TOKEN: ${{ secrets.PYPI_PROD_API_TOKEN }}
@@ -137,7 +193,15 @@ jobs:
           ORIGINAL_PACKAGE=$(grep '^name\s*=' pyproject.toml | head -1 | sed "s/name *= ['\"]//;s/['\"]//")
           echo "Recovering original source folder ${ORIGINAL_PACKAGE} from ${{ inputs.TEST_PYPI_PACKAGE_NAME }}"
           mv ${{ inputs.TEST_PYPI_PACKAGE_NAME }} ${ORIGINAL_PACKAGE}
+        shell: bash
 
+      ### poetry ###
+      - name: Rebuild for Real PyPI
+        id: undo-rebuild-pypi-poetry
+        env:
+          PYPI_PROD_API_TOKEN: ${{ secrets.PYPI_PROD_API_TOKEN }}
+        if: ${{ !inputs.USE_UV && inputs.TEST_PYPI_PACKAGE_NAME && inputs.DO_TEST_PUBLISH_FIRST && startsWith(github.ref, 'refs/tags/') }}
+        run: |
           echo "Rebuilding dist for Real PyPI"
           rm -rf dist/*
           poetry build -n
@@ -145,13 +209,38 @@ jobs:
 
       - name: Publish to PyPI
         id: prod-pypi
-        if: ${{ (!inputs.DO_TEST_PUBLISH_FIRST || (inputs.DO_TEST_PUBLISH_FIRST && steps.test-pypi.outcome == 'success')) && startsWith(github.ref, 'refs/tags/') }}
+        if: ${{ !inputs.USE_UV && (!inputs.DO_TEST_PUBLISH_FIRST || (inputs.DO_TEST_PUBLISH_FIRST && steps.test-pypi.outcome == 'success')) && startsWith(github.ref, 'refs/tags/') }}
         run: |
           echo "Since this is a tagged release, do a real publish"
           poetry publish -n -vv
 
-      - name: If Publish to PyPI Did Not Succeed, Fail Job
-        if: ${{ steps.prod-pypi.outcome != 'success' }}
+      - name: If Poetry Publish to PyPI Did Not Succeed, Fail Job
+        if: ${{ !inputs.USE_UV && steps.prod-pypi.outcome != 'success' }}
         run: |
-          echo "Since this is a tagged release, and the real publish failed or didn't run, fail the job"
+          echo "Since this is a tagged release, and the real poetry publish failed or didn't run, fail the job"
+          exit 1
+
+      ### uv ###
+      - name: Rebuild for Real PyPI
+        id: undo-rebuild-pypi-uv
+        env:
+          PYPI_PROD_API_TOKEN: ${{ secrets.PYPI_PROD_API_TOKEN }}
+        if: ${{ inputs.USE_UV && inputs.TEST_PYPI_PACKAGE_NAME && inputs.DO_TEST_PUBLISH_FIRST && startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          echo "Rebuilding dist for Real PyPI"
+          rm -rf dist/*
+          uv build -v
+        shell: bash
+
+      - name: uv Publish to PyPI
+        id: prod-pypi-uv
+        if: ${{ inputs.USE_UV && (!inputs.DO_TEST_PUBLISH_FIRST || (inputs.DO_TEST_PUBLISH_FIRST && steps.test-pypi-uv.outcome == 'success')) && startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          echo "Since this is a tagged release, do a real publish"
+          uv publish -v -n
+
+      - name: If uv Publish to PyPI Did Not Succeed, Fail Job
+        if: ${{ inputs.USE_UV && steps.prod-pypi-uv.outcome != 'success' }}
+        run: |
+          echo "Since this is a tagged release, and the real uv publish failed or didn't run, fail the job"
           exit 1
