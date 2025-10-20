@@ -1,7 +1,7 @@
 name: "PyPI Publish"
 
 # This expects tags to be available and assumes that the main branch is either
-# named `main` or `master`
+# named main or master
 #
 # you can use this in a GH Action like this:
 #
@@ -39,7 +39,7 @@ on:
         required: false
         type: string
       USE_UV:
-        description: 'Whether or not to use `uv` instead of `poetry`'
+        description: 'Whether or not to use uv instead of poetry'
         required: false
         default: false
         type: boolean
@@ -59,7 +59,7 @@ jobs:
           PYPI_PROD_API_TOKEN: ${{ secrets.PYPI_PROD_API_TOKEN }}
         run: |
            if [[ -z "${PYPI_PROD_API_TOKEN}" ]]; then
-             echo "Invalid configuration. If you're not using `uv`, you must supply a PyPI Prod API token in a secret (PYPI_PROD_API_TOKEN)."
+             echo "Invalid configuration. If you're not using uv, you must supply a PyPI Prod API token in a secret (PYPI_PROD_API_TOKEN)."
              exit 1
            fi
         shell: bash
