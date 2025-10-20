@@ -52,6 +52,11 @@ on:
 jobs:
   pypi:
     runs-on: ubuntu-latest
+    # permissions required for PyPI Trusted Publishing
+    # https://docs.pypi.org/trusted-publishers/using-a-publisher/
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checking configuration
         if: ${{ !inputs.USE_UV }}
