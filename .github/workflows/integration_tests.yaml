@@ -460,7 +460,7 @@ jobs:
             id: slack_notify
             if: ${{ env.SKIP_TESTS != 'true' && steps.generate_slack_report.outcome == 'success' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
-            uses: slackapi/slack-github-action@v2.0.0
+            uses: slackapi/slack-github-action@v2.1.1
             with:
               method: chat.postMessage
               token: ${{ secrets.CI_SLACK_BOT_TOKEN }}
