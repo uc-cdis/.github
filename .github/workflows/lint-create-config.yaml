@@ -55,7 +55,7 @@ jobs:
           echo "known_first_party=${{ inputs.python-module-name }}" >> .github/linters/.isort.cfg
         fi
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       with:
         name: linters-config
         path: |
