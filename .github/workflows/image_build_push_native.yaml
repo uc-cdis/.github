@@ -114,6 +114,7 @@ jobs:
 
       # https://github.com/docker/login-action#aws-public-elastic-container-registry-ecr
       - name: Login to ECR
+        if: ${{ !inputs.USE_QUAY_ONLY }}
         uses: docker/login-action@v3
         with:
           registry: ${{ inputs.AWS_ECR_REGISTRY }}
@@ -127,13 +128,13 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
-            ${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
+            quay.io/cdis/${{ env.REPO_NAME }}
+            ${{ !inputs.USE_QUAY_ONLY && format('{0}/gen3/{1}', inputs.AWS_ECR_REGISTRY, env.REPO_NAME) || '' }}
 
       - name: Set image repositories
         id: set-repos
         run: |
-          if [ "${{ inputs.QUAY_ONLY }}" = "true" ]; then
+          if [ "${{ inputs.USE_QUAY_ONLY }}" = "true" ]; then
             echo "repos=quay.io/cdis/${{ env.REPO_NAME }}" >> $GITHUB_ENV
           else
             echo "repos=quay.io/cdis/${{ env.REPO_NAME }},${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}" >> $GITHUB_ENV
@@ -189,6 +190,7 @@ jobs:
 
       # https://github.com/docker/login-action#aws-public-elastic-container-registry-ecr
       - name: Login to ECR
+        if: ${{ !inputs.USE_QUAY_ONLY }}
         uses: docker/login-action@v3
         with:
           registry: ${{ inputs.AWS_ECR_REGISTRY }}
@@ -233,8 +235,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ inputs.USE_QUAY_ONLY != 'true' && format('{0}/gen3/{1}', inputs.AWS_ECR_REGISTRY, env.REPO_NAME) || '' }}
             quay.io/cdis/${{ env.REPO_NAME }}
+            ${{ !inputs.USE_QUAY_ONLY && format('{0}/gen3/{1}', inputs.AWS_ECR_REGISTRY, env.REPO_NAME) || '' }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
