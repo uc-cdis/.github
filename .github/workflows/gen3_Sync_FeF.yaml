@@ -45,7 +45,7 @@ jobs:
 
       - name: Create new sync branch
         run: |
-          git checkout -b ${{ env.BRANCH_NAME }} ${{ env.DEFAULT_BRANCH }}
+          git checkout -b ${{ env.BRANCH_NAME }} origin/${{ env.DEFAULT_BRANCH }}
 
       - name: Merge from template
         run: |
@@ -67,7 +67,7 @@ jobs:
         run: |
           # Add all changes (the merge + our restored config)
           git add .
-          
+
           # Check if there are actually any changes to commit
           if git diff-index --quiet HEAD; then
             echo "No new changes from template. Stopping workflow."
