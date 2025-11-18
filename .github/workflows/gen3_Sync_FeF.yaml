@@ -60,7 +60,7 @@ jobs:
           # This is the key step to meet your requirement.
           # After the merge (-X theirs) overwrote everything, we
           # explicitly restore our original /config directory from our default branch.
-          git checkout ${{ env.DEFAULT_BRANCH }} -- config
+          git checkout origin/${{ env.DEFAULT_BRANCH }} -- config
 
       - name: Commit changes
         id: commit
