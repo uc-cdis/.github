@@ -70,8 +70,6 @@ jobs:
       - name: Commit changes
         id: commit
         run: |
-          export GH_TOKEN="${{ secrets.PLANXCYBORG_PAT }}"
-
           # Add all changes (the merge + our restored config)
           git add .
           
@@ -94,7 +92,7 @@ jobs:
         if: steps.commit.outputs.changes_exist == 'true'
         env:
           # Use the built-in GITHUB_TOKEN
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PLANXCYBORG_PAT }}
         run: |
           gh pr create \
             --title "chore: Sync from template repo for ${{ env.DATE }}" \
