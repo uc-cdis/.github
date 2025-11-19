@@ -61,11 +61,6 @@ jobs:
           # explicitly restore our original /config directory from our default branch.
           git checkout ${{ env.DEFAULT_BRANCH }} -- config
 
-          # Restore workflow files to avoid this `git push` error:
-          #   refusing to allow a GitHub App to create or update workflow `.github/workflows/image_build_push.yaml` without `workflows` permission
-          # See https://github.com/orgs/community/discussions/35410
-          git checkout ${{ env.DEFAULT_BRANCH }} -- .github/workflows
-
       - name: Commit changes
         id: commit
         run: |
