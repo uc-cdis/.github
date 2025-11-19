@@ -36,7 +36,7 @@ jobs:
       - name: Get default branch name
         id: vars
         run: |
-          echo "DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)" >> $GITHUB_ENV
+          echo "DEFAULT_BRANCH=origin/$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)" >> $GITHUB_ENV
           echo "BRANCH_NAME=chore/sync-${{ env.DATE }}" >> $GITHUB_ENV
 
       - name: Configure Git and add template remote
@@ -50,7 +50,7 @@ jobs:
 
       - name: Create new sync branch
         run: |
-          git checkout -b ${{ env.BRANCH_NAME }} origin/${{ env.DEFAULT_BRANCH }}
+          git checkout -b ${{ env.BRANCH_NAME }} ${{ env.DEFAULT_BRANCH }}
 
       - name: Merge from template
         run: |
@@ -65,12 +65,12 @@ jobs:
           # This is the key step to meet your requirement.
           # After the merge (-X theirs) overwrote everything, we
           # explicitly restore our original /config directory from our default branch.
-          git checkout origin/${{ env.DEFAULT_BRANCH }} -- config
+          git checkout ${{ env.DEFAULT_BRANCH }} -- config
 
           # Restore workflow files to avoid this `git push` error:
           #   refusing to allow a GitHub App to create or update workflow `.github/workflows/image_build_push.yaml` without `workflows` permission
           # See https://github.com/orgs/community/discussions/35410
-          git checkout origin/${{ env.DEFAULT_BRANCH }} -- .github/workflows
+          git checkout ${{ env.DEFAULT_BRANCH }} -- .github/workflows
 
       - name: Commit changes
         id: commit
@@ -108,5 +108,5 @@ jobs:
 
             ### Action Required:
             Please review the changes. Pay close attention to the \`/config\` directory to ensure that no **new** required variables or settings from the template were missed. You may need to manually add new config keys from the template's changes while keeping our values." \
-            --base origin/${{ env.DEFAULT_BRANCH }} \
+            --base ${{ env.DEFAULT_BRANCH }} \
             --head ${{ env.BRANCH_NAME }}
