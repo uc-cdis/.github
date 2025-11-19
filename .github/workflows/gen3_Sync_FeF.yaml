@@ -8,7 +8,6 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  actions: write  # updates to GitHub Actions workflows
 
 jobs:
   sync-and-pr:
@@ -68,7 +67,9 @@ jobs:
         run: |
           # Ignore changes to workflow files to avoid this `git push` error:
           # refusing to allow a GitHub App to create or update workflow `.github/workflows/image_build_push.yaml` without `workflows` permission
-          git checkout .github/workflows
+          # See https://github.com/orgs/community/discussions/35410
+          git diff
+          git checkout .github/workflows/*.yaml
 
           # Add all changes (the merge + our restored config)
           git add .
