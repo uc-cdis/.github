@@ -50,8 +50,8 @@ jobs:
 
       - name: Create new sync branch
         run: |
-          git fetch ${{ env.DEFAULT_BRANCH }}
-          git checkout -b ${{ env.BRANCH_NAME }} ${{ env.DEFAULT_BRANCH }}
+          git fetch origin ${{ env.DEFAULT_BRANCH }}
+          z ${{ env.BRANCH_NAME }} ${{ env.DEFAULT_BRANCH }}
 
       - name: Merge from template
         run: |
