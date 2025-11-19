@@ -94,6 +94,9 @@ jobs:
           # Use the built-in GITHUB_TOKEN
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Create the `template-sync` label so it can be used on the PR
+          gh api --silent repos/{{ github.event.repository.full_name }}/labels -f name="template-sync" -f color="a8893b"
+
           gh pr create \
             --title "chore: Sync from template repo for ${{ env.DATE }}" \
             --body "This PR syncs changes from the template repository \`uc-cdis/commons-frontend-app\`.
@@ -106,4 +109,4 @@ jobs:
             Please review the changes. Pay close attention to the \`/config\` directory to ensure that no **new** required variables or settings from the template were missed. You may need to manually add new config keys from the template's changes while keeping our values." \
             --base ${{ env.DEFAULT_BRANCH }} \
             --head ${{ env.BRANCH_NAME }} \
-            --label "chore,template-sync"
+            --label "template-sync"
