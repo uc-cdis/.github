@@ -3,7 +3,9 @@ name: Sync from FEF Template Repo
 on:
   workflow_call:
     secrets:
-      PLANXCYBORG_PAT:
+      # Need a personal access token - can't use the built-in GITHUB_TOKEN
+      # because it doesn't have permission to create labels and PRs
+      GITHUB_TOKEN:
         required: true
 
 # Set permissions for the GITHUB_TOKEN
@@ -48,6 +50,7 @@ jobs:
 
       - name: Create new sync branch
         run: |
+          git fetch ${{ env.DEFAULT_BRANCH }}
           git checkout -b ${{ env.BRANCH_NAME }} ${{ env.DEFAULT_BRANCH }}
 
       - name: Merge from template
@@ -94,8 +97,7 @@ jobs:
       - name: Create Pull Request
         if: steps.commit.outputs.changes_exist == 'true'
         env:
-          # Can't use the built-in GITHUB_TOKEN because it doesn't have permission to create labels and PRs
-          GH_TOKEN: ${{ secrets.PLANXCYBORG_PAT }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           gh pr create \
             --title "chore: Sync from template repo for ${{ env.DATE }}" \
