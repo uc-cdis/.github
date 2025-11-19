@@ -96,7 +96,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Create the `template-sync` label so it can be used on the PR
-          gh label create template-sync -f --color=a8893b
+          gh label create template-sync -f --color=a8893b --repo={{ github.event.repository.full_name }}
 
           gh pr create \
             --title "chore: Sync from template repo for ${{ env.DATE }}" \
