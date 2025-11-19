@@ -55,22 +55,21 @@ jobs:
           # || true = Continue even if the merge command exits with a non-zero status (which it might).
           git merge upstream/main --allow-unrelated-histories -X theirs --no-commit || true
 
-      - name: Restore local /config directory
+      - name: Restore local config and workflows directories
         run: |
           # This is the key step to meet your requirement.
           # After the merge (-X theirs) overwrote everything, we
           # explicitly restore our original /config directory from our default branch.
           git checkout ${{ env.DEFAULT_BRANCH }} -- config
 
+          # Restore workflow files to avoid this `git push` error:
+          #   refusing to allow a GitHub App to create or update workflow `.github/workflows/image_build_push.yaml` without `workflows` permission
+          # See https://github.com/orgs/community/discussions/35410
+          git checkout ${{ env.DEFAULT_BRANCH }} -- .github/workflows
+
       - name: Commit changes
         id: commit
         run: |
-          # Ignore changes to workflow files to avoid this `git push` error:
-          # refusing to allow a GitHub App to create or update workflow `.github/workflows/image_build_push.yaml` without `workflows` permission
-          # See https://github.com/orgs/community/discussions/35410
-          git diff
-          git checkout .github/workflows/*.yaml
-
           # Add all changes (the merge + our restored config)
           git add .
           
