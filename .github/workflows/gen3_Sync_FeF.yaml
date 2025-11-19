@@ -70,6 +70,8 @@ jobs:
       - name: Commit changes
         id: commit
         run: |
+          export GH_TOKEN="${{ secrets.PLANXCYBORG_PAT }}"
+
           # Add all changes (the merge + our restored config)
           git add .
           
