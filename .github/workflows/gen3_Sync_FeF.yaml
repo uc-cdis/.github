@@ -5,7 +5,7 @@ on:
     secrets:
       # Need a personal access token - can't use the built-in GITHUB_TOKEN
       # because it doesn't have permission to create labels and PRs
-      GITHUB_TOKEN:
+      GH_TOKEN:
         required: true
 
 # Set permissions for the GITHUB_TOKEN
