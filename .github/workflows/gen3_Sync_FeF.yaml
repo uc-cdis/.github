@@ -36,7 +36,7 @@ jobs:
       - name: Get default branch name
         id: vars
         run: |
-          echo "DEFAULT_BRANCH=origin/$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)" >> $GITHUB_ENV
+          echo "DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)" >> $GITHUB_ENV
           echo "BRANCH_NAME=chore/sync-${{ env.DATE }}" >> $GITHUB_ENV
 
       - name: Configure Git and add template remote
@@ -50,7 +50,7 @@ jobs:
 
       - name: Create new sync branch
         run: |
-          git checkout -b ${{ env.BRANCH_NAME }} ${{ env.DEFAULT_BRANCH }}
+          git checkout -b ${{ env.BRANCH_NAME }} origin/${{ env.DEFAULT_BRANCH }}
 
       - name: Merge from template
         run: |
@@ -65,19 +65,19 @@ jobs:
           # This is the key step to meet your requirement.
           # After the merge (-X theirs) overwrote everything, we
           # explicitly restore our original /config directory from our default branch.
-          git checkout ${{ env.DEFAULT_BRANCH }} -- config
+          git checkout origin/${{ env.DEFAULT_BRANCH }} -- config
 
           # Restore workflow files to avoid this `git push` error:
           #   refusing to allow a GitHub App to create or update workflow `.github/workflows/image_build_push.yaml` without `workflows` permission
           # See https://github.com/orgs/community/discussions/35410
-          git checkout ${{ env.DEFAULT_BRANCH }} -- .github/workflows
+          git checkout origin/${{ env.DEFAULT_BRANCH }} -- .github/workflows
 
       - name: Commit changes
         id: commit
         run: |
           # Add all changes (the merge + our restored config)
           git add .
-          
+
           # Check if there are actually any changes to commit
           if git diff-index --quiet HEAD; then
             echo "No new changes from template. Stopping workflow."
