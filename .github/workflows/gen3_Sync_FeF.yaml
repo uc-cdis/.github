@@ -8,12 +8,6 @@ on:
       GH_TOKEN:
         required: true
 
-# Set permissions for the GITHUB_TOKEN
-# This is necessary to create a branch and open a pull request
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
   sync-and-pr:
     runs-on: ubuntu-latest
