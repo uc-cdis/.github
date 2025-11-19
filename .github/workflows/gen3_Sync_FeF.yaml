@@ -2,6 +2,9 @@ name: Sync from FEF Template Repo
 
 on:
   workflow_call:
+    secrets:
+      PLANXCYBORG_PAT:
+        required: true
 
 # Set permissions for the GITHUB_TOKEN
 # This is necessary to create a branch and open a pull request
@@ -91,7 +94,7 @@ jobs:
       - name: Create Pull Request
         if: steps.commit.outputs.changes_exist == 'true'
         env:
-          # Use the built-in GITHUB_TOKEN
+          # Can't use the built-in GITHUB_TOKEN because it doesn't have permission to create labels and PRs
           GH_TOKEN: ${{ secrets.PLANXCYBORG_PAT }}
         run: |
           gh pr create \
