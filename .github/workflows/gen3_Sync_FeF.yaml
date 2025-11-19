@@ -36,7 +36,7 @@ jobs:
       - name: Get default branch name
         id: vars
         run: |
-          echo "DEFAULT_BRANCH=origin/$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)" >> $GITHUB_ENV
+          echo "DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)" >> $GITHUB_ENV
           echo "BRANCH_NAME=chore/sync-${{ env.DATE }}" >> $GITHUB_ENV
 
       - name: Configure Git and add template remote
