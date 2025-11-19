@@ -110,4 +110,4 @@ jobs:
             Please review the changes. Pay close attention to the \`/config\` directory to ensure that no **new** required variables or settings from the template were missed. You may need to manually add new config keys from the template's changes while keeping our values." \
             --base ${{ env.DEFAULT_BRANCH }} \
             --head ${{ env.BRANCH_NAME }} \
-            --repo={{ github.event.repository.full_name }}
+            --repo ${{ github.event.repository.full_name }}
