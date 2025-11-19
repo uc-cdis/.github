@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write  # updates to GitHub Actions workflows
 
 jobs:
   sync-and-pr:
