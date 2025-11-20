@@ -54,7 +54,7 @@ jobs:
           # || true = Continue even if the merge command exits with a non-zero status (which it might).
           git merge upstream/main --allow-unrelated-histories -X theirs --no-commit || true
 
-      - name: Restore local config and workflows directories
+      - name: Restore local /config directory
         run: |
           # This is the key step to meet your requirement.
           # After the merge (-X theirs) overwrote everything, we
