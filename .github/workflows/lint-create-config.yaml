@@ -37,11 +37,12 @@ jobs:
         mkdir .github/linters
 
     - name: Checkout Another Repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v4
       with:
         repository: uc-cdis/.github
         ref: fix/linting
         persist-credentials: false
+        fetch-depth: 0
         sparse-checkout: |
           .github/linters
 
