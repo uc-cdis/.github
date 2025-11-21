@@ -1,18 +1,12 @@
 name: Sync from FEF Template Repo
 
 on:
-  # 1. Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-  # 2. Runs on a schedule (the 1st of the month and the 23rd to pick up any changes)
-  schedule:
-  - cron: '0 3 1,23 * *'
-
-# Set permissions for the GITHUB_TOKEN
-# This is necessary to create a branch and open a pull request
-permissions:
-  contents: write
-  pull-requests: write
+  workflow_call:
+    secrets:
+      # Need a personal access token - can't use the built-in GITHUB_TOKEN
+      # because it doesn't have permission to create labels and PRs
+      GH_TOKEN:
+        required: true
 
 jobs:
   sync-and-pr:
@@ -72,7 +66,7 @@ jobs:
         run: |
           # Add all changes (the merge + our restored config)
           git add .
-          
+
           # Check if there are actually any changes to commit
           if git diff-index --quiet HEAD; then
             echo "No new changes from template. Stopping workflow."
@@ -91,19 +85,22 @@ jobs:
       - name: Create Pull Request
         if: steps.commit.outputs.changes_exist == 'true'
         env:
-          # Use the built-in GITHUB_TOKEN
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
+          # Create the label so it can be used on the PR
+          gh label create template-sync -f --color=a8893b --repo ${{ github.event.repository.full_name }}
+
           gh pr create \
             --title "chore: Sync from template repo for ${{ env.DATE }}" \
             --body "This PR syncs changes from the template repository \`uc-cdis/commons-frontend-app\`.
 
             ### Merge Strategy Used:
-            * All changes and conflicts from the template were accepted (`-X theirs`).
+            * All changes and conflicts from the template were accepted (\`-X theirs\`).
             * The entire local \`/config\` directory was then restored to preserve our settings.
 
             ### Action Required:
             Please review the changes. Pay close attention to the \`/config\` directory to ensure that no **new** required variables or settings from the template were missed. You may need to manually add new config keys from the template's changes while keeping our values." \
             --base ${{ env.DEFAULT_BRANCH }} \
             --head ${{ env.BRANCH_NAME }} \
-            --label "chore,template-sync"
+            --label "template-sync" \
+            --repo ${{ github.event.repository.full_name }}
