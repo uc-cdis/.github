@@ -28,7 +28,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     container:
-      image: github/super-linter/slim@v7
+      image: ghcr.io/super-linter/super-linter:slim-v7.1.0
       # this .cache is where the poetry installs are, so this ensures that all
       # steps (importantly the actual super-linter/pylint) has access to installed
       # packages (to determine if an import exists in Python)
