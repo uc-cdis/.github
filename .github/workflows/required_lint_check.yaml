@@ -28,7 +28,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     container:
-      image: ubuntu-latest
+      image: ubuntu:latest
       volumes:
         - /home/runner/.cache
     steps:
