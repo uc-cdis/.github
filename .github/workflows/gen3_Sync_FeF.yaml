@@ -69,12 +69,12 @@ jobs:
           # || true = Continue even if the merge command exits with a non-zero status (which it might).
           git merge upstream/main --allow-unrelated-histories -X theirs --no-commit || true
 
-      - name: Restore local /config directory
+      - name: Restore custom files
         run: |
-          # This is the key step to meet your requirement.
+          # This is the key step to meet the requirement.
           # After the merge (-X theirs) overwrote everything, we
-          # explicitly restore our original /config directory from our default branch.
-          git checkout ${{ env.DEFAULT_BRANCH }} -- config
+          # explicitly restore our original custom files from our default branch.
+          git checkout ${{ env.DEFAULT_BRANCH }} -- config .env*
 
       - name: Commit changes
         id: commit
