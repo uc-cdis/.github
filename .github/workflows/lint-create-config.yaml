@@ -40,7 +40,7 @@ jobs:
       uses: actions/checkout@v5
       with:
         repository: uc-cdis/.github
-        ref: ${{ github.ref_name }}
+        ref: fix/linting
         persist-credentials: false
         sparse-checkout: |
           .github/linters
