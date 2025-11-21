@@ -1,0 +1,106 @@
+name: Sync from FEF Template Repo
+
+on:
+  workflow_call:
+    secrets:
+      # Need a personal access token - can't use the built-in GITHUB_TOKEN
+      # because it doesn't have permission to create labels and PRs
+      GH_TOKEN:
+        required: true
+
+jobs:
+  sync-and-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get current date for branch name
+        id: date
+        # ---------------------------------'
+        # to avoid the "block composed value" syntax error.
+        # ---------------------------------
+        run: |
+          echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # We need the full history to merge unrelated histories
+          fetch-depth: 0
+
+      - name: Get default branch name
+        id: vars
+        run: |
+          echo "DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)" >> $GITHUB_ENV
+          echo "BRANCH_NAME=chore/sync-${{ env.DATE }}" >> $GITHUB_ENV
+
+      - name: Configure Git and add template remote
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Standardize the remote name, works for forks or template-generated repos
+          git remote remove upstream || true
+          git remote add upstream https://github.com/uc-cdis/commons-frontend-app.git
+          git fetch upstream
+
+      - name: Create new sync branch
+        run: |
+          git checkout -b ${{ env.BRANCH_NAME }} ${{ env.DEFAULT_BRANCH }}
+
+      - name: Merge from template
+        run: |
+          # This performs the merge, allowing unrelated histories.
+          # -X theirs = For any conflict, automatically use the version from the upstream (template) repo.
+          # --no-commit = We don't commit yet, as we need to restore the config files first.
+          # || true = Continue even if the merge command exits with a non-zero status (which it might).
+          git merge upstream/main --allow-unrelated-histories -X theirs --no-commit || true
+
+      - name: Restore local /config directory
+        run: |
+          # This is the key step to meet your requirement.
+          # After the merge (-X theirs) overwrote everything, we
+          # explicitly restore our original /config directory from our default branch.
+          git checkout ${{ env.DEFAULT_BRANCH }} -- config
+
+      - name: Commit changes
+        id: commit
+        run: |
+          # Add all changes (the merge + our restored config)
+          git add .
+
+          # Check if there are actually any changes to commit
+          if git diff-index --quiet HEAD; then
+            echo "No new changes from template. Stopping workflow."
+            echo "changes_exist=false" >> $GITHUB_OUTPUT
+          else
+            echo "New changes found. Committing."
+            git commit -m "chore: Sync from template repo (uc-cdis/commons-frontend-app) on ${{ env.DATE }}"
+            echo "changes_exist=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Push new branch
+        if: steps.commit.outputs.changes_exist == 'true'
+        run: |
+          git push --force --set-upstream origin ${{ env.BRANCH_NAME }}
+
+      - name: Create Pull Request
+        if: steps.commit.outputs.changes_exist == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          # Create the label so it can be used on the PR
+          gh label create template-sync -f --color=a8893b --repo ${{ github.event.repository.full_name }}
+
+          gh pr create \
+            --title "chore: Sync from template repo for ${{ env.DATE }}" \
+            --body "This PR syncs changes from the template repository \`uc-cdis/commons-frontend-app\`.
+
+            ### Merge Strategy Used:
+            * All changes and conflicts from the template were accepted (\`-X theirs\`).
+            * The entire local \`/config\` directory was then restored to preserve our settings.
+
+            ### Action Required:
+            Please review the changes. Pay close attention to the \`/config\` directory to ensure that no **new** required variables or settings from the template were missed. You may need to manually add new config keys from the template's changes while keeping our values." \
+            --base ${{ env.DEFAULT_BRANCH }} \
+            --head ${{ env.BRANCH_NAME }} \
+            --label "template-sync" \
+            --repo ${{ github.event.repository.full_name }}
