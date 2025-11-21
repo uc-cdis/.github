@@ -27,10 +27,6 @@ jobs:
   build:
     name: Lint
     runs-on: ubuntu-latest
-    container:
-      image: ubuntu:latest
-      volumes:
-        - /home/runner/.cache
     steps:
       - name: Set up python
         uses: actions/setup-python@v6
