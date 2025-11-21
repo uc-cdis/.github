@@ -35,8 +35,20 @@ extension-pkg-allow-list=
 extension-pkg-whitelist=
 
 ################################################################################
-######### ADD NEW ERRORS WHICH SHOULD FAIL THE SCRIPT IN fail-on HERE ##########
+##### ADD NEW ERRORS WHICH SHOULD FAIL THE SCRIPT IN enable & fail-on HERE #####
 ################################################################################
+
+# Enable the message, report, category or checker with the given id(s). You can
+# either give multiple identifier separated by comma (,) or put this option
+# multiple time (only on the command line, not in the configuration file where
+# it should appear only once). See also the "--disable" option for examples.
+enable=missing-function-docstring,
+       invalid-name,
+       protected-access,
+       undefined-variable,
+
+       #### NEW ERRORS YOU WANT TO FAIL ON? ADD ABOVE THIS
+
 
 # Return non-zero exit code if any of these messages/categories are detected,
 # even if score is above --fail-under value. Syntax same as enable. Messages
@@ -435,7 +447,10 @@ confidence=HIGH,
 # no Warning level messages displayed, use "--disable=all --enable=classes
 # --disable=W".
 #
-#
+# NOTE: Changed to all and added explicit enable above. Leaving historic
+#       justifications and explicit disables in case we want to use them in the
+#       the future
+disable=all
 # Justifications:
 #    too-many-arguments
 #           pytest fixtures don't appropriately get considered so this flags a
@@ -464,34 +479,27 @@ confidence=HIGH,
 #    import-error
 #           can't figure out how to correctly get packages to super-linter
 #           so this is spamming a ton of false positives. disable for now
-disable=raw-checker-failed,
-        bad-inline-option,
-        locally-disabled,
-        file-ignored,
-        suppressed-message,
-        useless-suppression,
-        deprecated-pragma,
-        use-symbolic-message-instead,
-        locally-disabled,
-        multiple-statements,
-        line-too-long,
-        broad-exception-caught,
-        logging-fstring-interpolation,
-        missing-module-docstring,
-        too-few-public-methods,
-        too-many-arguments,
-        too-many-locals,
-        fixme,
-        missing-class-docstring,
-        # TODO: perhaps enable this in the future
-        import-error
-
-# Enable the message, report, category or checker with the given id(s). You can
-# either give multiple identifier separated by comma (,) or put this option
-# multiple time (only on the command line, not in the configuration file where
-# it should appear only once). See also the "--disable" option for examples.
-enable=
-
+# disable=raw-checker-failed,
+#         bad-inline-option,
+#         locally-disabled,
+#         file-ignored,
+#         suppressed-message,
+#         useless-suppression,
+#         deprecated-pragma,
+#         use-symbolic-message-instead,
+#         locally-disabled,
+#         multiple-statements,
+#         line-too-long,
+#         broad-exception-caught,
+#         logging-fstring-interpolation,
+#         missing-module-docstring,
+#         too-few-public-methods,
+#         too-many-arguments,
+#         too-many-locals,
+#         fixme,
+#         missing-class-docstring,
+#         # TODO: perhaps enable this in the future
+#         import-error
 
 [METHOD_ARGS]
 
