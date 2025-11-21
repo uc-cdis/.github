@@ -22,7 +22,7 @@ git clone git@github.com:uc-cdis/.github.git ~/.gen3/.github
 
 Some linters require per-service/library configuration to properly format and parse. 
 
-### Edit the `~/.gen3/linters/.isort.cfg` 
+### Edit the `~/.gen3/.github/.github/linters/.isort.cfg` 
 
 Add the module name(s) as a comma-separated list to the bottom of the config. Example:
 
@@ -30,7 +30,7 @@ Add the module name(s) as a comma-separated list to the bottom of the config. Ex
 known_first_party=gen3discoveryai,anotherone
 ```
 
-### Edit the `~/.gen3/linters/.python-lint` 
+### Edit the `~/.gen3/.github/.github/.python-lint` 
 
 There's a utility to modify this appropriately. Make sure you're in your virtual env
 or the root of the repo you're trying to lint first.
