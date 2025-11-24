@@ -41,6 +41,7 @@ jobs:
         with:
           # We need the full history to merge unrelated histories
           fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN }}
 
       - name: Get default branch name
         id: vars
