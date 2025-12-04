@@ -35,6 +35,10 @@ on:
       TEST_LABELS:
         required: false
         type: string
+      AWS_ROLE_TO_ASSUME:
+        required: false
+        type: string
+        default: "arn:aws:iam::707767160287:role/github-action-role"
     secrets:
       CI_TEST_ORCID_USERID:
         required: true
@@ -254,7 +258,7 @@ jobs:
             if: ${{ env.SKIP_TESTS != 'true' }}
             uses: aws-actions/configure-aws-credentials@v3
             with:
-                role-to-assume: arn:aws:iam::707767160287:role/github-action-role
+                role-to-assume: ${{ inputs.AWS_ROLE_TO_ASSUME }}
                 role-session-name: GitHub_to_AWS_via_FederatedOIDC
                 aws-region: "us-east-1"
                 role-duration-seconds: 7200
