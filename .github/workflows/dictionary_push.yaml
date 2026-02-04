@@ -79,7 +79,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v6
       with:
-        python-version: 3.9
+        python-version: 3.13
     - name: Install AWS CLI
       uses: chrislennon/action-aws-cli@1.1
     - name: Install poetry

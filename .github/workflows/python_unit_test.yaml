@@ -28,6 +28,11 @@ on:
         required: false
         default: '3.9'
         type: string
+      poetry-version:
+        description: 'The Poetry package manager version to use. Defaults to latest'
+        required: false
+        default: ''
+        type: string
       run-coveralls:
         required: false
         default: false
@@ -100,9 +105,14 @@ jobs:
 
       - name: Install poetry
         # that is poetry's recommended way to install
+        # Empty POETRY_VERSION will get latest
         run: |
           pip install --upgrade pip
-          curl -sSL https://install.python-poetry.org | python -
+          if [ -n "${{ inputs.poetry-version }}" ]; then
+            curl -sSL https://install.python-poetry.org | POETRY_VERSION="${{ inputs.poetry-version }}" python -
+          else
+            curl -sSL https://install.python-poetry.org | python -
+          fi
           pip list
           poetry install -vv --all-extras --no-interaction
           poetry show
