@@ -14,6 +14,11 @@ name: Required Lint Check
 on:
   workflow_call:
     inputs:
+      poetry-version:
+        description: 'The Poetry package manager version to use. Defaults to latest'
+        required: false
+        default: ''
+        type: string
       python-version:
         description: 'The Python version to use and defaults to latest'
         required: false
@@ -28,18 +33,15 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
       - name: Set up python
         uses: actions/setup-python@v6
         with:
           python-version: ${{ inputs.python-version }}
-
-      - name: Checkout Code
-        uses: actions/checkout@v5
-        with:
-          # might need the full git history to get the
-          # list of files that changed across commits
-          fetch-depth: 0
-          persist-credentials: false
 
       - name: Checkout Another Repository
         uses: actions/checkout@v5
@@ -48,7 +50,6 @@ jobs:
           # TODO: Update
           ref: fix/linting
           persist-credentials: false
-          fetch-depth: 0
           sparse-checkout: |
             .github/linters
 
@@ -66,11 +67,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-poetry-
 
-      - name: Install poetry so virtual env has imports that pylint can check
+      - name: Install poetry
         # that is poetry's recommended way to install
+        # Empty POETRY_VERSION will get latest
         run: |
           pip install --upgrade pip
-          curl -sSL https://install.python-poetry.org | python -
+          if [ -n "${{ inputs.poetry-version }}" ]; then
+            curl -sSL https://install.python-poetry.org | POETRY_VERSION="${{ inputs.poetry-version }}" python -
+          else
+            curl -sSL https://install.python-poetry.org | python -
+          fi
           pip list
           poetry install -vv --all-extras --no-interaction
           poetry show
