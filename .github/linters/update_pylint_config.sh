@@ -15,9 +15,9 @@ fi
 
 echo
 echo "Updating $SCRIPT_DIR/.python-lint"
-echo "init-hook='import sys; sys.path.append(\".\"); sys.path.append(\"/tmp/lint\"); sys.path.append(\"$site_packages_folder\")'"
+echo "init-hook='import sys; sys.path.append(\"$site_packages_folder\")'"
 {
   echo "[MAIN]"
-  echo "init-hook='import sys; sys.path.append(\".\"); sys.path.append(\"/tmp/lint\"); sys.path.append(\"$site_packages_folder\")'"
+  echo "init-hook='import sys; sys.path.append(\"$site_packages_folder\")'"
   tail -n +3 $SCRIPT_DIR/.python-lint
 } > $SCRIPT_DIR/.python-lint.tmp && mv $SCRIPT_DIR/.python-lint.tmp $SCRIPT_DIR/.python-lint

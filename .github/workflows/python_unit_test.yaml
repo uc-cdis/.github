@@ -17,6 +17,12 @@ on:
         required: false
         default: 'tests/ci_commands_script.sh'
         type: string
+      # Note: run-tests-command is used only when a test-script is not provided
+      run-tests-command:
+        description: 'Command which runs tests'
+        required: false
+        default: 'poetry run pytest -vv'
+        type: string
       python-version:
         description: 'The Python version to use and defaults to latest'
         required: false
@@ -42,7 +48,7 @@ jobs:
         image: postgres:13
         env:
           # trust connections from other jobs in this workflow to access this service
-          # this simplifies the networking to this service 
+          # this simplifies the networking to this service
           POSTGRES_HOST_AUTH_METHOD: trust
         # Set health checks to wait until postgres has started
         options: >-
@@ -55,7 +61,7 @@ jobs:
           - 5432:5432
     steps:
       - name: Additional Postgres service configuration
-        # PostgreSQL 15 will revoke the CREATE permission from all users 
+        # PostgreSQL 15 will revoke the CREATE permission from all users
         # except a database owner from the public (or default) schema.
         # This is required by some services for db setup for testing, so grant
         # that permission to the postgres user now to hopefully avoid headache
@@ -65,7 +71,7 @@ jobs:
           echo "Versions"
           psql --version
           psql -U postgres -h localhost -d postgres -c 'SELECT version();'
-          
+
           echo "Grant admin privileges to postgres user"
           psql -U postgres -h localhost -d postgres -c 'GRANT CREATE ON SCHEMA public TO postgres;'
         env:
@@ -124,7 +130,7 @@ jobs:
             bash ${{ inputs.test-script }}
           else
             echo "Test script ${{ inputs.test-script }} not found. Falling back to default command"
-            poetry run pytest -vv
+            ${{ inputs.run-tests-command }}
           fi
         env:
             # The hostname used to communicate with the PostgreSQL service container
