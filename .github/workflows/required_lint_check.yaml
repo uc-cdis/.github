@@ -33,6 +33,11 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
+      - name: Post-Commit Pre-Commit Check to Ensure Pre-Commits Ran
+        # this ensures failure if local setup is misconfigured or webUI is used
+        # TODO: update to main/master
+        uses: uc-cdis/.github/.github/workflows/pre_commit.yaml@fix/linting
+
       - name: Checkout Code
         uses: actions/checkout@v5
         with:

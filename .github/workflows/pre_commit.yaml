@@ -1,0 +1,21 @@
+name: Post-Commit Check to Ensure Pre-Commits Ran
+
+# this ensures failure if local setup is misconfigured
+# or GH web UI is used, we still are alerted to failures.
+on:
+  workflow_call:
+    inputs:
+      COMMAND:
+        required: false
+        type: string
+        default: "pre-commit run -a"
+
+jobs:
+  run-pre-commit:
+    runs-on: ubuntu-latest
+    # don't run on main/master b/c it will fail due to
+    # not committing to such branches.
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: pre-commit run
+        run: ${{ inputs.COMMAND }}
