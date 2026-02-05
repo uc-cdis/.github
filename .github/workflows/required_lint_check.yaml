@@ -40,10 +40,10 @@ jobs:
           persist-credentials: false
           path: uc-cdis/.github
           sparse-checkout: |
-            linters
+            .github/linters
 
       - name: Display files
-        run: ls -aR uc-cdis/.github
+        run: ls -aR uc-cdis/.github/.github/
 
       - name: Checkout Code
         uses: actions/checkout@v5
@@ -89,12 +89,12 @@ jobs:
         run: echo "Cache miss, saving the cache"
 
       - name: Update pylint config with Python module path
-        working-directory: uc-cdis/.github/linters
+        working-directory: uc-cdis/.github/.github/linters
         run: bash update_pylint_config.sh
 
       - name: Cat file(s)
-        working-directory: uc-cdis/.github/linters
+        working-directory: uc-cdis/.github/.github/linters
         run: cat .python-lint
 
       - name: Lint Repo
-        run: pylint . --rcfile uc-cdis/.github/linters/.python-lint
+        run: pylint . --rcfile uc-cdis/.github/.github/linters/.python-lint
