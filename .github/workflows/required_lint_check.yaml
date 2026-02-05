@@ -97,4 +97,7 @@ jobs:
         run: cat .python-lint
 
       - name: Lint Repo
-        run: pylint . --rcfile uc-cdis/.github/.github/linters/.python-lint
+        run: |
+          pip install pylint
+          pip show pylint
+          pylint . --rcfile uc-cdis/.github/.github/linters/.python-lint
