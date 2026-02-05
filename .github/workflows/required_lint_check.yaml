@@ -31,17 +31,6 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v5
-        with:
-          persist-credentials: false
-          fetch-depth: 0
-
-      - name: Set up python
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ inputs.python-version }}
-
       - name: Checkout repo containing central linter config
         uses: actions/checkout@v5
         with:
@@ -52,6 +41,20 @@ jobs:
           path: uc-cdis/.github
           sparse-checkout: |
             linters
+
+      - name: Display files
+        run: ls -aR uc-cdis/.github
+
+      - name: Checkout Code
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Set up python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ inputs.python-version }}
 
       - name: Display files
         run: ls -aR
@@ -85,12 +88,13 @@ jobs:
         if: inputs.use-cache && steps.cache-poetry.outputs.cache-hit != 'true'
         run: echo "Cache miss, saving the cache"
 
-      - name: Use Python module path to update necessary linter configs
-        run: |
-          bash uc-cdis/.github/linters/udpate_pylint_config.sh
+      - name: Update pylint config with Python module path
+        working-directory: uc-cdis/.github/linters
+        run: bash update_pylint_config.sh
 
       - name: Cat file(s)
-        run: cat uc-cdis/.github/linters/.python-lint
+        working-directory: uc-cdis/.github/linters
+        run: cat .python-lint
 
       - name: Lint Repo
-        run: pylint .
+        run: pylint . --rcfile uc-cdis/.github/linters/.python-lint
