@@ -8,8 +8,12 @@ on:
       COMMAND:
         required: false
         type: string
-        default: "pre-commit run -a"
-
+        default: 'pre-commit run -a'
+      PYTHON_VERSION:
+        description: 'The Python version to use'
+        required: false
+        default: '3.13'
+        type: string
 jobs:
   run-pre-commit:
     runs-on: ubuntu-latest
@@ -22,6 +26,16 @@ jobs:
         github.ref != 'refs/heads/master'
       )
     steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ inputs.PYTHON_VERSION }}
+
       - name: python info
         run: python --version
       - name: pre-commit install
@@ -30,5 +44,6 @@ jobs:
         with:
           path: ~/.cache/pre-commit
           key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
+
       - name: pre-commit run
         run: ${{ inputs.COMMAND }}
