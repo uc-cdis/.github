@@ -15,7 +15,20 @@ jobs:
     runs-on: ubuntu-latest
     # don't run on main/master b/c it will fail due to
     # not committing to such branches.
-    if: github.event_name == 'pull_request'
+    if: |
+      (
+        github.event_name == 'push' &&
+        github.ref != 'refs/heads/main' &&
+        github.ref != 'refs/heads/master'
+      )
     steps:
+      - name: python info
+        run: python --version
+      - name: pre-commit install
+        run: python -m pip install pre-commit
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
       - name: pre-commit run
         run: ${{ inputs.COMMAND }}
