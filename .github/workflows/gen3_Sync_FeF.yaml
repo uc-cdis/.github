@@ -75,6 +75,7 @@ jobs:
           # This is the key step to meet the requirement.
           # After the merge (-X theirs) overwrote everything, we
           # explicitly restore our original custom files from our default branch.
+          git status
           git checkout ${{ env.DEFAULT_BRANCH }} -- config .env*
 
       - name: Commit changes
