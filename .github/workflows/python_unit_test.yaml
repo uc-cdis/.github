@@ -111,6 +111,12 @@ jobs:
           poetry install -vv --all-extras --no-interaction
           poetry show
 
+      - name: Print poetry installer error log
+        if: failure()
+        run: |
+          echo "=== Poetry installer error log ==="
+          cat /home/runner/work/my-repo/my-repo/poetry-installer-error-*.log || echo "No error log found"
+
       - name: Save poetry cache if cache miss
         if: inputs.use-cache && steps.cache-poetry.outputs.cache-hit != 'true'
         run: echo "Cache miss, saving the cache"
