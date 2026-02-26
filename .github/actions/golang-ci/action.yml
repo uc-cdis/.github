@@ -5,7 +5,7 @@ inputs:
   GO_VERSION:
     required: false
     type: string
-    default: "1.22"
+    default: "1.26"
   TESTS_LOCATION:
     required: false
     type: string
@@ -19,11 +19,11 @@ runs:
   using: "composite"
   steps:
     - name: Set up Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version: "${{ inputs.GO_VERSION }}"
     - name: Check out code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v6
     - name: Install dependencies
       run: |
         go mod download
@@ -34,15 +34,9 @@ runs:
         go test ${{ inputs.TESTS_LOCATION }} -v -coverpkg=${{ inputs.TESTS_LOCATION }} -race -covermode atomic -coverprofile=${{ inputs.COVERAGE_PROFILE_OUTPUT_LOCATION }}
       shell: bash
     - name: Lint source code
-      uses: golangci/golangci-lint-action@v6
+      uses: golangci/golangci-lint-action@v9
       with:
-        version: v1.62
         args: --timeout=5m
-        skip-cache: true
-    - name: Display lint results
-      run: golangci-lint run
-      if: always()
-      shell: bash
     - name: Install goveralls
       run: go install github.com/mattn/goveralls@latest
       shell: bash
