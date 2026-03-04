@@ -1,0 +1,49 @@
+name: Post-Commit Check to Ensure Pre-Commits Ran
+
+# this ensures failure if local setup is misconfigured
+# or GH web UI is used, we still are alerted to failures.
+on:
+  workflow_call:
+    inputs:
+      COMMAND:
+        required: false
+        type: string
+        default: 'pre-commit run -a'
+      PYTHON_VERSION:
+        description: 'The Python version to use'
+        required: false
+        default: '3.13'
+        type: string
+jobs:
+  run-pre-commit:
+    runs-on: ubuntu-latest
+    # don't run on main/master b/c it will fail due to
+    # not committing to such branches.
+    if: |
+      (
+        github.event_name == 'push' &&
+        github.ref != 'refs/heads/main' &&
+        github.ref != 'refs/heads/master'
+      )
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ inputs.PYTHON_VERSION }}
+
+      - name: python info
+        run: python --version
+      - name: pre-commit install
+        run: python -m pip install pre-commit
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: pre-commit run
+        run: ${{ inputs.COMMAND }}
