@@ -58,7 +58,7 @@ jobs:
           tool: just@${{ inputs.JUST_VERSION }}
 
       - name: pre-commit install
-        run: python -m pip install pre-commi
+        run: python -m pip install pre-commit
 
       - uses: actions/cache@v4
         with:
