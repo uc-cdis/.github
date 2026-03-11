@@ -1,13 +1,20 @@
 ---
 name: Required Lint Checks
-# this is intended to block on a limited set of required lint to remove
+# Intended to block on a limited set of required lint to remove
 #
 # The required lint check, is, well, required to pass and WILL block merges and builds,
 # but is opinionated and slim (there are only a few things we error on).
 #
+# Flexible to support EITHER uv or poetry package managers.
+#
 on:
   workflow_call:
     inputs:
+      uv-version:
+        description: 'The uv package manager version to use. Defaults to latest'
+        required: false
+        default: ''
+        type: string
       poetry-version:
         description: 'The Poetry package manager version to use. Defaults to latest'
         required: false
@@ -61,7 +68,7 @@ jobs:
 
       # cache the dependencies based on a hash of the lock file
       - name: Poetry cache
-        if: inputs.use-cache
+        if: inputs.use-cache && inputs.uv-version == ''
         id: cache-poetry
         uses: actions/cache@v3
         with:
@@ -70,7 +77,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-poetry-
 
+      - name: uv cache
+        if: inputs.use-cache && inputs.uv-version != ''
+        id: cache-uv
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/uv
+          key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+
       - name: Install poetry
+        if: inputs.poetry-version != '' && inputs.uv-version == ''
         # that is poetry's recommended way to install
         # Empty POETRY_VERSION will get latest
         run: |
@@ -84,8 +102,15 @@ jobs:
           poetry install -vv --all-extras --no-interaction
           poetry show
 
+      - name: Install uv
+        if: inputs.uv-version != ''
+        run: |
+          pip install --upgrade pip
+          pip list
+          curl -LsSf https://astral.sh/uv/${{ inputs.uv-version }}/install.sh | sh
+
       - name: Save poetry cache if cache miss
-        if: inputs.use-cache && steps.cache-poetry.outputs.cache-hit != 'true'
+        if: inputs.use-cache && inputs.uv-version == ''
         run: echo "Cache miss, saving the cache"
 
       - name: Update pylint config with Python module path

@@ -5,6 +5,14 @@ name: Post-Commit Check to Ensure Pre-Commits Ran
 on:
   workflow_call:
     inputs:
+      UV_VERSION:
+        required: false
+        type: string
+        default: ''
+      JUST_VERSION:
+        required: false
+        type: string
+        default: ''
       COMMAND:
         required: false
         type: string
@@ -38,8 +46,21 @@ jobs:
 
       - name: python info
         run: python --version
+
+      - name: Install uv
+        if: inputs.UV_VERSION != ''
+        run: |
+          curl -LsSf https://astral.sh/uv/${{ inputs.UV_VERSION }}/install.sh | sh
+
+      - uses: extractions/setup-just@v3
+        if: inputs.JUST_VERSION != ''
+        name: Install just
+        with:
+          just-version: ${{ inputs.JUST_VERSION }}
+
       - name: pre-commit install
-        run: python -m pip install pre-commit
+        run: python -m pip install pre-commi
+
       - uses: actions/cache@v4
         with:
           path: ~/.cache/pre-commit
