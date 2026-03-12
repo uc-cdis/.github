@@ -33,6 +33,15 @@ on:
         required: false
         default: ''
         type: string
+      uv-version:
+        description: 'The uv package manager version to use. Providing this will prefer uv over poetry'
+        required: false
+        default: ''
+        type: string
+      just-version:
+        required: false
+        type: string
+        default: ''
       run-coveralls:
         required: false
         default: false
@@ -94,7 +103,7 @@ jobs:
 
       # cache the dependencies based on a hash of the lock file
       - name: Poetry cache
-        if: inputs.use-cache
+        if: inputs.use-cache && inputs.uv-version == ''
         id: cache-poetry
         uses: actions/cache@v3
         with:
@@ -103,7 +112,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-poetry-
 
+      - name: uv cache
+        if: inputs.use-cache && inputs.uv-version != ''
+        id: cache-uv
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/uv
+          key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+
       - name: Install poetry
+        if: inputs.uv-version == ''
         # that is poetry's recommended way to install
         # Empty POETRY_VERSION will get latest
         run: |
@@ -117,8 +137,22 @@ jobs:
           poetry install -vv --all-extras --no-interaction
           poetry show
 
+      - name: Install uv
+        if: inputs.uv-version != ''
+        run: |
+          curl -LsSf https://astral.sh/uv/${{ inputs.uv-version }}/install.sh | sh
+
+      - uses: taiki-e/install-action@v2
+        if: inputs.just-version != ''
+        with:
+          tool: just@${{ inputs.just-version }}
+
       - name: Save poetry cache if cache miss
-        if: inputs.use-cache && steps.cache-poetry.outputs.cache-hit != 'true'
+        if: inputs.uv-version == '' && inputs.use-cache && steps.cache-poetry.outputs.cache-hit != 'true'
+        run: echo "Cache miss, saving the cache"
+
+      - name: Save uv cache if cache miss
+        if: inputs.uv-version != '' && inputs.use-cache && steps.cache-uv.outputs.cache-hit != 'true'
         run: echo "Cache miss, saving the cache"
 
       - name: Run the service-specific setup script, if it exists
