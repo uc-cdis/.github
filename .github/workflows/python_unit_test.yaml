@@ -92,10 +92,12 @@ jobs:
             # The hostname used to communicate with the PostgreSQL service container
             POSTGRES_HOST: localhost
             POSTGRES_PORT: 5432
+
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
+
       - name: Set up python
         uses: actions/setup-python@v6
         with:

@@ -37,7 +37,7 @@ jobs:
           echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           # We need the full history to merge unrelated histories
           fetch-depth: 0
