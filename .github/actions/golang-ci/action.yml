@@ -14,6 +14,10 @@ inputs:
     required: false
     type: string
     default: "./profile.cov"
+  LINT_CODE:
+    required: false
+    type: bool
+    default: true
 
 runs:
   using: "composite"
@@ -34,6 +38,7 @@ runs:
         go test ${{ inputs.TESTS_LOCATION }} -v -coverpkg=${{ inputs.TESTS_LOCATION }} -race -covermode atomic -coverprofile=${{ inputs.COVERAGE_PROFILE_OUTPUT_LOCATION }}
       shell: bash
     - name: Lint source code
+      if: ${{ inputs.LINT_CODE }}
       uses: golangci/golangci-lint-action@v9
       with:
         args: --timeout=5m
