@@ -37,6 +37,7 @@ runs:
       uses: golangci/golangci-lint-action@v9
       with:
         args: --timeout=5m
+        only-new-issues: true
     - name: Install goveralls
       run: go install github.com/mattn/goveralls@latest
       shell: bash
