@@ -32,7 +32,7 @@ on:
 jobs:
   post-commit:
     name: Post-Commit Validation of Pre-Commit Checks
-    uses: uc-cdis/.github/.github/workflows/pre_commit.yaml@fix/linting
+    uses: uc-cdis/.github/.github/workflows/pre_commit.yaml@master
 
   lint:
     name: Lint
