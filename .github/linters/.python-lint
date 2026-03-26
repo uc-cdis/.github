@@ -1,5 +1,5 @@
 [MAIN]
-init-hook='import sys; sys.path.append("."); sys.path.append("/tmp/lint");'
+init-hook='import sys; sys.path.append(".");'
 
 # Analyse import fallback blocks. This can be used to support both Python 2 and
 # 3 compatible code, which means that the block might have code that exists
@@ -46,6 +46,7 @@ enable=missing-function-docstring,
        invalid-name,
        protected-access,
        undefined-variable,
+       import-error,
 
        #### NEW ERRORS YOU WANT TO FAIL ON? ADD ABOVE THIS
 
@@ -57,6 +58,7 @@ fail-on=missing-function-docstring,
         invalid-name,
         protected-access,
         undefined-variable,
+        import-error,
 
         #### NEW ERRORS YOU WANT TO FAIL ON? ADD ABOVE THIS
 
@@ -123,10 +125,6 @@ recursive=no
 # directory used to determine a package namespace for modules located under the
 # source root.
 source-roots=
-
-# When enabled, pylint would attempt to guess common misconfiguration and emit
-# user-friendly hints instead of false-positive error messages.
-suggestion-mode=yes
 
 # Allow loading of arbitrary C extensions. Extensions are imported into the
 # active Python interpreter and may run arbitrary code.
@@ -476,9 +474,6 @@ disable=all
 #           should go
 #    missing-class-docstring
 #           while nice to have, this isn't a deal breaker
-#    import-error
-#           can't figure out how to correctly get packages to super-linter
-#           so this is spamming a ton of false positives. disable for now
 # disable=raw-checker-failed,
 #         bad-inline-option,
 #         locally-disabled,
@@ -498,8 +493,6 @@ disable=all
 #         too-many-locals,
 #         fixme,
 #         missing-class-docstring,
-#         # TODO: perhaps enable this in the future
-#         import-error
 
 [METHOD_ARGS]
 

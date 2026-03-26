@@ -17,6 +17,12 @@ on:
         required: false
         default: 'tests/ci_commands_script.sh'
         type: string
+      # Note: run-tests-command is used only when a test-script is not provided
+      run-tests-command:
+        description: 'Command which runs tests'
+        required: false
+        default: 'poetry run pytest -vv'
+        type: string
       python-version:
         description: 'The Python version to use and defaults to latest'
         required: false
@@ -27,6 +33,15 @@ on:
         required: false
         default: ''
         type: string
+      uv-version:
+        description: 'The uv package manager version to use. Providing this will prefer uv over poetry'
+        required: false
+        default: ''
+        type: string
+      just-version:
+        required: false
+        type: string
+        default: ''
       run-coveralls:
         required: false
         default: false
@@ -47,7 +62,7 @@ jobs:
         image: postgres:13
         env:
           # trust connections from other jobs in this workflow to access this service
-          # this simplifies the networking to this service 
+          # this simplifies the networking to this service
           POSTGRES_HOST_AUTH_METHOD: trust
         # Set health checks to wait until postgres has started
         options: >-
@@ -60,7 +75,7 @@ jobs:
           - 5432:5432
     steps:
       - name: Additional Postgres service configuration
-        # PostgreSQL 15 will revoke the CREATE permission from all users 
+        # PostgreSQL 15 will revoke the CREATE permission from all users
         # except a database owner from the public (or default) schema.
         # This is required by some services for db setup for testing, so grant
         # that permission to the postgres user now to hopefully avoid headache
@@ -70,17 +85,19 @@ jobs:
           echo "Versions"
           psql --version
           psql -U postgres -h localhost -d postgres -c 'SELECT version();'
-          
+
           echo "Grant admin privileges to postgres user"
           psql -U postgres -h localhost -d postgres -c 'GRANT CREATE ON SCHEMA public TO postgres;'
         env:
             # The hostname used to communicate with the PostgreSQL service container
             POSTGRES_HOST: localhost
             POSTGRES_PORT: 5432
+
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
+
       - name: Set up python
         uses: actions/setup-python@v6
         with:
@@ -88,7 +105,7 @@ jobs:
 
       # cache the dependencies based on a hash of the lock file
       - name: Poetry cache
-        if: inputs.use-cache
+        if: inputs.use-cache && inputs.uv-version == ''
         id: cache-poetry
         uses: actions/cache@v3
         with:
@@ -97,7 +114,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-poetry-
 
+      - name: uv cache
+        if: inputs.use-cache && inputs.uv-version != ''
+        id: cache-uv
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/uv
+          key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+
       - name: Install poetry
+        if: inputs.uv-version == ''
         # that is poetry's recommended way to install
         # Empty POETRY_VERSION will get latest
         run: |
@@ -106,13 +134,27 @@ jobs:
             curl -sSL https://install.python-poetry.org | POETRY_VERSION="${{ inputs.poetry-version }}" python -
           else
             curl -sSL https://install.python-poetry.org | python -
-          fi          
+          fi
           pip list
           poetry install -vv --all-extras --no-interaction
           poetry show
 
+      - name: Install uv
+        if: inputs.uv-version != ''
+        run: |
+          curl -LsSf https://astral.sh/uv/${{ inputs.uv-version }}/install.sh | sh
+
+      - uses: taiki-e/install-action@v2
+        if: inputs.just-version != ''
+        with:
+          tool: just@${{ inputs.just-version }}
+
       - name: Save poetry cache if cache miss
-        if: inputs.use-cache && steps.cache-poetry.outputs.cache-hit != 'true'
+        if: inputs.uv-version == '' && inputs.use-cache && steps.cache-poetry.outputs.cache-hit != 'true'
+        run: echo "Cache miss, saving the cache"
+
+      - name: Save uv cache if cache miss
+        if: inputs.uv-version != '' && inputs.use-cache && steps.cache-uv.outputs.cache-hit != 'true'
         run: echo "Cache miss, saving the cache"
 
       - name: Run the service-specific setup script, if it exists
@@ -134,7 +176,7 @@ jobs:
             bash ${{ inputs.test-script }}
           else
             echo "Test script ${{ inputs.test-script }} not found. Falling back to default command"
-            poetry run pytest -vv
+            ${{ inputs.run-tests-command }}
           fi
         env:
             # The hostname used to communicate with the PostgreSQL service container

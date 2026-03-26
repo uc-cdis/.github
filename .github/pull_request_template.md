@@ -10,7 +10,7 @@ Internal to CTDS: Add your JIRA ticket number to the PR title and make sure you 
 - Update the documentation, or justify if not needed.
 -->
 
-Link to JIRA ticket if there is one: 
+Link to JIRA ticket if there is one:
 
 ### New Features
 
