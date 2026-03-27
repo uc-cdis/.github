@@ -131,7 +131,7 @@ jobs:
           # Checkout current repo
           - name: Checkout current repo
             if: ${{ env.SKIP_TESTS != 'true' }}
-            uses: actions/checkout@v4
+            uses: actions/checkout@v6
 
 
           # Skip tests when there are only markdown files
@@ -152,7 +152,7 @@ jobs:
           # Checkout master branch of gen3-code-vigil when another repo is under test
           - name: Checkout integration test code
             if: ${{ env.SKIP_TESTS != 'true' && github.event.repository.name  != 'gen3-code-vigil' }}
-            uses: actions/checkout@v4
+            uses: actions/checkout@
             with:
               repository: uc-cdis/gen3-code-vigil
               ref: ${{ inputs.TEST_REPO_BRANCH }}
@@ -161,7 +161,7 @@ jobs:
           # Checkout gen3-gitops repo
           - name: Checkout gen3-gitops repo
             if: ${{ env.SKIP_TESTS != 'true' }}
-            uses: actions/checkout@v4
+            uses: actions/checkout@v6
             with:
               repository: uc-cdis/gen3-gitops
               ref: 'master'
@@ -189,7 +189,7 @@ jobs:
           # allure report generation needs node
           - name: Set up node
             if: ${{ env.SKIP_TESTS != 'true' }}
-            uses: actions/setup-node@v4
+            uses: actions/setup-node@v6
             with:
               node-version: 20
 
@@ -203,7 +203,7 @@ jobs:
           # Setup helm
           - name: Set Up Helm
             if: ${{ env.SKIP_TESTS != 'true' }}
-            uses: azure/setup-helm@v4.3.0
+            uses: azure/setup-helm@v6.3.0
             with:
               version: latest
 
@@ -228,7 +228,7 @@ jobs:
           - name: Install dependencies
             if: ${{ env.SKIP_TESTS != 'true' }}
             env:
-              YQ_VERSION: v4.45.2
+              YQ_VERSION: v6.45.2
               YQ_BINARY: yq_linux_amd64
             run: |
               sudo rm -f /etc/apt/sources.list.d/github_git-lfs.list
