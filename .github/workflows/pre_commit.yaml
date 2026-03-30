@@ -5,6 +5,14 @@ name: Post-Commit Check to Ensure Pre-Commits Ran
 on:
   workflow_call:
     inputs:
+      UV_VERSION:
+        required: false
+        type: string
+        default: ''
+      JUST_VERSION:
+        required: false
+        type: string
+        default: ''
       COMMAND:
         required: false
         type: string
@@ -27,7 +35,7 @@ jobs:
       )
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
 
@@ -38,8 +46,20 @@ jobs:
 
       - name: python info
         run: python --version
+
+      - name: Install uv
+        if: inputs.UV_VERSION != ''
+        run: |
+          curl -LsSf https://astral.sh/uv/${{ inputs.UV_VERSION }}/install.sh | sh
+
+      - uses: taiki-e/install-action@v2
+        if: inputs.JUST_VERSION != ''
+        with:
+          tool: just@${{ inputs.JUST_VERSION }}
+
       - name: pre-commit install
         run: python -m pip install pre-commit
+
       - uses: actions/cache@v4
         with:
           path: ~/.cache/pre-commit

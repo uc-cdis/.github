@@ -37,10 +37,13 @@ jobs:
           echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           # We need the full history to merge unrelated histories
           fetch-depth: 0
+          # Checking out the default branch allows us to trigger this workflow from a different branch
+          # while still running the sync from the default branch
+          ref: ${{ github.event.repository.default_branch }}
           token: ${{ secrets.GH_TOKEN }}
 
       - name: Get default branch name
@@ -72,10 +75,12 @@ jobs:
 
       - name: Restore custom files
         run: |
-          # This is the key step to meet the requirement.
-          # After the merge (-X theirs) overwrote everything, we
+          # This is a key step: after the merge (-X theirs) overwrote everything, we
           # explicitly restore our original custom files from our default branch.
-          git checkout ${{ env.DEFAULT_BRANCH }} -- config .env*
+          # The syntax below:
+          # - leaves our custom config and .env files unchanged
+          # - adds any new config and .env files that were added uptream
+          git ls-tree -r --name-only ${{ env.DEFAULT_BRANCH }} config .env* | xargs git checkout origin/${{ env.DEFAULT_BRANCH }}
 
       - name: Commit changes
         id: commit

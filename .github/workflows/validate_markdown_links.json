@@ -5,6 +5,10 @@
             "pattern": "^(?!http).*#.+"
         },
         {
+            "description": "Ignore common local http domains",
+            "pattern": "^(?:http:\/\/)?(?:localhost|0\.0\.0\.0|127\.0\.0\.1)(?::\d+)?$"
+        },
+        {
             "description": "This link initially returns a 403 to prevent access to bots. Ignoring this to prevent the workflow from failing.",
             "pattern": "https://valentina-db.com/en/all-downloads/vstudio"
         }

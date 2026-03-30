@@ -23,7 +23,7 @@ git clone git@github.com:uc-cdis/.github.git ~/.gen3/.github
 There's a utility to modify this appropriately so it understands the top
 level packages for the service/library you're working on. Make sure you're in your virtual env or the root of the repo you're trying to lint first and then use the utility.
 
-> Ensure you've run `poetry install` before this so your virtual env exists
+> Ensure you've run `poetry install` (or `uv sync`) before this so your virtual env exists
 
 ```bash
 cd repos/gen3-discovery-ai  # a repo you are working on and want to lint
