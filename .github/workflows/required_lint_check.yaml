@@ -25,7 +25,7 @@ on:
 jobs:
   post-commit:
     name: Post-Commit Validation of Pre-Commit Checks
-    uses: uc-cdis/.github/.github/workflows/pre_commit.yaml@fix/linting
+    uses: uc-cdis/.github/.github/workflows/pre_commit.yaml@master
 
   lint:
     name: Lint
@@ -41,8 +41,6 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: uc-cdis/.github
-          # TODO: Update
-          ref: fix/linting
           persist-credentials: false
           path: uc-cdis/.github
           sparse-checkout: |
