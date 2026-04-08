@@ -533,14 +533,14 @@ jobs:
                   echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/gh_action_logs.txt)" >> output/report.md
                 fi
               fi
-              if [ "${{ steps.upload_analyze_failure_file_logs.outcome }}" == "success" ]; then
-                if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
-                  DATE=$(date +%Y%m%d)
-                  echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt)" >> output/report.md
-                else
-                  echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt)" >> output/report.md
-                fi
-              fi
+              # if [ "${{ steps.upload_analyze_failure_file_logs.outcome }}" == "success" ]; then
+              #   if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
+              #     DATE=$(date +%Y%m%d)
+              #     echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt)" >> output/report.md
+              #   else
+              #     echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt)" >> output/report.md
+              #   fi
+              # fi
 
           - name: Render report to the PR
             id: publish_md_report
