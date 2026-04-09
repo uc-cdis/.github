@@ -447,7 +447,7 @@ jobs:
 
           - name: Generate markdown report
             id: generate_md_report
-            if: ${{ env.SKIP_TESTS != 'true' && steps.upload_files_to_s3.outcome == 'success' }}
+            if: ${{ env.SKIP_TESTS != 'true' }}
             continue-on-error: true
             # It is possible for env is prepped but tests error out, the pod logs will help in debugging env issues
             run: |
