@@ -489,7 +489,7 @@ jobs:
 
           - name: Render report to the PR
             id: publish_md_report
-            if: ${{ env.SKIP_TESTS != 'true' && github.event_name == 'pull_request' && steps.upload_files_to_s3.outcome == 'success' }}
+            if: ${{ env.SKIP_TESTS != 'true' && github.event_name == 'pull_request' && steps.generate_md_report.outcome == 'success' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
             run: gh pr comment $PR_NUM --body-file output/report.md -R $REPO_FN
             env:
