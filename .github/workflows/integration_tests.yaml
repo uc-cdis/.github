@@ -457,16 +457,18 @@ jobs:
                   touch output/report.md
                 fi
                 if [[ -n "$FAILURE_PODS" ]]; then
-                  {
-                    echo "PR_ERROR_MSG<<EOF"
-                    echo "Failed to Prepare CI environment."
-                    echo ""
-                    echo "The following pods are not in healthy state:"
-                    echo "$FAILURE_PODS"
-                    echo "EOF"
-                  } >> "$GITHUB_ENV"
+                    PR_ERROR_MSG="Failed to Prepare CI environment.
+
+                    The following pods are not in healthy state:
+                    $FAILURE_PODS"
+
+                    {
+                        echo "PR_ERROR_MSG<<EOF"
+                        echo "$PR_ERROR_MSG"
+                        echo "EOF"
+                    } >> "$GITHUB_ENV"
                 fi
-                echo -e "\n${{ env.PR_ERROR_MSG }}" >> output/report.md
+                echo -e "\n$PR_ERROR_MSG" >> output/report.md
               fi
               if [ "${{ steps.upload_files_to_s3.outcome }}" == "success" ]; then
                 if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
