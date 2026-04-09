@@ -207,22 +207,6 @@ jobs:
             with:
               version: latest
 
-          # # Setup GCP
-          # - name: 'Authenticate with GCP'
-          #   uses: 'google-github-actions/auth@v2'
-          #   with:
-          #     workload_identity_provider: 'projects/397853036191/locations/global/workloadIdentityPools/github-helm-ci-identity-pool/providers/github-provider'
-          #     service_account: 'gh-actions-sa@dcf-integration.iam.gserviceaccount.com'
-
-          # - name: 'Set up Cloud SDK'
-          #   uses: 'google-github-actions/setup-gcloud@v2'
-          #   with:
-          #     version: '>= 363.0.0'
-
-          # - name: 'Use gcloud CLI'
-          #   run: 'gcloud info'
-
-
           # Install gen3-integration-tests dependencies
           # wamerican: data-simulator needs "/usr/share/dict/words" to generate data that isn't random strings
           - name: Install dependencies
@@ -349,22 +333,6 @@ jobs:
                 exit 1
               fi
 
-          - name: Check for crashloop pods from Prepare CI environment
-            id: check_crashloop_pods
-            if: ${{ env.SKIP_TESTS != 'true' && steps.prep_ci_env.outcome != 'success' }}
-            continue-on-error: true  # if this fails, we still need to run clean-up steps1
-            run: |
-              if [[ -n "$FAILURE_PODS" ]]; then
-                  {
-                    echo "PR_ERROR_MSG<<EOF"
-                    echo "Failed to Prepare CI environment."
-                    echo ""
-                    echo "The following pods are not in healthy state:"
-                    echo "$FAILURE_PODS"
-                    echo "EOF"
-                  } >> "$GITHUB_ENV"
-              fi
-
           # This is used for running specific test suites by labeling the PR with the test class
           # Multiple suites can be executed by adding multiple labels
           - name: Get test labels
@@ -421,12 +389,6 @@ jobs:
                 echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
               fi
 
-          # - name: Helm uninstall environment
-          #   id: helm_uninstall_env
-          #   continue-on-error: true  # if this fails, we still need to run clean-up steps
-          #   run: |
-          #     helm uninstall $NAMESPACE -n $NAMESPACE
-
           - name: Merge report.md if failed tests were rerun
             id: merge_report_md_on_rerun
             if: ${{ env.SKIP_TESTS != 'true' && env.FAILED_TEST_SUITES != '' }}
@@ -459,59 +421,57 @@ jobs:
                 fi
               fi
 
-          - name: Upload allure report to S3
-            id: upload_allure_report
+          - name: Upload files to S3
+            id: upload_files_to_s3
             if: ${{ env.SKIP_TESTS != 'true' && steps.generate_allure_report.outcome == 'success' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
             run: |
-              echo -e "\n\n******* Upload reports to S3 *******" >> logs/gh_action_logs.txt
+              echo -e "\n\n******* Upload reports/gh action logs to S3 *******" >> logs/gh_action_logs.txt
               if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
                 DATE=$(date +%Y%m%d)
                 aws s3 sync ./allure-report s3://ci-allure-reports/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM >> logs/gh_action_logs.txt 2>&1
                 if [ -n "$FAILED_TEST_SUITES" ]; then
                   aws s3 sync ./rerun-allure-report s3://ci-allure-reports/nightly-run-$CI_ENV/$DATE-rerun/$RUN_NUM/$ATTEMPT_NUM >> logs/gh_action_logs.txt 2>&1
                 fi
+                aws s3 cp logs/gh_action_logs.txt s3://ci-allure-reports/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM/gh_action_logs.txt >> logs/gh_action_logs.txt 2>&1
               else
                 aws s3 sync ./allure-report s3://ci-allure-reports/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM >> logs/gh_action_logs.txt 2>&1
                 if [ -n "$FAILED_TEST_SUITES" ]; then
                   aws s3 sync ./rerun-allure-report s3://ci-allure-reports/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM-rerun >> logs/gh_action_logs.txt 2>&1
                 fi
-              fi
-              if [ $? -ne 0 ]; then
-                echo "PR_ERROR_MSG=Failed to upload allure report to s3 bucket" >> $GITHUB_ENV
-              fi
-
-          - name: Upload logs to S3
-            id: upload_gh_action_logs
-            if: ${{ env.SKIP_TESTS != 'true' && (steps.prep_ci_env.outcome == 'success' || steps.prep_ci_env.outcome == 'failure') }}
-            continue-on-error: true  # if this fails, we still need to run clean-up steps
-            run: |
-              echo -e "\n\n******** Upload GH action logs to S3 ********" >> logs/gh_action_logs.txt
-              if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
-                DATE=$(date +%Y%m%d)
-                aws s3 cp logs/gh_action_logs.txt s3://ci-allure-reports/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM/gh_action_logs.txt >> logs/gh_action_logs.txt 2>&1
-              else
                 aws s3 cp logs/gh_action_logs.txt s3://ci-allure-reports/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/gh_action_logs.txt >> logs/gh_action_logs.txt 2>&1
               fi
               if [ $? -ne 0 ]; then
-                echo "PR_ERROR_MSG=Failed to upload allure report to s3 bucket" >> $GITHUB_ENV
+                echo "PR_ERROR_MSG=Failed to upload files to s3 bucket" >> $GITHUB_ENV
               fi
-
 
           - name: Generate markdown report
             id: generate_md_report
-            if: ${{ env.SKIP_TESTS != 'true' && (steps.upload_allure_report.outcome == 'success' || steps.upload_gh_action_logs.outcome == 'success') }}
+            if: ${{ env.SKIP_TESTS != 'true' }}
             continue-on-error: true
             # It is possible for env is prepped but tests error out, the pod logs will help in debugging env issues
             run: |
-              if [ -n "${{ env.PR_ERROR_MSG }}" ]; then
+              if [ -n "$PR_ERROR_MSG" ]; then
                 if [ ! -f output/report.md ]; then
                   mkdir output
                   touch output/report.md
                 fi
-                echo -e "\n${{ env.PR_ERROR_MSG }}" >> output/report.md
+                if [[ -n "$FAILURE_PODS" ]]; then
+                    PR_ERROR_MSG="Failed to Prepare CI environment.
+
+                    The following pods are not in healthy state:
+                    $FAILURE_PODS"
+
+                    {
+                        echo "PR_ERROR_MSG<<EOF"
+                        echo "$PR_ERROR_MSG"
+                        echo "EOF"
+                    } >> "$GITHUB_ENV"
+                fi
+                echo -e "\n$PR_ERROR_MSG" >> output/report.md
               fi
-              if [ "${{ steps.upload_allure_report.outcome }}" == "success" ]; then
+              DATE=$(date +%Y%m%d)
+              if [ "${{ steps.upload_files_to_s3.outcome }}" == "success" ]; then
                 if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
                   DATE=$(date +%Y%m%d)
                   echo -e "\nPlease find the detailed integration test report [here](https://allure.ci.planx-pla.net/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM/index.html)" >> output/report.md
@@ -525,26 +485,15 @@ jobs:
                   fi
                 fi
               fi
-              if [ "${{ steps.upload_gh_action_logs.outcome }}" == "success" ]; then
-                if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
-                  DATE=$(date +%Y%m%d)
-                  echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM/gh_action_logs.txt)" >> output/report.md
-                else
-                  echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/gh_action_logs.txt)" >> output/report.md
-                fi
+              if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
+                echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM/gh_action_logs.txt)" >> output/report.md
+              else
+                echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/gh_action_logs.txt)" >> output/report.md
               fi
-              # if [ "${{ steps.upload_analyze_failure_file_logs.outcome }}" == "success" ]; then
-              #   if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
-              #     DATE=$(date +%Y%m%d)
-              #     echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt)" >> output/report.md
-              #   else
-              #     echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt)" >> output/report.md
-              #   fi
-              # fi
 
           - name: Render report to the PR
             id: publish_md_report
-            if: ${{ env.SKIP_TESTS != 'true' && github.event_name == 'pull_request' && (steps.upload_allure_report.outcome == 'success' || steps.upload_gh_action_logs.outcome == 'success') }}
+            if: ${{ env.SKIP_TESTS != 'true' && github.event_name == 'pull_request' && steps.generate_md_report.outcome == 'success' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
             run: gh pr comment $PR_NUM --body-file output/report.md -R $REPO_FN
             env:
@@ -552,7 +501,7 @@ jobs:
 
           - name: Generate Slack report
             id: generate_slack_report
-            if: ${{ env.SKIP_TESTS != 'true' && (steps.upload_allure_report.outcome == 'success' || steps.upload_gh_action_logs.outcome == 'success') }}
+            if: ${{ env.SKIP_TESTS != 'true' && steps.publish_md_report.outcome == 'success' }}
             continue-on-error: true # if this fails, we still need to run clean-up steps
             run: poetry run python -m gen3_ci.scripts.generate_slack_report
 
@@ -574,13 +523,6 @@ jobs:
             run: |
               echo -e "\n\n****** Running Analyze Failures using AI agent ******" >>  logs/gh_action_logs.txt
               poetry run python -m gen3_ci.scripts.analyze_failed_tests_using_ai_agent >> logs/gh_action_logs.txt 2>&1
-
-          - name: Upload failure analysis to S3
-            id: upload_analyze_failure_file
-            if: ${{ env.SKIP_TESTS != 'true' && steps.analyze_failures_using_ai_agent.outcome == 'success' }}
-            continue-on-error: true  # if this fails, we still need to run clean-up steps
-            run: |
-              echo -e "\n\n******** Upload analyze failure file to S3 ********" >> logs/gh_action_logs.txt
               if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
                 DATE=$(date +%Y%m%d)
                 aws s3 cp logs/failure_analysis.txt s3://ci-allure-reports/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt >> logs/gh_action_logs.txt 2>&1
@@ -588,8 +530,21 @@ jobs:
                 aws s3 cp logs/failure_analysis.txt s3://ci-allure-reports/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt >> logs/gh_action_logs.txt 2>&1
               fi
               if [ $? -ne 0 ]; then
-                echo "PR_ERROR_MSG=Failed to upload failure analysis file to s3 bucket" >> $GITHUB_ENV
+                echo "PR_ERROR_MSG=Failed to run analyze failures using ai agent step" >> $GITHUB_ENV
               fi
+            env:
+              THREAD_TS: ${{ steps.slack_notify.outputs.ts }}
+
+          - name: Publish test anaylsis on same slack thread
+            id: publish_test_analysis
+            if: ${{ env.SKIP_TESTS != 'true' && steps.analyze_failures_using_ai_agent.outcome == 'success' }}
+            continue-on-error: true  # if this fails, we still need to run clean-up steps
+            uses: slackapi/slack-github-action@v2.0.0
+            with:
+              method: chat.postMessage
+              token: ${{ secrets.CI_SLACK_BOT_TOKEN }}
+              payload-file-path: "./${{ inputs.WORKING_DIR }}/test_analysis_slack_report.json"
+              payload-templated: true
 
           - name: Mark workflow as failed for unsuccessful test runs
             if: ${{ env.SKIP_TESTS != 'true' && steps.run_service_tests.outcome != 'success' && steps.run_tests.outcome != 'success' && steps.rerun_failed_tests.outcome != 'success' }}
