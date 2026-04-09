@@ -487,7 +487,7 @@ jobs:
               fi
               if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
                 echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM/gh_action_logs.txt)" >> output/report.md
-              else:
+              else
                 echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/gh_action_logs.txt)" >> output/report.md
               fi
 
@@ -501,7 +501,7 @@ jobs:
 
           - name: Generate Slack report
             id: generate_slack_report
-            if: ${{ env.SKIP_TESTS != 'true' && steps.upload_files_to_s3.outcome == 'success' }}
+            if: ${{ env.SKIP_TESTS != 'true' && steps.publish_md_report.outcome == 'success' }}
             continue-on-error: true # if this fails, we still need to run clean-up steps
             run: poetry run python -m gen3_ci.scripts.generate_slack_report
 
