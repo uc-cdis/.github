@@ -451,7 +451,7 @@ jobs:
             continue-on-error: true
             # It is possible for env is prepped but tests error out, the pod logs will help in debugging env issues
             run: |
-              if [ -n "${{ env.PR_ERROR_MSG }}" ]; then
+              if [ -n "$PR_ERROR_MSG" ]; then
                 if [ ! -f output/report.md ]; then
                   mkdir output
                   touch output/report.md
