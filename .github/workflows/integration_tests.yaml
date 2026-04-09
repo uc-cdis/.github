@@ -470,6 +470,7 @@ jobs:
                 fi
                 echo -e "\n$PR_ERROR_MSG" >> output/report.md
               fi
+              DATE=$(date +%Y%m%d)
               if [ "${{ steps.upload_files_to_s3.outcome }}" == "success" ]; then
                 if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
                   DATE=$(date +%Y%m%d)
@@ -477,14 +478,17 @@ jobs:
                   if [ -n "$FAILED_TEST_SUITES" ]; then
                     echo -e "\nPlease find the detailed integration test report after rerunning failed tests [here](https://allure.ci.planx-pla.net/nightly-run-$CI_ENV/$DATE-rerun/$RUN_NUM/$ATTEMPT_NUM/index.html)" >> output/report.md
                   fi
-                  echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM/gh_action_logs.txt)" >> output/report.md
                 else
                   echo -e "\nPlease find the detailed integration test report [here](https://allure.ci.planx-pla.net/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/index.html)" >> output/report.md
                   if [ -n "$FAILED_TEST_SUITES" ]; then
                     echo -e "\nPlease find the detailed integration test report after rerunning failed tests [here](https://allure.ci.planx-pla.net/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM-rerun/index.html)" >> output/report.md
                   fi
-                  echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/gh_action_logs.txt)" >> output/report.md
                 fi
+              fi
+              if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
+                echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM/gh_action_logs.txt)" >> output/report.md
+              else:
+                echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/gh_action_logs.txt)" >> output/report.md
               fi
 
           - name: Render report to the PR
