@@ -458,7 +458,7 @@ jobs:
                 aws s3 cp logs/gh_action_logs.txt s3://ci-allure-reports/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/gh_action_logs.txt >> logs/gh_action_logs.txt 2>&1
               fi
               if [ $? -ne 0 ]; then
-                echo "PR_ERROR_MSG=Failed to upload allure report to s3 bucket" >> $GITHUB_ENV
+                echo "PR_ERROR_MSG=Failed to upload files to s3 bucket" >> $GITHUB_ENV
               fi
 
           - name: Generate markdown report
@@ -530,7 +530,7 @@ jobs:
                 aws s3 cp logs/failure_analysis.txt s3://ci-allure-reports/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt >> logs/gh_action_logs.txt 2>&1
               fi
               if [ $? -ne 0 ]; then
-                echo "PR_ERROR_MSG=Failed to upload failure analysis file to s3 bucket" >> $GITHUB_ENV
+                echo "PR_ERROR_MSG=Failed to run analyze failures using ai agent step" >> $GITHUB_ENV
               fi
             env:
               THREAD_TS: ${{ steps.slack_notify.outputs.ts }}
