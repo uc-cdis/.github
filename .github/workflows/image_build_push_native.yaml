@@ -166,7 +166,9 @@ jobs:
         with:
           name: digests-${{ env.PLATFORM_PAIR }}
           path: ${{ runner.temp }}/digests/*
+          overwrite: true
           if-no-files-found: error
+          
           retention-days: 1
   merge:
     runs-on: ubuntu-latest
