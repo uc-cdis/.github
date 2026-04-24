@@ -68,7 +68,7 @@ jobs:
       - name: Poetry cache
         if: inputs.use-cache && inputs.uv-version == ''
         id: cache-poetry
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
@@ -78,7 +78,7 @@ jobs:
       - name: uv cache
         if: inputs.use-cache && inputs.uv-version != ''
         id: cache-uv
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: ~/.cache/uv
           key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
