@@ -44,17 +44,17 @@ on:
         type: string
         default: "false"
       SETUP_SCRIPT_1:
-        description: 'A Bash script that handles necessary setup before namespace creation'
+        description: 'URL to a bash script that handles necessary setup before namespace creation'
         required: false
         type: string
         default: ""
       SETUP_SCRIPT_2:
-        description: 'A Bash script that handles necessary setup before environment preparation'
+        description: 'URL to a bash script that handles necessary setup before environment preparation'
         required: false
         type: string
         default: ""
       SETUP_SCRIPT_3:
-        description: 'A Bash script that handles necessary setup after environment preparation, before running the tests'
+        description: 'URL to a bash script that handles necessary setup after environment preparation, before running the tests'
         required: false
         type: string
         default: ""
@@ -329,7 +329,7 @@ jobs:
             working-directory: ${{ github.workspace }}
             run: |
               echo "Running setup script ${{ inputs.SETUP_SCRIPT_1 }}"
-              bash ${{ inputs.SETUP_SCRIPT_1 }}
+              curl -sSL ${{ inputs.SETUP_SCRIPT_1 }} | bash
 
           # Create PR namespace and PR hostname env var
           - name: Create namespace and env vars
@@ -377,7 +377,7 @@ jobs:
             working-directory: ${{ github.workspace }}
             run: |
               echo "Running setup script ${{ inputs.SETUP_SCRIPT_2 }}"
-              bash ${{ inputs.SETUP_SCRIPT_2 }}
+              curl -sSL ${{ inputs.SETUP_SCRIPT_2 }} | bash
 
           # Apply the changes to the manifest of the selected CI environment, roll the pods and run usersync
           # Generate API keys for test users for the environment
@@ -417,7 +417,7 @@ jobs:
             working-directory: ${{ github.workspace }}
             run: |
               echo "Running setup script ${{ inputs.SETUP_SCRIPT_3 }}"
-              bash ${{ inputs.SETUP_SCRIPT_3 }}
+              curl -sSL ${{ inputs.SETUP_SCRIPT_3 }} | bash
 
           # This is used for running specific test suites by labeling the PR with the test class
           # Multiple suites can be executed by adding multiple labels
