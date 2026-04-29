@@ -7,6 +7,10 @@ on:
       QUAY_REPO:
         required: false
         type: string
+      # needed to be set if repo org differs in quay
+      QUAY_ORG:
+        required: false
+        type: string
       # set this for service PRs to select tests pertaining to the service under test
       # must match the marker used for the service, please look at the `markers` section of pyproject.toml
       SERVICE_TO_TEST:
@@ -35,6 +39,25 @@ on:
       TEST_LABELS:
         required: false
         type: string
+      EXTERNAL_TO_CTDS:
+        required: false
+        type: string
+        default: "false"
+      SETUP_SCRIPT_1:
+        description: 'A Bash script that handles necessary setup before namespace creation'
+        required: false
+        type: string
+        default: ""
+      SETUP_SCRIPT_2:
+        description: 'A Bash script that handles necessary setup before environment preparation'
+        required: false
+        type: string
+        default: ""
+      SETUP_SCRIPT_3:
+        description: 'A Bash script that handles necessary setup after environment preparation, before running the tests'
+        required: false
+        type: string
+        default: ""
     secrets:
       CI_TEST_ORCID_USERID:
         required: true
@@ -95,6 +118,7 @@ jobs:
           GH_WORKSPACE: ${{ github.workspace }}
           HELM_BRANCH: ${{ inputs.HELM_BRANCH }}
           QUAY_REPO: ${{ inputs.QUAY_REPO }}
+          QUAY_ORG: ${{ inputs.QUAY_ORG }}
           IS_NIGHTLY_RUN: ${{ inputs.IS_NIGHTLY_RUN }}
           TEST_LABELS: ${{ inputs.TEST_LABELS }}
           CI_ENV: ${{ inputs.CI_ENV }}
@@ -114,8 +138,12 @@ jobs:
             run:  |
               echo "Current repo: ${{ github.event.repository.full_name }}"
               echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
-              echo "::error::External PRs cannot run integration tests"
-              exit 1
+              if gh api repos/$REPO_FN/pulls/$PR_NUM --jq '.labels | map(.name) | .[] | select(. == "safe to test")' | grep -q .; then
+                  echo "External PR is labeled with 'safe to test': proceeding"
+              else
+                  echo "::error::External PRs cannot run integration tests unless they are labeled with 'safe to test'"
+                  exit 1
+              fi
 
           # Skip integration tests when the following PR labels are present:
           # not-ready-for-ci / decommission-environment
@@ -128,11 +156,13 @@ jobs:
                   echo "SKIP_TESTS=true" >> $GITHUB_ENV
               fi
 
+          - name: Free disk space
+            uses: jlumbroso/free-disk-space@main
+
           # Checkout current repo
           - name: Checkout current repo
             if: ${{ env.SKIP_TESTS != 'true' }}
             uses: actions/checkout@v6
-
 
           # Skip tests when there are only markdown files
           - name: Skip integration tests if PR contains only Markdown files
@@ -173,7 +203,6 @@ jobs:
               commit_time=$(gh api repos/$REPO_FN/commits/$COMMIT_SHA | jq -r '.commit.committer.date')
               echo "COMMIT_TIME=$commit_time" >> $GITHUB_ENV
 
-          # gen3-integration-tests run with python 3.9
           - name: Set up Python
             if: ${{ env.SKIP_TESTS != 'true' }}
             uses: actions/setup-python@v5
@@ -196,7 +225,7 @@ jobs:
           # Setup kubectl
           - name: Set Up kubectl
             if: ${{ env.SKIP_TESTS != 'true' }}
-            uses: azure/setup-kubectl@v3
+            uses: azure/setup-kubectl@v4
             with:
               version: latest
 
@@ -222,9 +251,8 @@ jobs:
           # - name: 'Use gcloud CLI'
           #   run: 'gcloud info'
 
-
           # Install gen3-integration-tests dependencies
-          # wamerican: data-simulator needs "/usr/share/dict/words" to generate data that isn't random strings
+          # Note: data-simulator needs "/usr/share/dict/words" to generate data that isn't random strings
           - name: Install dependencies
             if: ${{ env.SKIP_TESTS != 'true' }}
             env:
@@ -252,7 +280,7 @@ jobs:
 
           # Configure credentials to access cluster.
           - name: Configure AWS Credentials
-            if: ${{ env.SKIP_TESTS != 'true' }}
+            if: ${{ env.SKIP_TESTS != 'true' && inputs.EXTERNAL_TO_CTDS != 'true' }}
             uses: aws-actions/configure-aws-credentials@v3
             with:
                 role-to-assume: arn:aws:iam::707767160287:role/github-action-role
@@ -262,12 +290,12 @@ jobs:
 
           # Create kubeconfig to point at cluster.
           - name: Update kube config
-            if: ${{ env.SKIP_TESTS != 'true' }}
+            if: ${{ env.SKIP_TESTS != 'true' && inputs.EXTERNAL_TO_CTDS != 'true' }}
             run: |
               aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region "us-east-1"
 
           # Ensure we do not cross the threshold of maximum number of CI envs allowed
-          # The workflow waits if CI infrastructure is at capacity (MAX_ENVS, set to 10)
+          # The workflow waits if CI infrastructure is at capacity (`MAX_ENVS`)
           - name: Wait for CI environment
             if: ${{ env.SKIP_TESTS != 'true' }}
             id: wait_for_ci_env
@@ -295,6 +323,14 @@ jobs:
                 WAITED=$((WAITED + WAIT_INTERVAL))
               done
 
+          - name: Run custom script (pre namespace creation)
+            id: run_custom_script_1
+            if: ${{ env.SKIP_TESTS != 'true' && inputs.SETUP_SCRIPT_1 }}
+            working-directory: ${{ github.workspace }}
+            run: |
+              echo "Running setup script ${{ inputs.SETUP_SCRIPT_1 }}"
+              bash ${{ inputs.SETUP_SCRIPT_1 }}
+
           # Create PR namespace and PR hostname env var
           - name: Create namespace and env vars
             if: ${{ env.SKIP_TESTS != 'true' }}
@@ -313,8 +349,10 @@ jobs:
                 NAMESPACE=${REPO}-pr-${PR_NUM}
                 HOSTNAME=${REPO}-pr-${PR_NUM}.ci.planx-pla.net
               fi
+              HOSTNAME_PROTOCOL=https
               echo "NAMESPACE=$NAMESPACE" >> $GITHUB_ENV
               echo "HOSTNAME=$HOSTNAME" >> $GITHUB_ENV
+              echo "HOSTNAME_PROTOCOL=$HOSTNAME_PROTOCOL" >> $GITHUB_ENV
               namespace_exists=$(kubectl get namespace "$NAMESPACE" --no-headers --ignore-not-found)
               if [ -n "$namespace_exists" ]; then
                 echo "Namespace $NAMESPACE exists, performing teardown..."
@@ -333,11 +371,19 @@ jobs:
               SOURCE_CONFIG=$(echo "$PR_FILES" | grep -v "^.github/" | awk -F'/' '{if ($1 != ".github" && NF > 1) print $1"/"$2}' | sort -u | tr '\n' ',' | sed 's/,$//')
               echo "SOURCE_CONFIG=$SOURCE_CONFIG" >> $GITHUB_ENV
 
+          - name: Run custom script (pre environment preparation)
+            id: run_custom_script_2
+            if: ${{ env.SKIP_TESTS != 'true' && steps.create_ns.outcome == 'success' && inputs.SETUP_SCRIPT_2 }}
+            working-directory: ${{ github.workspace }}
+            run: |
+              echo "Running setup script ${{ inputs.SETUP_SCRIPT_2 }}"
+              bash ${{ inputs.SETUP_SCRIPT_2 }}
+
           # Apply the changes to the manifest of the selected CI environment, roll the pods and run usersync
           # Generate API keys for test users for the environment
           - name: Prepare CI environment
             id: prep_ci_env
-            if: ${{ env.SKIP_TESTS != 'true' && (steps.create_ns.outcome == 'success' || steps.select_ci_env.outcome == 'success') }}
+            if: ${{ env.SKIP_TESTS != 'true' && steps.create_ns.outcome == 'success' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
             run: |
               echo $SOURCE_CONFIG
@@ -365,6 +411,14 @@ jobs:
                   } >> "$GITHUB_ENV"
               fi
 
+          - name: Run custom script (post environment preparation)
+            id: run_custom_script_3
+            if: ${{ env.SKIP_TESTS != 'true' && steps.prep_ci_env.outcome == 'success' && inputs.SETUP_SCRIPT_3 }}
+            working-directory: ${{ github.workspace }}
+            run: |
+              echo "Running setup script ${{ inputs.SETUP_SCRIPT_3 }}"
+              bash ${{ inputs.SETUP_SCRIPT_3 }}
+
           # This is used for running specific test suites by labeling the PR with the test class
           # Multiple suites can be executed by adding multiple labels
           - name: Get test labels
@@ -375,13 +429,18 @@ jobs:
               if [[ -n $TEST_LABELS ]]; then
                 test_label_expr="${TEST_LABELS//,/ or }"
                 test_label="-k \"$test_label_expr\""
-              else
-                if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
-                  test_label=$(gh api repos/$REPO_FN/pulls/$PR_NUM --jq '.labels | map(select(.name | test("^(?i)test"))) | map(.name) | if length > 0 then "-k \"" + join(" or ") + "\"" else "" end')
-                fi
+              elif [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+                test_label=$(gh api repos/$REPO_FN/pulls/$PR_NUM --jq '.labels | map(select(.name | test("^(?i)test"))) | map(.name) | if length > 0 then "-k \"" + join(" or ") + "\"" else "" end')
               fi
               echo $test_label
               echo "TEST_LABEL=$test_label" >> $GITHUB_ENV
+
+              skip_quay_build=$(gh pr view --repo $REPO_FN $PR_NUM --json labels --jq '.labels[].name' | grep -x "skip-quay-build")
+              if [[ -n "$skip_quay_build" ]]; then
+                echo "SKIP_QUAY_BUILD=true" >> $GITHUB_ENV
+              else
+                echo "SKIP_QUAY_BUILD=false" >> $GITHUB_ENV
+              fi
 
           - name: Run tests pertaining to specific service
             id: run_service_tests
@@ -461,7 +520,7 @@ jobs:
 
           - name: Upload allure report to S3
             id: upload_allure_report
-            if: ${{ env.SKIP_TESTS != 'true' && steps.generate_allure_report.outcome == 'success' }}
+            if: ${{ env.SKIP_TESTS != 'true' && inputs.EXTERNAL_TO_CTDS != 'true' && steps.generate_allure_report.outcome == 'success' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
             run: |
               echo -e "\n\n******* Upload reports to S3 *******" >> logs/gh_action_logs.txt
@@ -481,9 +540,18 @@ jobs:
                 echo "PR_ERROR_MSG=Failed to upload allure report to s3 bucket" >> $GITHUB_ENV
               fi
 
+          - name: Print logs
+            id: print_logs
+            # This step only runs for non-CTDS repos where we do not upload the logs to S3
+            if: ${{ env.SKIP_TESTS != 'true' && inputs.EXTERNAL_TO_CTDS == 'true' }}
+            continue-on-error: true  # if this fails, we still need to run clean-up steps
+            run: |
+              echo Logs:
+              cat logs/gh_action_logs.txt
+
           - name: Upload logs to S3
             id: upload_gh_action_logs
-            if: ${{ env.SKIP_TESTS != 'true' && (steps.prep_ci_env.outcome == 'success' || steps.prep_ci_env.outcome == 'failure') }}
+            if: ${{ env.SKIP_TESTS != 'true' && inputs.EXTERNAL_TO_CTDS != 'true' && (steps.prep_ci_env.outcome == 'success' || steps.prep_ci_env.outcome == 'failure') }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
             run: |
               echo -e "\n\n******** Upload GH action logs to S3 ********" >> logs/gh_action_logs.txt
@@ -496,7 +564,6 @@ jobs:
               if [ $? -ne 0 ]; then
                 echo "PR_ERROR_MSG=Failed to upload allure report to s3 bucket" >> $GITHUB_ENV
               fi
-
 
           - name: Generate markdown report
             id: generate_md_report
@@ -544,7 +611,7 @@ jobs:
 
           - name: Render report to the PR
             id: publish_md_report
-            if: ${{ env.SKIP_TESTS != 'true' && github.event_name == 'pull_request' && (steps.upload_allure_report.outcome == 'success' || steps.upload_gh_action_logs.outcome == 'success') }}
+            if: ${{ env.SKIP_TESTS != 'true' && github.event_name == 'pull_request' && (steps.generate_allure_report.outcome == 'success' || steps.upload_gh_action_logs.outcome == 'success') }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
             run: gh pr comment $PR_NUM --body-file output/report.md -R $REPO_FN
             env:
@@ -552,13 +619,13 @@ jobs:
 
           - name: Generate Slack report
             id: generate_slack_report
-            if: ${{ env.SKIP_TESTS != 'true' && (steps.upload_allure_report.outcome == 'success' || steps.upload_gh_action_logs.outcome == 'success') }}
+            if: ${{ env.SKIP_TESTS != 'true' && inputs.EXTERNAL_TO_CTDS != 'true' && (steps.upload_allure_report.outcome == 'success' || steps.upload_gh_action_logs.outcome == 'success') }}
             continue-on-error: true # if this fails, we still need to run clean-up steps
             run: poetry run python -m gen3_ci.scripts.generate_slack_report
 
           - name: Publish report to Slack
             id: slack_notify
-            if: ${{ env.SKIP_TESTS != 'true' && steps.generate_slack_report.outcome == 'success' }}
+            if: ${{ env.SKIP_TESTS != 'true' && inputs.EXTERNAL_TO_CTDS != 'true' && steps.generate_slack_report.outcome == 'success' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
             uses: slackapi/slack-github-action@v2.0.0
             with:
@@ -569,7 +636,7 @@ jobs:
 
           - name: Analyze Failures using AI agent
             id: analyze_failures_using_ai_agent
-            if: ${{ env.SKIP_TESTS != 'true' && (steps.prep_ci_env.outcome == 'failure' || ((steps.run_service_tests.outcome == 'failure' || steps.run_tests.outcome == 'failure') && steps.rerun_failed_tests.outcome != 'success')) }}
+            if: ${{ env.SKIP_TESTS != 'true' && inputs.EXTERNAL_TO_CTDS != 'true' && (steps.prep_ci_env.outcome == 'failure' || ((steps.run_service_tests.outcome == 'failure' || steps.run_tests.outcome == 'failure') && steps.rerun_failed_tests.outcome != 'success')) }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
             run: |
               echo -e "\n\n****** Running Analyze Failures using AI agent ******" >>  logs/gh_action_logs.txt
@@ -586,9 +653,9 @@ jobs:
             env:
               THREAD_TS: ${{ steps.slack_notify.outputs.ts }}
 
-          - name: Publish test anaylsis on same slack thread
+          - name: Publish test analysis on same slack thread
             id: publish_test_analysis
-            if: ${{ env.SKIP_TESTS != 'true' && steps.analyze_failures_using_ai_agent.outcome == 'success' }}
+            if: ${{ env.SKIP_TESTS != 'true' && inputs.EXTERNAL_TO_CTDS != 'true' && steps.analyze_failures_using_ai_agent.outcome == 'success' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
             uses: slackapi/slack-github-action@v2.0.0
             with:
