@@ -156,9 +156,6 @@ jobs:
                   echo "SKIP_TESTS=true" >> $GITHUB_ENV
               fi
 
-          - name: Free disk space
-            uses: jlumbroso/free-disk-space@main
-
           # Checkout current repo
           - name: Checkout current repo
             if: ${{ env.SKIP_TESTS != 'true' }}
