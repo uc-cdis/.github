@@ -373,7 +373,7 @@ jobs:
           # Must run before `Prepare CI environment` which checks the `SKIP_QUAY_BUILD` env var.
           - name: Get test labels
             id: get_test_labels
-            if: ${{ env.SKIP_TESTS != 'true' && steps.prep_ci_env.outcome == 'success' }}
+            if: ${{ env.SKIP_TESTS != 'true' && steps.create_ns.outcome == 'success' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
             run: |
               if [[ -n $TEST_LABELS ]]; then
