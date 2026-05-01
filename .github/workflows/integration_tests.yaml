@@ -434,6 +434,7 @@ jobs:
 
               skip_quay_build=$(gh pr view --repo $REPO_FN $PR_NUM --json labels --jq '.labels[].name' | grep -x "skip-quay-build")
               if [[ -n "$skip_quay_build" ]]; then
+                echo "Found 'skip-quay-build' label on PR"
                 echo "SKIP_QUAY_BUILD=true" >> $GITHUB_ENV
               else
                 echo "SKIP_QUAY_BUILD=false" >> $GITHUB_ENV
