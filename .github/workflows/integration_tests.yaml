@@ -610,7 +610,9 @@ jobs:
             id: publish_md_report
             if: ${{ env.SKIP_TESTS != 'true' && github.event_name == 'pull_request' && (steps.generate_allure_report.outcome == 'success' || steps.upload_gh_action_logs.outcome == 'success') }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
-            run: gh pr comment $PR_NUM --body-file output/report.md -R $REPO_FN
+            run: |
+              sed -i '1## ${{ github.workflow }}' output/report.md
+              gh pr comment $PR_NUM --body-file output/report.md -R $REPO_FN
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
