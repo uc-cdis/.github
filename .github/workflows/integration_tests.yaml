@@ -368,6 +368,31 @@ jobs:
               SOURCE_CONFIG=$(echo "$PR_FILES" | grep -v "^.github/" | awk -F'/' '{if ($1 != ".github" && NF > 1) print $1"/"$2}' | sort -u | tr '\n' ',' | sed 's/,$//')
               echo "SOURCE_CONFIG=$SOURCE_CONFIG" >> $GITHUB_ENV
 
+          # This is used for running specific test suites by labeling the PR with the test class
+          # Multiple suites can be executed by adding multiple labels.
+          # Must run before `Prepare CI environment` which checks the `SKIP_QUAY_BUILD` env var.
+          - name: Get test labels
+            id: get_test_labels
+            if: ${{ env.SKIP_TESTS != 'true' && steps.prep_ci_env.outcome == 'success' }}
+            continue-on-error: true  # if this fails, we still need to run clean-up steps
+            run: |
+              if [[ -n $TEST_LABELS ]]; then
+                test_label_expr="${TEST_LABELS//,/ or }"
+                test_label="-k \"$test_label_expr\""
+              elif [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+                test_label=$(gh api repos/$REPO_FN/pulls/$PR_NUM --jq '.labels | map(select(.name | test("^(?i)test"))) | map(.name) | if length > 0 then "-k \"" + join(" or ") + "\"" else "" end')
+              fi
+              echo $test_label
+              echo "TEST_LABEL=$test_label" >> $GITHUB_ENV
+
+              skip_quay_build=$(gh pr view --repo $REPO_FN $PR_NUM --json labels --jq '.labels[].name' | grep -x "skip-quay-build")
+              if [[ -n "$skip_quay_build" ]]; then
+                echo "Found 'skip-quay-build' label on PR"
+                echo "SKIP_QUAY_BUILD=true" >> $GITHUB_ENV
+              else
+                echo "SKIP_QUAY_BUILD=false" >> $GITHUB_ENV
+              fi
+
           - name: Run custom script (pre environment preparation)
             id: run_custom_script_2
             if: ${{ env.SKIP_TESTS != 'true' && steps.create_ns.outcome == 'success' && inputs.SETUP_SCRIPT_2 }}
@@ -415,30 +440,6 @@ jobs:
             run: |
               echo "Running setup script ${{ inputs.SETUP_SCRIPT_3 }}"
               curl -sSL ${{ inputs.SETUP_SCRIPT_3 }} | bash
-
-          # This is used for running specific test suites by labeling the PR with the test class
-          # Multiple suites can be executed by adding multiple labels
-          - name: Get test labels
-            id: get_test_labels
-            if: ${{ env.SKIP_TESTS != 'true' && steps.prep_ci_env.outcome == 'success' }}
-            continue-on-error: true  # if this fails, we still need to run clean-up steps
-            run: |
-              if [[ -n $TEST_LABELS ]]; then
-                test_label_expr="${TEST_LABELS//,/ or }"
-                test_label="-k \"$test_label_expr\""
-              elif [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
-                test_label=$(gh api repos/$REPO_FN/pulls/$PR_NUM --jq '.labels | map(select(.name | test("^(?i)test"))) | map(.name) | if length > 0 then "-k \"" + join(" or ") + "\"" else "" end')
-              fi
-              echo $test_label
-              echo "TEST_LABEL=$test_label" >> $GITHUB_ENV
-
-              skip_quay_build=$(gh pr view --repo $REPO_FN $PR_NUM --json labels --jq '.labels[].name' | grep -x "skip-quay-build")
-              if [[ -n "$skip_quay_build" ]]; then
-                echo "Found 'skip-quay-build' label on PR"
-                echo "SKIP_QUAY_BUILD=true" >> $GITHUB_ENV
-              else
-                echo "SKIP_QUAY_BUILD=false" >> $GITHUB_ENV
-              fi
 
           - name: Run tests pertaining to specific service
             id: run_service_tests
