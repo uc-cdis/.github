@@ -16,27 +16,27 @@ for how to contribute code to our repositories.
 
 ### Chat with Gen3 staff and the community
 
-If you have questions about operating or using a Gen3 system please contact us.  We can be reached on [slack](https://docs.google.com/forms/d/e/1FAIpQLSczyhhOXeCK9FdVtpQpelOHYnRj1EAq1rwwnm9q6cPAe5a7ug/viewform), [discussion board](https://forums.gen3.org/), or via email (support@gen3.org).
+If you have questions about operating or using a Gen3 system please contact us.  We can be [reached on Slack](https://docs.google.com/forms/d/e/1FAIpQLSczyhhOXeCK9FdVtpQpelOHYnRj1EAq1rwwnm9q6cPAe5a7ug/viewform), or via email (support@gen3.org).
 
 ### Events
 
-We hold regular forums on a variety of topics to engage with and hear from the community.  You can find previous and upcoming events [here](https://gen3.org/community/events/).
+We hold regular forums on a variety of topics to engage with and hear from the community.  You can find [previous and upcoming events here](https://gen3.org/community/events/).
 
 ### Gen3 releases
 
-Gen3 releases typically happen every month.  The lastest release notes can be found [here](https://github.com/uc-cdis/cdis-manifest/tree/master/releases).
+Gen3 releases typically happen every month.  The [lastest release notes can be found here](https://github.com/uc-cdis/cdis-manifest/tree/master/releases).
 
 ## User Guides
 
 ### Setting up and operating a Gen3 data commons or mesh
 
-Gen3 on [Helm](https://github.com/uc-cdis/gen3-helm) is the new preferred way to deploy a Gen3 commons or mesh. Using Helm, a package manager for Kubernetes, Gen3 can be installed against any cluster, including a local one such as Minikube or Rancher Desktop. Helm is a tool that streamlines the installation and management of applications on Kubernetes platforms. Helm plays a crucial role in simplifying the deployment and management of Gen3 components within your environment.
+[Gen3 on Helm](https://github.com/uc-cdis/gen3-helm) is the new preferred way to deploy a Gen3 commons or mesh. Using Helm, a package manager for Kubernetes, Gen3 can be installed against any cluster, including a local one such as Minikube or Rancher Desktop. Helm is a tool that streamlines the installation and management of applications on Kubernetes platforms. Helm plays a crucial role in simplifying the deployment and management of Gen3 components within your environment.
 
-This option is suitable for all deployments. If you are ready to get started, you can follow our guide [here](https://docs.gen3.org/gen3-resources/operator-guide/).
+This option is suitable for all deployments. If you are ready to get started, you can [follow our guide here](https://docs.gen3.org/gen3-resources/operator-guide/).
 
 ### Using a Gen3 system
 
-To learn more about interacting with a Gen3 data commons or mesh including how to create a data dictionary, upload data and metadata, indexing files, and other topics please refer to our user guide found [here](https://docs.gen3.org/gen3-resources/user-guide/).
+To learn more about interacting with a Gen3 data commons or mesh including how to create a data dictionary, upload data and metadata, indexing files, and other topics please refer to our [user guide found here](https://docs.gen3.org/gen3-resources/user-guide/).
 
 ## Additional References
 
@@ -54,4 +54,4 @@ Today with our partners, we operate a data ecosystem comprising over 20 data com
 
 We are based in Chicago, but our work engages collaborators from across the world.
 
-You can find out more [here](https://ctds.uchicago.edu/).
+You can [find out more here](https://ctds.uchicago.edu/).
