@@ -68,6 +68,7 @@ jobs:
 
       # https://github.com/docker/login-action#aws-public-elastic-container-registry-ecr
       - name: Login to ECR
+        if: ${{ !inputs.USE_QUAY_ONLY }}
         uses: docker/login-action@v3
         with:
           registry: ${{ inputs.AWS_ECR_REGISTRY }}
@@ -124,7 +125,7 @@ jobs:
             quay.io/cdis/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
             ${{ inputs.AWS_ECR_REGISTRY }}/gen3/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
 
-      - name: Build and push
+      - name: Build and push ECR
         if: ${{ !inputs.USE_QUAY_ONLY }}
         uses: docker/build-push-action@v6
         # You may get ECR-push errors when first adding the workflow to a github repo.
@@ -143,8 +144,7 @@ jobs:
           platforms: ${{ inputs.BUILD_PLATFORMS }}
           build-args: ${{ inputs.BUILD_ARGS }}
 
-      - name: Build and push (Quay only)
-        if: ${{ inputs.USE_QUAY_ONLY }}
+      - name: Build and push Quay
         uses: docker/build-push-action@v6
         with:
           context: ${{ inputs.DOCKERFILE_BUILD_CONTEXT }}
