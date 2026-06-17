@@ -22,12 +22,12 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Check out code
+      uses: actions/checkout@v6
     - name: Set up Go
       uses: actions/setup-go@v6
       with:
         go-version: "${{ inputs.GO_VERSION }}"
-    - name: Check out code
-      uses: actions/checkout@v6
     - name: Install dependencies
       run: |
         go mod download
