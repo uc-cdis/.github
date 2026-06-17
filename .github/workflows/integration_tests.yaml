@@ -340,12 +340,7 @@ jobs:
             continue-on-error: true  # if this fails, we still need to run clean-up steps
             run: |
               matches=$(gh api repos/$REPO_FN/pulls/$PR_NUM \
-                --jq '[.labels[] | select(.name | test("(?i)(-pr-|-helm|nightly-build)")) | .name]')
-              count=$(jq 'length' <<< "$matches")
-              if [[ $count -gt 1 ]]; then
-                echo "Expected at most one namespace label, found $count"
-                exit 1
-              fi
+                --jq '[.labels[] | select(.name | test("(?i)(nightly-build)")) | .name]')
               NAMESPACE_LABEL=$(jq -r '.[0] // ""' <<< "$matches")
               echo "NAMESPACE_LABEL=$NAMESPACE_LABEL" >> $GITHUB_ENV
               
