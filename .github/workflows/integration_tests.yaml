@@ -348,10 +348,13 @@ jobs:
               fi
               NAMESPACE_LABEL=$(jq -r '.[0] // ""' <<< "$matches")
               echo "NAMESPACE_LABEL=$NAMESPACE_LABEL" >> $GITHUB_ENV
+              if [ $? -ne 0 ]; then
+                echo "PR_ERROR_MSG=Expected one namespace, but got more than one" >> $GITHUB_ENV
+              fi
               
           # Create PR namespace and PR hostname env var
           - name: Create namespace and env vars
-            if: ${{ env.SKIP_TESTS != 'true' }}
+            if: ${{ env.SKIP_TESTS != 'true' && steps.get_namespace_label.outcome == 'success' }}
             id: create_ns
             # Change the HOSTNAME with full domain name
             run: |
