@@ -342,7 +342,7 @@ jobs:
               
           # Create PR namespace and PR hostname env var
           - name: Create namespace and env vars
-            if: ${{ env.SKIP_TESTS != 'true' && steps.get_namespace_label.outcome == 'success' }}
+            if: ${{ env.SKIP_TESTS != 'true' }}
             id: create_ns
             # Change the HOSTNAME with full domain name
             run: |
