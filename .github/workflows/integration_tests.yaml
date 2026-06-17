@@ -144,12 +144,8 @@ jobs:
             run:  |
               echo "Current repo: ${{ github.event.repository.full_name }}"
               echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
-              if gh api repos/$REPO_FN/pulls/$PR_NUM --jq '.labels | map(.name) | .[] | select(. == "safe to test")' | grep -q .; then
-                  echo "External PR is labeled with 'safe to test': proceeding"
-              else
-                  echo "::error::External PRs cannot run integration tests unless they are labeled with 'safe to test'"
-                  exit 1
-              fi
+              echo "::error::External PRs cannot run integration tests"
+              exit 1
 
           # Skip integration tests when the following PR labels are present:
           # not-ready-for-ci / decommission-environment
