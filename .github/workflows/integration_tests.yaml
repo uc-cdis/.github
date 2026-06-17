@@ -334,23 +334,44 @@ jobs:
               echo "Running setup script ${{ inputs.SETUP_SCRIPT_1 }}"
               curl -sSL ${{ inputs.SETUP_SCRIPT_1 }} | bash
 
+          - name: Get Namespace label
+            id: get_namespace_label
+            if: ${{ env.SKIP_TESTS != 'true' && steps.wait_for_ci_env.outcome == 'success' }}
+            continue-on-error: true  # if this fails, we still need to run clean-up steps
+            run: |
+              matches=$(gh api repos/$REPO_FN/pulls/$PR_NUM \
+                --jq '[.labels[] | select(.name | test("(?i)(-pr-|-helm|nightly-build)")) | .name]')
+              count=$(jq 'length' <<< "$matches")
+              if [[ $count -gt 1 ]]; then
+                echo "Expected at most one namespace label, found $count"
+                exit 1
+              fi
+              NAMESPACE_LABEL=$(jq -r '.[0] // ""' <<< "$matches")
+              echo "NAMESPACE_LABEL=$NAMESPACE_LABEL" >> $GITHUB_ENV
+              
           # Create PR namespace and PR hostname env var
           - name: Create namespace and env vars
             if: ${{ env.SKIP_TESTS != 'true' }}
             id: create_ns
             # Change the HOSTNAME with full domain name
             run: |
-              if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
-                if [[ "$CI_ENV" == "gen3ff" ]]; then
-                  NAMESPACE=nightly-build-ff
-                  HOSTNAME=nightly-build-ff.ci.planx-pla.net
-                else
-                  NAMESPACE=nightly-build
-                  HOSTNAME=nightly-build.ci.planx-pla.net
-                fi
+              if [[ -n "$NAMESPACE_LABEL" ]]; then
+                echo "Namespace label is set: $NAMESPACE_LABEL"
+                NAMESPACE=${NAMESPACE_LABEL}
+                HOSTNAME=${NAMESPACE_LABEL}.ci.planx-pla.net
               else
-                NAMESPACE=${REPO}-pr-${PR_NUM}
-                HOSTNAME=${REPO}-pr-${PR_NUM}.ci.planx-pla.net
+                if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
+                  if [[ "$CI_ENV" == "gen3ff" ]]; then
+                    NAMESPACE=nightly-build-ff
+                    HOSTNAME=nightly-build-ff.ci.planx-pla.net
+                  else
+                    NAMESPACE=nightly-build
+                    HOSTNAME=nightly-build.ci.planx-pla.net
+                  fi
+                else
+                  NAMESPACE=${REPO}-pr-${PR_NUM}
+                  HOSTNAME=${REPO}-pr-${PR_NUM}.ci.planx-pla.net
+                fi
               fi
               HOSTNAME_PROTOCOL=https
               echo "NAMESPACE=$NAMESPACE" >> $GITHUB_ENV
