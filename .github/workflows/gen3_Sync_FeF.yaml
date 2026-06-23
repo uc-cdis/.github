@@ -82,7 +82,7 @@ jobs:
           # - adds any new config and .env files that were added uptream
           git ls-tree -r --name-only ${{ env.DEFAULT_BRANCH }} config .env* | xargs git checkout origin/${{ env.DEFAULT_BRANCH }}
           # - additional files to be left out
-          git checkout ${{ env.DEFAULT_BRANCH }} -- public/icons/favicon.ico src/middleware.ts
+          git checkout ${{ env.DEFAULT_BRANCH }} -- public/icons/favicon.ico src/proxy.ts
 
       - name: Commit changes
         id: commit
