@@ -193,7 +193,7 @@ jobs:
             uses: actions/checkout@v6
             with:
               repository: uc-cdis/gen3-gitops
-              ref: ${{ github.event.repository.full_name == 'uc-cdis/gen3-gitops' && github.event.pull_request.head.ref || 'master' }}
+              ref: ${{ env.REPO_FN == 'uc-cdis/gen3-gitops' && env.BRANCH || 'master' }}
               path: gen3-gitops-ci
 
           - name: Get commit time
