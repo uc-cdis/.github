@@ -20,6 +20,10 @@ on:
         required: false
         type: string
         default: master
+      GITOPS_REPO_BRANCH:
+        required: false
+        type: string
+        default: master
       HELM_BRANCH:
         required: false
         type: string
@@ -193,7 +197,7 @@ jobs:
             uses: actions/checkout@v6
             with:
               repository: uc-cdis/gen3-gitops
-              ref: ${{ env.REPO_FN == 'uc-cdis/gen3-gitops' && env.BRANCH || 'master' }}
+              ref: ${{ inputs.GITOPS_REPO_BRANCH }}
               path: gen3-gitops-ci
 
           - name: Get commit time
@@ -339,7 +343,7 @@ jobs:
                 --jq '[.labels[] | select(.name | test("^nightly-build(-ff)?$")) | .name]')
               NAMESPACE_LABEL=$(jq -r '.[0] // ""' <<< "$matches")
               echo "NAMESPACE_LABEL=$NAMESPACE_LABEL" >> $GITHUB_ENV
-              
+
           # Create PR namespace and PR hostname env var
           - name: Create namespace and env vars
             if: ${{ env.SKIP_TESTS != 'true' }}
