@@ -143,9 +143,10 @@ jobs:
             working-directory: ${{ github.workspace }}
             run:  |
               echo "Current repo: ${{ github.event.repository.full_name }} - Owner: ${{ github.repository_owner }}"
-              echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}" - Owner: ${{ github.event.pull_request.head.repo.owner.login }}"
+              echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }} - Owner: ${{ github.event.pull_request.head.repo.owner.login }}"
 
-              if ${{ github.repository_owner }} == "uc-cdis" && ${{ github.event.pull_request.head.repo.owner.login }} != "uc-cdis"; then
+              if [[ "${{ github.repository_owner }}" == "uc-cdis" && "${{ github.event.pull_request.head.repo.owner.login }}" != "uc-cdis" ]]; then
+
                   echo "::error::External PRs cannot run integration tests"
                   exit 1
               else
