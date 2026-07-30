@@ -142,10 +142,15 @@ jobs:
             if: ${{ github.event.pull_request.head.repo.fork == true && github.event_name == 'pull_request' }}
             working-directory: ${{ github.workspace }}
             run:  |
-              echo "Current repo: ${{ github.event.repository.full_name }}"
-              echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
-              echo "::error::External PRs cannot run integration tests"
-              exit 1
+              echo "Current repo: ${{ github.event.repository.full_name }} - Owner: ${{ github.repository_owner }}"
+              echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}" - Owner: ${{ github.event.pull_request.head.repo.owner.login }}"
+
+              if ${{ github.repository_owner }} == "uc-cdis" && ${{ github.event.pull_request.head.repo.owner.login }} != "uc-cdis"; then
+                  echo "::error::External PRs cannot run integration tests"
+                  exit 1
+              else
+                  echo "PR from fork is NOT a uc-cdis external PR: proceeding"
+              fi
 
           # Skip integration tests when the following PR labels are present:
           # not-ready-for-ci / decommission-environment
@@ -339,7 +344,7 @@ jobs:
                 --jq '[.labels[] | select(.name | test("^nightly-build(-ff)?$")) | .name]')
               NAMESPACE_LABEL=$(jq -r '.[0] // ""' <<< "$matches")
               echo "NAMESPACE_LABEL=$NAMESPACE_LABEL" >> $GITHUB_ENV
-              
+
           # Create PR namespace and PR hostname env var
           - name: Create namespace and env vars
             if: ${{ env.SKIP_TESTS != 'true' }}
