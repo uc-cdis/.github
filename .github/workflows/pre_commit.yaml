@@ -13,6 +13,10 @@ on:
         required: false
         type: string
         default: ''
+      DBMATE_VERSION:
+        required: false
+        type: string
+        default: ''
       COMMAND:
         required: false
         type: string
@@ -55,6 +59,13 @@ jobs:
         if: inputs.JUST_VERSION != ''
         with:
           tool: just@${{ inputs.JUST_VERSION }}
+
+      - name: Install dbmate
+        if: inputs.DBMATE_VERSION != ''
+        run: |
+          sudo curl -fsSL -o /usr/local/bin/dbmate https://github.com/amacneil/dbmate/releases/${{ inputs.DBMATE_VERSION }}/download/dbmate-linux-amd64
+          sudo chmod +x /usr/local/bin/dbmate
+          /usr/local/bin/dbmate --help
 
       - name: pre-commit install
         run: |
