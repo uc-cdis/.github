@@ -29,8 +29,9 @@ jobs:
         args: '**.md'
         ignore: ${{ inputs.SYNTAX_CHECK_IGNORE_FILES }}
 
-    - name: Check dead links
-      uses: gaurav-nelson/github-action-markdown-link-check@1.0.15
+    - name: Run linkspector
+      uses: umbrelladocs/action-linkspector@v1
       with:
-        config-file: '.github/workflows/validate_markdown_links.json'
-        use-quiet-mode: 'yes'
+        github_token: ${{ secrets.github_token }}
+        reporter: github-pr-review
+        fail_level: any
