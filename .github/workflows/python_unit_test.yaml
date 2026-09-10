@@ -19,9 +19,9 @@ on:
         type: string
       # Note: run-tests-command is used only when a test-script is not provided
       run-tests-command:
-        description: 'Command which runs tests'
+        description: 'Command which runs tests. Left empty, resolves to "uv run pytest -vv" when uv-version is set and "poetry run pytest -vv" otherwise'
         required: false
-        default: 'poetry run pytest -vv'
+        default: ''
         type: string
       python-version:
         description: 'The Python version to use and defaults to latest'
@@ -142,7 +142,21 @@ jobs:
       - name: Install uv
         if: inputs.uv-version != ''
         run: |
-          curl -LsSf https://astral.sh/uv/${{ inputs.uv-version }}/install.sh | sh
+          # astral.sh serves a pinned installer at /uv/<x.y.z>/install.sh and the
+          # newest-release installer at the unversioned /uv/install.sh.
+          if [ "${{ inputs.uv-version }}" = "latest" ]; then
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+          else
+            curl -LsSf "https://astral.sh/uv/${{ inputs.uv-version }}/install.sh" | sh
+          fi
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install dependencies with uv
+        if: inputs.uv-version != ''
+        # The counterpart to `poetry install --all-extras` on the poetry path.
+        run: |
+          uv sync --all-extras
+          uv pip list
 
       - uses: taiki-e/install-action@v2
         if: inputs.just-version != ''
@@ -176,7 +190,21 @@ jobs:
             bash ${{ inputs.test-script }}
           else
             echo "Test script ${{ inputs.test-script }} not found. Falling back to default command"
-            ${{ inputs.run-tests-command }}
+            TESTS_COMMAND="${{ inputs.run-tests-command }}"
+            if [ -z "$TESTS_COMMAND" ]; then
+              # Resolved here rather than as an input default so the fallback can follow
+              # the package manager actually in use.
+              if [ -n "${{ inputs.uv-version }}" ]; then
+                TESTS_COMMAND="uv run pytest -vv"
+              else
+                TESTS_COMMAND="poetry run pytest -vv"
+              fi
+            fi
+            echo "Running: $TESTS_COMMAND"
+            # eval, not a bare expansion: the shell does not re-parse operators such
+            # as `&&` out of a variable, so a compound command would instead be passed
+            # to the first program as arguments.
+            eval "$TESTS_COMMAND"
           fi
         env:
             # The hostname used to communicate with the PostgreSQL service container
