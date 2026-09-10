@@ -11,7 +11,7 @@ on:
   workflow_call:
     inputs:
       uv-version:
-        description: 'The uv package manager version to use. Defaults to latest'
+        description: 'The uv package manager version to use, e.g. "0.9.7" or "latest". Providing this will prefer uv over poetry; left empty, poetry is used'
         required: false
         default: ''
         type: string
@@ -105,7 +105,14 @@ jobs:
         run: |
           pip install --upgrade pip
           pip list
-          curl -LsSf https://astral.sh/uv/${{ inputs.uv-version }}/install.sh | sh
+          # astral.sh serves a pinned installer at /uv/<x.y.z>/install.sh and the
+          # newest-release installer at the unversioned /uv/install.sh.
+          if [ "${{ inputs.uv-version }}" = "latest" ]; then
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+          else
+            curl -LsSf "https://astral.sh/uv/${{ inputs.uv-version }}/install.sh" | sh
+          fi
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Save poetry cache if cache miss
         if: inputs.use-cache && inputs.uv-version == ''
