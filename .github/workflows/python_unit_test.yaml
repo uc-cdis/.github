@@ -200,8 +200,11 @@ jobs:
                 TESTS_COMMAND="poetry run pytest -vv"
               fi
             fi
-            echo "Falling back to: $TESTS_COMMAND"
-            $TESTS_COMMAND
+            echo "Running: $TESTS_COMMAND"
+            # eval, not a bare expansion: the shell does not re-parse operators such
+            # as `&&` out of a variable, so a compound command would instead be passed
+            # to the first program as arguments.
+            eval "$TESTS_COMMAND"
           fi
         env:
             # The hostname used to communicate with the PostgreSQL service container
