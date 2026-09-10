@@ -469,6 +469,7 @@ jobs:
             id: run_service_tests
             if: ${{ env.SKIP_TESTS != 'true' && inputs.SERVICE_TO_TEST && steps.prep_ci_env.outcome == 'success' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
+            timeout-minutes: 90
             run: |
               echo -e "\n\n************ Run tests ************" >> logs/gh_action_logs.txt
               mkdir output
@@ -484,6 +485,7 @@ jobs:
             id: run_tests
             if: ${{ env.SKIP_TESTS != 'true' && !inputs.SERVICE_TO_TEST && steps.prep_ci_env.outcome == 'success' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
+            timeout-minutes: 90
             run: |
               echo -e "\n\n************ Run tests ************" >> logs/gh_action_logs.txt
               mkdir output
@@ -499,6 +501,7 @@ jobs:
             id: rerun_failed_tests
             if: ${{ env.SKIP_TESTS != 'true' && env.FAILED_TEST_SUITES != '' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
+            timeout-minutes: 90
             env:
               RERUNNING_TESTS: true
             run: |
