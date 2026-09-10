@@ -44,10 +44,21 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
+      # job.workflow_ref is this file's own `owner/repo/path@ref`, so the linter config
+      # below tracks the ref the caller pinned rather than the default branch. Left
+      # unset, checkout of another repository follows that repository's
+      # default branch, so a caller on @some-branch would lint against master's config.
+      - name: Resolve the ref this workflow was called at
+        id: workflow-ref
+        run: echo "ref=${WORKFLOW_REF##*@}" >> "$GITHUB_OUTPUT"
+        env:
+          WORKFLOW_REF: ${{ job.workflow_ref }}
+
       - name: Checkout repo containing central linter config
         uses: actions/checkout@v6
         with:
           repository: uc-cdis/.github
+          ref: ${{ steps.workflow-ref.outputs.ref }}
           persist-credentials: false
           path: uc-cdis/.github
           sparse-checkout: |
