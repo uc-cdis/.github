@@ -474,7 +474,14 @@ jobs:
               echo -e "\n\n************ Run tests ************" >> logs/gh_action_logs.txt
               mkdir output
               poetry run pytest --video=retain-on-failure -n auto -m "${{ inputs.SERVICE_TO_TEST }} and not wip" --alluredir allure-results --no-header --dist loadscope ${{ env.TEST_LABEL }} -o faulthandler_timeout=300 >> logs/gh_action_logs.txt 2>&1
-              if [ $? -ne 0 ]; then
+              EXIT_CODE=$?
+              if [ $EXIT_CODE -eq 5 ]; then
+                echo "::warning title=Pytest Notice::No tests matched the current service filters. Skipping test execution."
+
+                echo "### ⚠️ No Tests Executed" >> $GITHUB_STEP_SUMMARY
+                echo "The filter combination \`${{ inputs.SERVICE_TO_TEST }} and not wip\` alongside keyword \`${{ env.TEST_LABEL }}\` returned 0 tests." >> $GITHUB_STEP_SUMMARY
+                echo "This run exited gracefully with no operations performed." >> $GITHUB_STEP_SUMMARY
+              elif [ $EXIT_CODE -ne 0 ]; then
                 echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
               fi
               if [ -n "$FAILED_TEST_SUITES" ]; then
