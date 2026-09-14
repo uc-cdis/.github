@@ -58,6 +58,11 @@ on:
         required: false
         type: string
         default: ""
+      KIND_INTEGRATION_TESTS:
+        description: 'Determine if the workflow is for kind integration tests'
+        required: false
+        type: string
+        default: "false"
     secrets:
       CI_TEST_ORCID_USERID:
         required: true
@@ -129,6 +134,7 @@ jobs:
           TEST_LABELS: ${{ inputs.TEST_LABELS }}
           CI_ENV: ${{ inputs.CI_ENV }}
           SKIP_TESTS: 'false'
+          KIND_INTEGRATION_TESTS: ${{ inputs.KIND_INTEGRATION_TESTS }}
 
         steps:
           - name: Set Start Time
@@ -475,7 +481,7 @@ jobs:
               mkdir output
               poetry run pytest --video=retain-on-failure -n auto -m "${{ inputs.SERVICE_TO_TEST }} and not wip" --alluredir allure-results --no-header --dist loadscope ${{ env.TEST_LABEL }} -o faulthandler_timeout=300 >> logs/gh_action_logs.txt 2>&1
               EXIT_CODE=$?
-              if [ $EXIT_CODE -eq 5 ]; then
+              if [[ "$EXIT_CODE" -eq 5 && "$KIND_INTEGRATION_TESTS" == "true" ]]; then
                 echo "::warning title=Pytest Notice::No tests matched the current service filters. Skipping test execution."
 
                 echo "### ⚠️ No Tests Executed" >> $GITHUB_STEP_SUMMARY
