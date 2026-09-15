@@ -698,6 +698,29 @@ jobs:
               payload-file-path: "./${{ inputs.WORKING_DIR }}/test_analysis_slack_report.json"
               payload-templated: true
 
+          - name: Generate markdown report for test analysis
+            id: generate_md_report_test_analysis
+            if: ${{ env.SKIP_TESTS != 'true' && github.event_name == 'pull_request' && inputs.EXTERNAL_TO_CTDS != 'true' && steps.analyze_failures_using_ai_agent.outcome == 'success' }}
+            continue-on-error: true
+            run: |
+              if [ ! -f output/report_test_analysis.md ]; then
+                touch output/report_test_analysis.md
+              fi
+              if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
+                echo -e "\nPlease find the detailed test analysis report [here](https://allure.ci.planx-pla.net/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt)" >> output/report_test_analysis.md
+              else
+                echo -e "\nPlease find the detailed test analysis report [here](https://allure.ci.planx-pla.net/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt)" >> output/report_test_analysis.md
+              fi
+          - name: Render report to the PR
+            id: publish_md_report_test_analysis
+            if: ${{ env.SKIP_TESTS != 'true' && github.event_name == 'pull_request' && steps.generate_md_report_test_analysis.outcome == 'success' }}
+            continue-on-error: true  # if this fails, we still need to run clean-up steps
+            run: |
+              sed -i "1i## ${{ github.workflow }}" output/test_analysis_slack_report.md
+              gh pr comment $PR_NUM --body-file output/test_analysis_slack_report.md -R $REPO_FN
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
           - name: Mark workflow as failed for unsuccessful test runs
             if: ${{ env.SKIP_TESTS != 'true' && steps.run_service_tests.outcome != 'success' && steps.run_tests.outcome != 'success' && steps.rerun_failed_tests.outcome != 'success' }}
             run: echo "Test run was unsuccessful, marking workflow as failed" && exit 1
