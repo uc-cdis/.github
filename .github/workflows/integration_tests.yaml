@@ -704,6 +704,7 @@ jobs:
             continue-on-error: true
             run: |
               if [ ! -f output/report_test_analysis.md ]; then
+                mkdir output
                 touch output/report_test_analysis.md
               fi
               if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
