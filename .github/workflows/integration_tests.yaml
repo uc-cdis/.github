@@ -711,6 +711,7 @@ jobs:
               else
                 echo -e "\nPlease find the detailed test analysis report [here](https://allure.ci.planx-pla.net/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt)" >> output/report_test_analysis.md
               fi
+
           - name: Render report to the PR
             id: publish_md_report_test_analysis
             if: ${{ env.SKIP_TESTS != 'true' && github.event_name == 'pull_request' && steps.generate_md_report_test_analysis.outcome == 'success' }}
