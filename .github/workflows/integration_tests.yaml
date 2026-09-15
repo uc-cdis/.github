@@ -703,10 +703,7 @@ jobs:
             if: ${{ env.SKIP_TESTS != 'true' && github.event_name == 'pull_request' && inputs.EXTERNAL_TO_CTDS != 'true' && steps.analyze_failures_using_ai_agent.outcome == 'success' }}
             continue-on-error: true
             run: |
-              if [ ! -f output/report_test_analysis.md ]; then
-                mkdir output
-                touch output/report_test_analysis.md
-              fi
+              touch output/report_test_analysis.md
               if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
                 echo -e "\nPlease find the detailed test analysis report [here](https://allure.ci.planx-pla.net/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt)" >> output/report_test_analysis.md
               else
