@@ -487,6 +487,7 @@ jobs:
                 echo "### ⚠️ No Tests Executed" >> $GITHUB_STEP_SUMMARY
                 echo "The filter combination \`${{ inputs.SERVICE_TO_TEST }} and not wip\` alongside keyword \`${{ env.TEST_LABEL }}\` returned 0 tests." >> $GITHUB_STEP_SUMMARY
                 echo "This run exited gracefully with no operations performed." >> $GITHUB_STEP_SUMMARY
+                exit 0
               elif [ $EXIT_CODE -ne 0 ]; then
                 echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
               fi
