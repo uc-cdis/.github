@@ -156,10 +156,16 @@ jobs:
           echo "Exporting Quay digest: sha256:${digest}"
           touch "${{ runner.temp }}/digests/${digest}"
 
+      # The artifact name must identify the image, not just the platform. A
+      # caller that builds several images (frontend, api, agent) calls this
+      # workflow once per image inside a single run, and artifacts are scoped to
+      # the run -- so a platform-only name means every one of those jobs writes
+      # to the same two artifact names and, with overwrite: true, clobbers the
+      # others.
       - name: Upload digest artifact
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ env.PLATFORM_PAIR }}
+          name: digests-${{ env.REPO_NAME }}-${{ env.PLATFORM_PAIR }}
           path: ${{ runner.temp }}/digests/*
           overwrite: true
           if-no-files-found: error
@@ -170,15 +176,13 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - build
+    env:
+      # Number of entries in the build matrix above. Kept here so the guard in
+      # "List downloaded digests" can tell a complete set of per-arch digests
+      # from a partial one.
+      EXPECTED_DIGESTS: 2
 
     steps:
-      - name: Download digest artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: ${{ runner.temp }}/digests
-          pattern: digests-*
-          merge-multiple: true
-
       - name: Set image variables
         shell: bash
         run: |
@@ -205,6 +209,17 @@ jobs:
 
           echo "IMAGE_TAG=${image_tag}" >> "$GITHUB_ENV"
           echo "REPO_NAME=${repo_name}" >> "$GITHUB_ENV"
+
+      # Scoped to this image's own artifacts. A bare digests-* pattern also
+      # matches the digests uploaded by sibling calls to this workflow in the
+      # same run, which is how this job ended up waiting on a digest that
+      # belongs to a different repository and was never pushed to this one.
+      - name: Download digest artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-${{ env.REPO_NAME }}-*
+          merge-multiple: true
 
       - name: Login to Quay.io
         uses: docker/login-action@v3
@@ -239,6 +254,15 @@ jobs:
 
           if [[ "${digest_count}" -eq 0 ]]; then
             echo "ERROR: no digest artifacts were downloaded"
+            exit 1
+          fi
+
+          # One digest per build matrix entry. Fewer means an arch did not
+          # upload, and publishing the manifest list anyway would quietly ship a
+          # single-arch image under a multi-arch tag.
+          if [[ "${digest_count}" -ne "${EXPECTED_DIGESTS}" ]]; then
+            echo "ERROR: expected ${EXPECTED_DIGESTS} digest artifact(s), found ${digest_count}"
+            echo "Refusing to publish an incomplete manifest list."
             exit 1
           fi
 
