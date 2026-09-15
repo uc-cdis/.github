@@ -715,7 +715,7 @@ jobs:
             if: ${{ env.SKIP_TESTS != 'true' && github.event_name == 'pull_request' && steps.generate_md_report_test_analysis.outcome == 'success' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
             run: |
-              sed -i "1i## ${{ github.workflow }}" output/report_test_analysis.md
+              sed -i "1i## Test Analysis" output/report_test_analysis.md
               gh pr comment $PR_NUM --body-file output/report_test_analysis.md -R $REPO_FN
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
