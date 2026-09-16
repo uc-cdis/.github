@@ -58,6 +58,11 @@ on:
         required: false
         type: string
         default: ""
+      KIND_INTEGRATION_TESTS:
+        description: 'Determine if the workflow is for kind integration tests'
+        required: false
+        type: string
+        default: "false"
     secrets:
       CI_TEST_ORCID_USERID:
         required: true
@@ -129,6 +134,7 @@ jobs:
           TEST_LABELS: ${{ inputs.TEST_LABELS }}
           CI_ENV: ${{ inputs.CI_ENV }}
           SKIP_TESTS: 'false'
+          KIND_INTEGRATION_TESTS: ${{ inputs.KIND_INTEGRATION_TESTS }}
 
         steps:
           - name: Set Start Time
@@ -474,7 +480,15 @@ jobs:
               echo -e "\n\n************ Run tests ************" >> logs/gh_action_logs.txt
               mkdir output
               poetry run pytest --video=retain-on-failure -n auto -m "${{ inputs.SERVICE_TO_TEST }} and not wip" --alluredir allure-results --no-header --dist loadscope ${{ env.TEST_LABEL }} -o faulthandler_timeout=300 >> logs/gh_action_logs.txt 2>&1
-              if [ $? -ne 0 ]; then
+              EXIT_CODE=$?
+              if [[ "$EXIT_CODE" -eq 5 && "$KIND_INTEGRATION_TESTS" == "true" ]]; then
+                echo "::warning title=Pytest Notice::No tests matched the current service filters. Skipping test execution."
+
+                echo "### ⚠️ No Tests Executed"
+                echo "The filter combination \`${{ inputs.SERVICE_TO_TEST }} and not wip\` alongside keyword \`${{ env.TEST_LABEL }}\` returned 0 tests."
+                echo "This run exited gracefully with no operations performed."
+                exit 0
+              elif [ $EXIT_CODE -ne 0 ]; then
                 echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
               fi
               if [ -n "$FAILED_TEST_SUITES" ]; then
