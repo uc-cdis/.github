@@ -142,10 +142,16 @@ jobs:
             if: ${{ github.event.pull_request.head.repo.fork == true && github.event_name == 'pull_request' }}
             working-directory: ${{ github.workspace }}
             run:  |
-              echo "Current repo: ${{ github.event.repository.full_name }}"
-              echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
-              echo "::error::External PRs cannot run integration tests"
-              exit 1
+              echo "Current repo: ${{ github.event.repository.full_name }} - Owner: ${{ github.repository_owner }}"
+              echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }} - Owner: ${{ github.event.pull_request.head.repo.owner.login }}"
+
+              if [[ "${{ github.repository_owner }}" == "uc-cdis" && "${{ github.event.pull_request.head.repo.owner.login }}" != "uc-cdis" ]]; then
+
+                  echo "::error::External PRs cannot run integration tests"
+                  exit 1
+              else
+                  echo "PR from fork is NOT a uc-cdis external PR: proceeding"
+              fi
 
           # Skip integration tests when the following PR labels are present:
           # not-ready-for-ci / decommission-environment
@@ -193,7 +199,7 @@ jobs:
             uses: actions/checkout@v6
             with:
               repository: uc-cdis/gen3-gitops
-              ref: 'master'
+              ref: ${{ env.REPO_FN == 'uc-cdis/gen3-gitops' && env.BRANCH || 'master' }}
               path: gen3-gitops-ci
 
           - name: Get commit time
@@ -204,34 +210,35 @@ jobs:
 
           - name: Set up Python
             if: ${{ env.SKIP_TESTS != 'true' }}
-            uses: actions/setup-python@v5
+            uses: actions/setup-python@v6
             with:
               python-version: '3.13'
 
           - name: Set up Go
             if: ${{ env.SKIP_TESTS != 'true' }}
-            uses: actions/setup-go@v5
+            uses: actions/setup-go@v6
             with:
               go-version: '1.17'
+              cache: false
 
           # allure report generation needs node
           - name: Set up node
             if: ${{ env.SKIP_TESTS != 'true' }}
-            uses: actions/setup-node@v4
+            uses: actions/setup-node@v6
             with:
-              node-version: 20
+              node-version: 24
 
           # Setup kubectl
           - name: Set Up kubectl
             if: ${{ env.SKIP_TESTS != 'true' }}
-            uses: azure/setup-kubectl@v4
+            uses: azure/setup-kubectl@v5
             with:
               version: latest
 
           # Setup helm
           - name: Set Up Helm
             if: ${{ env.SKIP_TESTS != 'true' }}
-            uses: azure/setup-helm@v4.3.0
+            uses: azure/setup-helm@v5.0.0
             with:
               version: latest
 
@@ -279,7 +286,7 @@ jobs:
           # Configure credentials to access cluster.
           - name: Configure AWS Credentials
             if: ${{ env.SKIP_TESTS != 'true' && inputs.EXTERNAL_TO_CTDS != 'true' }}
-            uses: aws-actions/configure-aws-credentials@v3
+            uses: aws-actions/configure-aws-credentials@v6
             with:
                 role-to-assume: arn:aws:iam::707767160287:role/github-action-role
                 role-session-name: GitHub_to_AWS_via_FederatedOIDC
@@ -338,7 +345,7 @@ jobs:
                 --jq '[.labels[] | select(.name | test("^nightly-build(-ff)?$")) | .name]')
               NAMESPACE_LABEL=$(jq -r '.[0] // ""' <<< "$matches")
               echo "NAMESPACE_LABEL=$NAMESPACE_LABEL" >> $GITHUB_ENV
-              
+
           # Create PR namespace and PR hostname env var
           - name: Create namespace and env vars
             if: ${{ env.SKIP_TESTS != 'true' }}
@@ -462,36 +469,45 @@ jobs:
             id: run_service_tests
             if: ${{ env.SKIP_TESTS != 'true' && inputs.SERVICE_TO_TEST && steps.prep_ci_env.outcome == 'success' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
+            timeout-minutes: 90
             run: |
               echo -e "\n\n************ Run tests ************" >> logs/gh_action_logs.txt
               mkdir output
-              uv run pytest --video=retain-on-failure -n logical -m "${{ inputs.SERVICE_TO_TEST }} and not wip" --alluredir allure-results --no-header --dist loadscope ${{ env.TEST_LABEL }} >> logs/gh_action_logs.txt 2>&1
+              poetry run pytest --video=retain-on-failure -n auto -m "${{ inputs.SERVICE_TO_TEST }} and not wip" --alluredir allure-results --no-header --dist loadscope ${{ env.TEST_LABEL }} -o faulthandler_timeout=300 >> logs/gh_action_logs.txt 2>&1
               if [ $? -ne 0 ]; then
                 echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
+              fi
+              if [ -n "$FAILED_TEST_SUITES" ]; then
+                echo "Failed test suites: $FAILED_TEST_SUITES"
               fi
 
           - name: Run tests
             id: run_tests
             if: ${{ env.SKIP_TESTS != 'true' && !inputs.SERVICE_TO_TEST && steps.prep_ci_env.outcome == 'success' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
+            timeout-minutes: 90
             run: |
               echo -e "\n\n************ Run tests ************" >> logs/gh_action_logs.txt
               mkdir output
-              uv run pytest --video=retain-on-failure -n logical -m "not wip" --alluredir allure-results --no-header --dist loadscope ${{ env.TEST_LABEL }} >> logs/gh_action_logs.txt 2>&1
+              poetry run pytest --video=retain-on-failure -n auto -m "not wip" --alluredir allure-results --no-header --dist loadscope ${{ env.TEST_LABEL }} -o faulthandler_timeout=300 >> logs/gh_action_logs.txt 2>&1
               if [ $? -ne 0 ]; then
                 echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
+              fi
+              if [ -n "$FAILED_TEST_SUITES" ]; then
+                echo "Failed test suites: $FAILED_TEST_SUITES"
               fi
 
           - name: Rerun failed tests
             id: rerun_failed_tests
             if: ${{ env.SKIP_TESTS != 'true' && env.FAILED_TEST_SUITES != '' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
+            timeout-minutes: 90
             env:
               RERUNNING_TESTS: true
             run: |
               echo -e "\n\n************ Rerunning failed tests ************" >> logs/gh_action_logs.txt 2>&1
               mv output/report.md output/report_run_before_rerun.md
-              uv run pytest --video=retain-on-failure -n logical -m "not wip" --alluredir rerun-allure-results --no-header --dist loadscope --last-failed --last-failed-no-failures=none >> logs/gh_action_logs.txt 2>&1
+              poetry run pytest --video=retain-on-failure -n auto -m "not wip" --alluredir rerun-allure-results --no-header --dist loadscope --last-failed --last-failed-no-failures=none -o faulthandler_timeout=300 >> logs/gh_action_logs.txt 2>&1
               if [ $? -ne 0 ]; then
                 echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
               fi
@@ -645,7 +661,7 @@ jobs:
             id: slack_notify
             if: ${{ env.SKIP_TESTS != 'true' && inputs.EXTERNAL_TO_CTDS != 'true' && steps.generate_slack_report.outcome == 'success' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
-            uses: slackapi/slack-github-action@v2.0.0
+            uses: slackapi/slack-github-action@v4.0.0
             with:
               method: chat.postMessage
               token: ${{ secrets.CI_SLACK_BOT_TOKEN }}
@@ -662,8 +678,10 @@ jobs:
               if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
                 DATE=$(date +%Y%m%d)
                 aws s3 cp logs/failure_analysis.txt s3://ci-allure-reports/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt >> logs/gh_action_logs.txt 2>&1
+                aws s3 cp logs/gh_action_logs.txt s3://ci-allure-reports/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM/gh_action_logs.txt >> logs/gh_action_logs.txt 2>&1
               else
                 aws s3 cp logs/failure_analysis.txt s3://ci-allure-reports/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt >> logs/gh_action_logs.txt 2>&1
+                aws s3 cp logs/gh_action_logs.txt s3://ci-allure-reports/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/gh_action_logs.txt >> logs/gh_action_logs.txt 2>&1
               fi
               if [ $? -ne 0 ]; then
                 echo "PR_ERROR_MSG=Failed to run analyze failures using ai agent step" >> $GITHUB_ENV
@@ -671,16 +689,38 @@ jobs:
             env:
               THREAD_TS: ${{ steps.slack_notify.outputs.ts }}
 
-          - name: Publish test analysis on same slack thread
-            id: publish_test_analysis
+          - name: Publish failure analysis on same slack thread
+            id: publish_failure_analysis
             if: ${{ env.SKIP_TESTS != 'true' && inputs.EXTERNAL_TO_CTDS != 'true' && steps.analyze_failures_using_ai_agent.outcome == 'success' }}
             continue-on-error: true  # if this fails, we still need to run clean-up steps
-            uses: slackapi/slack-github-action@v2.0.0
+            uses: slackapi/slack-github-action@v4.0.0
             with:
               method: chat.postMessage
               token: ${{ secrets.CI_SLACK_BOT_TOKEN }}
-              payload-file-path: "./${{ inputs.WORKING_DIR }}/test_analysis_slack_report.json"
+              payload-file-path: "./${{ inputs.WORKING_DIR }}/failure_analysis_slack_report.json"
               payload-templated: true
+
+          - name: Generate markdown report for failure analysis
+            id: generate_md_report_failure_analysis
+            if: ${{ env.SKIP_TESTS != 'true' && github.event_name == 'pull_request' && inputs.EXTERNAL_TO_CTDS != 'true' && steps.analyze_failures_using_ai_agent.outcome == 'success' }}
+            continue-on-error: true
+            run: |
+              touch output/report_failure_analysis.md
+              if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
+                echo -e "\nPlease find the detailed test analysis report [here](https://allure.ci.planx-pla.net/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt)" >> output/report_failure_analysis.md
+              else
+                echo -e "\nPlease find the detailed test analysis report [here](https://allure.ci.planx-pla.net/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt)" >> output/report_failure_analysis.md
+              fi
+
+          - name: Render report to the PR for failure analysis
+            id: publish_md_report_failure_analysis
+            if: ${{ env.SKIP_TESTS != 'true' && github.event_name == 'pull_request' && steps.generate_md_report_failure_analysis.outcome == 'success' }}
+            continue-on-error: true  # if this fails, we still need to run clean-up steps
+            run: |
+              sed -i "1i## Failure Analysis" output/report_failure_analysis.md
+              gh pr comment $PR_NUM --body-file output/report_failure_analysis.md -R $REPO_FN
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
           - name: Mark workflow as failed for unsuccessful test runs
             if: ${{ env.SKIP_TESTS != 'true' && steps.run_service_tests.outcome != 'success' && steps.run_tests.outcome != 'success' && steps.rerun_failed_tests.outcome != 'success' }}

@@ -73,7 +73,13 @@ fail-under=0
 #from-stdin=
 
 # Files or directories to be skipped. They should be base names, not paths.
-ignore=CVS,gunicorn.conf.py
+#
+# `pylint .` against a directory with no __init__.py treats it as a namespace
+# package and walks the entire subtree regardless of `recursive` below, so an
+# in-tree virtualenv gets linted along with every installed dependency. Base
+# names listed here are pruned from that walk, so the subtree is never entered.
+# uv places its virtualenv at .venv inside the project, so this must stay listed.
+ignore=CVS,gunicorn.conf.py,.venv
 
 # Add files or directories matching the regular expressions patterns to the
 # ignore-list. The regex matches against paths and can be in Posix or Windows
