@@ -168,6 +168,8 @@ jobs:
           - name: Checkout current repo
             if: ${{ env.SKIP_TESTS != 'true' }}
             uses: actions/checkout@v6
+            with:
+              ref: ${{ github.event.repository.name == 'gen3-code-vigil' && inputs.TEST_REPO_BRANCH || github.ref }}
 
           # Skip tests when there are only markdown files
           - name: Skip integration tests if PR contains only Markdown files
