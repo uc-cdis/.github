@@ -38,11 +38,10 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v6
       with:
-        python-version: 3.9
+        python-version: '3.13'
     - name: Install dependencies
       run: |
         pip install gen3users
-        pip install pyyaml==5.4
         pip install yamllint
     - name: Checkout, lint and test
       run: |
