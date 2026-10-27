@@ -53,7 +53,14 @@ jobs:
       - name: Install uv
         if: inputs.UV_VERSION != ''
         run: |
-          curl -LsSf https://astral.sh/uv/${{ inputs.UV_VERSION }}/install.sh | sh
+          # astral.sh serves a pinned installer at /uv/<x.y.z>/install.sh and the
+          # newest-release installer at the unversioned /uv/install.sh.
+          if [ "${{ inputs.UV_VERSION }}" = "latest" ]; then
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+          else
+            curl -LsSf "https://astral.sh/uv/${{ inputs.UV_VERSION }}/install.sh" | sh
+          fi
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - uses: taiki-e/install-action@v2
         if: inputs.JUST_VERSION != ''

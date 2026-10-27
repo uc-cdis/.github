@@ -11,7 +11,7 @@ on:
   workflow_call:
     inputs:
       uv-version:
-        description: 'The uv package manager version to use. Defaults to latest'
+        description: 'The uv package manager version to use, e.g. "0.9.7" or "latest". Providing this will prefer uv over poetry; left empty, poetry is used'
         required: false
         default: ''
         type: string
@@ -44,10 +44,21 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
+      # job.workflow_ref is this file's own `owner/repo/path@ref`, so the linter config
+      # below tracks the ref the caller pinned rather than the default branch. Left
+      # unset, checkout of another repository follows that repository's
+      # default branch, so a caller on @some-branch would lint against master's config.
+      - name: Resolve the ref this workflow was called at
+        id: workflow-ref
+        run: echo "ref=${WORKFLOW_REF##*@}" >> "$GITHUB_OUTPUT"
+        env:
+          WORKFLOW_REF: ${{ job.workflow_ref }}
+
       - name: Checkout repo containing central linter config
         uses: actions/checkout@v6
         with:
           repository: uc-cdis/.github
+          ref: ${{ steps.workflow-ref.outputs.ref }}
           persist-credentials: false
           path: uc-cdis/.github
           sparse-checkout: |
@@ -105,7 +116,14 @@ jobs:
         run: |
           pip install --upgrade pip
           pip list
-          curl -LsSf https://astral.sh/uv/${{ inputs.uv-version }}/install.sh | sh
+          # astral.sh serves a pinned installer at /uv/<x.y.z>/install.sh and the
+          # newest-release installer at the unversioned /uv/install.sh.
+          if [ "${{ inputs.uv-version }}" = "latest" ]; then
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+          else
+            curl -LsSf "https://astral.sh/uv/${{ inputs.uv-version }}/install.sh" | sh
+          fi
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Save poetry cache if cache miss
         if: inputs.use-cache && inputs.uv-version == ''
