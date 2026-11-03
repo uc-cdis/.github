@@ -483,21 +483,26 @@ jobs:
                 echo "Failed test suites: $FAILED_TEST_SUITES"
               fi
 
+
           - name: Run tests
             id: run_tests
             if: ${{ env.SKIP_TESTS != 'true' && !inputs.SERVICE_TO_TEST && steps.prep_ci_env.outcome == 'success' }}
-            continue-on-error: true  # if this fails, we still need to run clean-up steps
+            continue-on-error: true # If this fails, still run cleanup steps
             timeout-minutes: 120
             run: |
+              mkdir -p logs output
               echo -e "\n\n************ Run tests ************" >> logs/gh_action_logs.txt
-              mkdir output
-              poetry run pytest --video=retain-on-failure -n logical -m "not wip" --alluredir allure-results --no-header --dist loadscope -o faulthandler_timeout=240 ${{ env.TEST_LABEL }} >> logs/gh_action_logs.txt 2>&1
-              if [ $? -ne 0 ]; then
-                echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
+              PYTHONUNBUFFERED=1 poetry run pytest --video=retain-on-failure -n logical -m "not wip" --alluredir allure-results --no-header --dist loadscope -o faulthandler_timeout=240 ${{ env.TEST_LABEL }} -vv 2>&1 | tee -a logs/gh_action_logs.txt
+              pytest_exit_code=${PIPESTATUS[0]}
+              if [ "$pytest_exit_code" -ne 0 ]; then
+                echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> "$GITHUB_ENV"
               fi
+
               if [ -n "$FAILED_TEST_SUITES" ]; then
                 echo "Failed test suites: $FAILED_TEST_SUITES"
               fi
+              exit "$pytest_exit_code"
+
 
           - name: Rerun failed tests
             id: rerun_failed_tests
@@ -509,7 +514,7 @@ jobs:
             run: |
               echo -e "\n\n************ Rerunning failed tests ************" >> logs/gh_action_logs.txt 2>&1
               mv output/report.md output/report_run_before_rerun.md
-              poetry run pytest --video=retain-on-failure -n logical -m "not wip" --alluredir rerun-allure-results --no-header --dist loadscope --last-failed --last-failed-no-failures=none -o faulthandler_timeout=240 >> logs/gh_action_logs.txt 2>&1
+              poetry run pytest --video=retain-on-failure -n logical -m "not wip" --alluredir rerun-allure-results --no-header --dist loadscope --last-failed --last-failed-no-failures=none -o faulthandler_timeout=240 -vv 2>&1 | tee -a logs/gh_action_logs.txt
               if [ $? -ne 0 ]; then
                 echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
               fi
