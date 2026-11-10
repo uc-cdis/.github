@@ -101,8 +101,7 @@ jobs:
           echo "IMAGE_TAG=${image_tag}" >> "$GITHUB_ENV"
           echo "REPO_NAME=${repo_name}" >> "$GITHUB_ENV"
 
-          # One gha cache scope per image and platform: with the shared default
-          # scope, the amd64 and arm64 jobs overwrite each other's cache.
+          # Per image and platform, or the amd64 and arm64 jobs overwrite each other's cache
           dockerfile="${{ inputs.DOCKERFILE_LOCATION }}"
           dockerfile="${dockerfile#./}"
           echo "CACHE_SCOPE=${repo_name}-${dockerfile//\//-}-${PLATFORM_PAIR}" >> "$GITHUB_ENV"
