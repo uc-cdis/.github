@@ -101,6 +101,12 @@ jobs:
           echo "IMAGE_TAG=${image_tag}" >> "$GITHUB_ENV"
           echo "REPO_NAME=${repo_name}" >> "$GITHUB_ENV"
 
+          # One gha cache scope per image and platform: with the shared default
+          # scope, the amd64 and arm64 jobs overwrite each other's cache.
+          dockerfile="${{ inputs.DOCKERFILE_LOCATION }}"
+          dockerfile="${dockerfile#./}"
+          echo "CACHE_SCOPE=${repo_name}-${dockerfile//\//-}-${PLATFORM_PAIR}" >> "$GITHUB_ENV"
+
           # Important:
           # Platform images are pushed by digest to Quay only.
           # The finished multi-arch Quay image is copied to ECR later.
@@ -143,8 +149,8 @@ jobs:
           context: ${{ inputs.DOCKERFILE_BUILD_CONTEXT }}
           file: ${{ inputs.DOCKERFILE_LOCATION }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ env.CACHE_SCOPE }}
+          cache-to: type=gha,mode=max,scope=${{ env.CACHE_SCOPE }}
           platforms: ${{ matrix.platform }}
           outputs: type=image,name=${{ env.IMAGE_REPOS }},push-by-digest=true,name-canonical=true,push=true
 
