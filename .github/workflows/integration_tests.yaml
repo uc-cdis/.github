@@ -487,6 +487,7 @@ jobs:
               if [ -n "$FAILED_TEST_SUITES" ]; then
                 echo "Failed test suites: $FAILED_TEST_SUITES"
               fi
+              exit $EXIT_CODE
 
           - name: Run tests
             id: run_tests
@@ -508,6 +509,7 @@ jobs:
               if [ -n "$FAILED_TEST_SUITES" ]; then
                 echo "Failed test suites: $FAILED_TEST_SUITES"
               fi
+              exit $EXIT_CODE
 
           - name: Rerun failed tests
             id: rerun_failed_tests
@@ -528,6 +530,7 @@ jobs:
                   echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
                 fi
               fi
+              exit $EXIT_CODE
 
           # - name: Helm uninstall environment
           #   id: helm_uninstall_env
