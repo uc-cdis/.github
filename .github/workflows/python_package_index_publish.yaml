@@ -15,7 +15,7 @@ name: "PyPI Poetry Publish"
 #      name: PyPI Poetry Publish
 #      uses: uc-cdis/.github/.github/workflows/python_package_index_publish.yaml@master
 #      with:
-#          PYTHON_VERSION: '3.9'
+#          PYTHON_VERSION: '3.13'
 #          DO_TEST_PUBLISH_FIRST: true
 #      secrets:
 #        PYPI_TEST_API_TOKEN: ${{ secrets.PYPI_TEST_API_TOKEN }}
@@ -27,7 +27,7 @@ on:
       PYTHON_VERSION:
         description: 'The Python version to use'
         required: false
-        default: '3.9'
+        default: '3.13'
         type: string
       DO_TEST_PUBLISH_FIRST:
         description: 'Whether or not to test publishing to Test PyPI first'

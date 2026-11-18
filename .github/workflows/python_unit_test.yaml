@@ -24,9 +24,9 @@ on:
         default: ''
         type: string
       python-version:
-        description: 'The Python version to use and defaults to latest'
+        description: 'The Python version to use. Defaults to 3.13'
         required: false
-        default: '3.9'
+        default: '3.13'
         type: string
       poetry-version:
         description: 'The Poetry package manager version to use. Defaults to latest'
