@@ -479,7 +479,7 @@ jobs:
               EXIT_CODE=${EXIT_CODE:-0}
               if [ $EXIT_CODE -ne 0 ]; then
                 if [[ "$EXIT_CODE" -eq 5 ]]; then
-                  echo "PR_ERROR_MSG=### ⚠️ No Tests Executed. The filter combination \`${{ inputs.SERVICE_TO_TEST }} and not wip\` alongside keyword \`${{ env.TEST_LABEL }}\` returned 0 tests." >> $GITHUB_ENV
+                  echo "PR_ERROR_MSG=### ⚠️ No Tests Executed. The filter combination '${{ inputs.SERVICE_TO_TEST }} and not wip' alongside keyword '${{ env.TEST_LABEL }}' returned 0 tests." >> $GITHUB_ENV
                 else
                   echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
                 fi
