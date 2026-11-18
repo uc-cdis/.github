@@ -523,12 +523,8 @@ jobs:
               mv output/report.md output/report_run_before_rerun.md
               poetry run pytest --video=retain-on-failure -n logical -m "not wip" --alluredir rerun-allure-results --no-header --dist loadscope --last-failed --last-failed-no-failures=none -o faulthandler_timeout=240 >> logs/gh_action_logs.txt 2>&1 || EXIT_CODE=$?
               EXIT_CODE=${EXIT_CODE:-0}
-              if [ $EXIT_CODE -ne 0 ]; then
-                if [[ "$EXIT_CODE" -eq 5 ]]; then
-                  echo "PR_ERROR_MSG=### ⚠️ No Tests Executed. Please check the test labels are correct." >> $GITHUB_ENV
-                else
-                  echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
-                fi
+              if [[ $EXIT_CODE -ne 0 && $EXIT_CODE -ne 5 ]]; then
+                echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
               fi
               exit $EXIT_CODE
 
