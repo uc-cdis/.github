@@ -477,6 +477,7 @@ jobs:
               mkdir output
               poetry run pytest --video=retain-on-failure -n logical -m "${{ inputs.SERVICE_TO_TEST }} and not wip" --alluredir allure-results --no-header --dist loadscope -o faulthandler_timeout=240 ${{ env.TEST_LABEL }} >> logs/gh_action_logs.txt 2>&1
               EXIT_CODE=$?
+              echo $EXIT_CODE
               if [ $EXIT_CODE -ne 0 ]; then
                 if [[ "$EXIT_CODE" -eq 5 ]]; then
                   echo "PR_ERROR_MSG=### ⚠️ No Tests Executed. The filter combination \`${{ inputs.SERVICE_TO_TEST }} and not wip\` alongside keyword \`${{ env.TEST_LABEL }}\` returned 0 tests." >> $GITHUB_ENV
