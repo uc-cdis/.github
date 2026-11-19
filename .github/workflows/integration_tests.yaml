@@ -475,13 +475,19 @@ jobs:
             run: |
               echo -e "\n\n************ Run tests ************" >> logs/gh_action_logs.txt
               mkdir output
-              poetry run pytest --video=retain-on-failure -n logical -m "${{ inputs.SERVICE_TO_TEST }} and not wip" --alluredir allure-results --no-header --dist loadscope -o faulthandler_timeout=240 ${{ env.TEST_LABEL }} >> logs/gh_action_logs.txt 2>&1
-              if [ $? -ne 0 ]; then
-                echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
+              poetry run pytest --video=retain-on-failure -n logical -m "${{ inputs.SERVICE_TO_TEST }} and not wip" --alluredir allure-results --no-header --dist loadscope -o faulthandler_timeout=240 ${{ env.TEST_LABEL }} >> logs/gh_action_logs.txt 2>&1 || EXIT_CODE=$?
+              EXIT_CODE=${EXIT_CODE:-0}
+              if [ $EXIT_CODE -ne 0 ]; then
+                if [[ "$EXIT_CODE" -eq 5 ]]; then
+                  echo "PR_ERROR_MSG=### ⚠️ No Tests Executed. The filter combination '${{ inputs.SERVICE_TO_TEST }} and not wip' alongside keyword '${{ env.TEST_LABEL }}' returned 0 tests." >> $GITHUB_ENV
+                else
+                  echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
+                fi
               fi
               if [ -n "$FAILED_TEST_SUITES" ]; then
                 echo "Failed test suites: $FAILED_TEST_SUITES"
               fi
+              exit $EXIT_CODE
 
           - name: Run tests
             id: run_tests
@@ -491,13 +497,19 @@ jobs:
             run: |
               echo -e "\n\n************ Run tests ************" >> logs/gh_action_logs.txt
               mkdir output
-              poetry run pytest --video=retain-on-failure -n logical -m "not wip" --alluredir allure-results --no-header --dist loadscope -o faulthandler_timeout=240 ${{ env.TEST_LABEL }} >> logs/gh_action_logs.txt 2>&1
-              if [ $? -ne 0 ]; then
-                echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
+              poetry run pytest --video=retain-on-failure -n logical -m "not wip" --alluredir allure-results --no-header --dist loadscope -o faulthandler_timeout=240 ${{ env.TEST_LABEL }} >> logs/gh_action_logs.txt 2>&1 || EXIT_CODE=$?
+              EXIT_CODE=${EXIT_CODE:-0}
+              if [ $EXIT_CODE -ne 0 ]; then
+                if [[ "$EXIT_CODE" -eq 5 ]]; then
+                  echo "PR_ERROR_MSG=### ⚠️ No Tests Executed. Please check the test labels are correct." >> $GITHUB_ENV
+                else
+                  echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
+                fi
               fi
               if [ -n "$FAILED_TEST_SUITES" ]; then
                 echo "Failed test suites: $FAILED_TEST_SUITES"
               fi
+              exit $EXIT_CODE
 
           - name: Rerun failed tests
             id: rerun_failed_tests
@@ -509,10 +521,12 @@ jobs:
             run: |
               echo -e "\n\n************ Rerunning failed tests ************" >> logs/gh_action_logs.txt 2>&1
               mv output/report.md output/report_run_before_rerun.md
-              poetry run pytest --video=retain-on-failure -n logical -m "not wip" --alluredir rerun-allure-results --no-header --dist loadscope --last-failed --last-failed-no-failures=none -o faulthandler_timeout=240 >> logs/gh_action_logs.txt 2>&1
-              if [ $? -ne 0 ]; then
+              poetry run pytest --video=retain-on-failure -n logical -m "not wip" --alluredir rerun-allure-results --no-header --dist loadscope --last-failed --last-failed-no-failures=none -o faulthandler_timeout=240 >> logs/gh_action_logs.txt 2>&1 || EXIT_CODE=$?
+              EXIT_CODE=${EXIT_CODE:-0}
+              if [[ $EXIT_CODE -ne 0 && $EXIT_CODE -ne 5 ]]; then
                 echo "PR_ERROR_MSG=Test(s) failures encountered in PR" >> $GITHUB_ENV
               fi
+              exit $EXIT_CODE
 
           # - name: Helm uninstall environment
           #   id: helm_uninstall_env
@@ -601,7 +615,7 @@ jobs:
 
           - name: Generate markdown report
             id: generate_md_report
-            if: ${{ env.SKIP_TESTS != 'true' && (steps.upload_allure_report.outcome == 'success' || steps.upload_gh_action_logs.outcome == 'success') }}
+            if: ${{ env.SKIP_TESTS != 'true' }}
             continue-on-error: true
             # It is possible for env is prepped but tests error out, the pod logs will help in debugging env issues
             run: |
@@ -634,14 +648,6 @@ jobs:
                   echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/gh_action_logs.txt)" >> output/report.md
                 fi
               fi
-              # if [ "${{ steps.upload_analyze_failure_file_logs.outcome }}" == "success" ]; then
-              #   if [[ "$IS_NIGHTLY_RUN" == "true" ]]; then
-              #     DATE=$(date +%Y%m%d)
-              #     echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/nightly-run-$CI_ENV/$DATE/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt)" >> output/report.md
-              #   else
-              #     echo -e "\nPlease find the Github Action logs [here](https://allure.ci.planx-pla.net/$REPO/$PR_NUM/$RUN_NUM/$ATTEMPT_NUM/failure_analysis.txt)" >> output/report.md
-              #   fi
-              # fi
 
           - name: Render report to the PR
             id: publish_md_report
